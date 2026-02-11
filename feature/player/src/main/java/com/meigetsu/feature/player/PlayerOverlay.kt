@@ -2,6 +2,7 @@ package com.meigetsu.feature.player
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -20,6 +21,8 @@ fun PlayerOverlay(
     onDoubleTapLeft: () -> Unit,
     onDoubleTapRight: () -> Unit,
     onBackClick: () -> Unit,
+    onVolumeChange: (Float) -> Unit,
+    onBrightnessChange: (Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isVisible by remember { mutableStateOf(true) }
@@ -36,6 +39,15 @@ fun PlayerOverlay(
                         else onDoubleTapRight()
                     }
                 )
+            }
+            .pointerInput(Unit) {
+                detectVerticalDragGestures { change, dragAmount ->
+                    if (change.position.x < size.width / 2) {
+                        onBrightnessChange(-dragAmount / size.height)
+                    } else {
+                        onVolumeChange(-dragAmount / size.height)
+                    }
+                }
             }
     ) {
         if (isVisible) {

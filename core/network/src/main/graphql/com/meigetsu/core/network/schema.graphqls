@@ -1,16 +1,27 @@
 type Query {
   Page(page: Int, perPage: Int): Page
   Media(id: Int, type: MediaType): Media
+  Character(id: Int): Character
 }
 
 type Page {
+  pageInfo: PageInfo
   media(type: MediaType, sort: [MediaSort], search: String): [Media]
+  characters(search: String): [Character]
+}
+
+type PageInfo {
+  total: Int
+  perPage: Int
+  currentPage: Int
+  lastPage: Int
+  hasNextPage: Boolean
 }
 
 type Media {
   id: Int!
   title: MediaTitle
-  description: String
+  description(asHtml: Boolean): String
   coverImage: MediaCoverImage
   bannerImage: String
   averageScore: Int
@@ -22,6 +33,8 @@ type Media {
   genres: [String]
   season: MediaSeason
   seasonYear: Int
+  characters(role: CharacterRole, sort: [CharacterSort]): CharacterConnection
+  recommendations(sort: [RecommendationSort], page: Int, perPage: Int): RecommendationConnection
 }
 
 type MediaTitle {
@@ -35,6 +48,43 @@ type MediaCoverImage {
   large: String
   medium: String
   color: String
+}
+
+type Character {
+  id: Int!
+  name: CharacterName
+  image: CharacterImage
+  description(asHtml: Boolean): String
+  media(sort: [MediaSort], type: MediaType): MediaConnection
+}
+
+type CharacterName {
+  full: String
+  native: String
+  alternative: [String]
+}
+
+type CharacterImage {
+  large: String
+  medium: String
+}
+
+type CharacterConnection {
+  nodes: [Character]
+}
+
+type MediaConnection {
+  nodes: [Media]
+}
+
+type RecommendationConnection {
+  nodes: [Recommendation]
+}
+
+type Recommendation {
+  id: Int
+  media: Media
+  mediaRecommendation: Media
 }
 
 enum MediaType {
@@ -104,4 +154,24 @@ enum MediaSeason {
   SPRING
   SUMMER
   FALL
+}
+
+enum CharacterRole {
+  MAIN
+  SUPPORTING
+  BACKGROUND
+}
+
+enum CharacterSort {
+  ID
+  ID_DESC
+  ROLE
+  ROLE_DESC
+}
+
+enum RecommendationSort {
+  ID
+  ID_DESC
+  RATING
+  RATING_DESC
 }

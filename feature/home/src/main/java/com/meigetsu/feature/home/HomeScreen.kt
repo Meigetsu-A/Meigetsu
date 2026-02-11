@@ -1,6 +1,7 @@
 package com.meigetsu.feature.home
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
@@ -18,11 +19,35 @@ fun HomeScreen(
 ) {
     val trendingAnime by viewModel.trendingAnime.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize().padding(16.dp)) {
-        Text(text = "Trending Now", style = MaterialTheme.typography.headlineSmall)
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        item {
+            HomeSection(
+                title = "Trending Now",
+                resource = trendingAnime,
+                onMediaClick = onMediaClick
+            )
+        }
+        item {
+            HomeSection(
+                title = "Popular Anime",
+                resource = trendingAnime, // Reuse for now or add new call
+                onMediaClick = onMediaClick
+            )
+        }
+    }
+}
+
+@Composable
+fun HomeSection(
+    title: String,
+    resource: Resource<List<com.meigetsu.core.model.Anime>>,
+    onMediaClick: (String) -> Unit
+) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(text = title, style = MaterialTheme.typography.titleLarge)
         Spacer(modifier = Modifier.height(8.dp))
 
-        when (val result = trendingAnime) {
+        when (resource) {
             is Resource.Loading -> {
                 LazyRow {
                     items(3) { LoadingSkeleton(Modifier.width(140.dp).padding(8.dp)) }
@@ -30,7 +55,7 @@ fun HomeScreen(
             }
             is Resource.Success -> {
                 LazyRow {
-                    items(result.data ?: emptyList()) { anime ->
+                    items(resource.data ?: emptyList()) { anime ->
                         MediaCard(
                             title = anime.title,
                             imageUrl = anime.coverImage,
@@ -41,7 +66,7 @@ fun HomeScreen(
                 }
             }
             is Resource.Error -> {
-                Text(text = result.message ?: "Error")
+                Text(text = resource.message ?: "Error", color = MaterialTheme.colorScheme.error)
             }
         }
     }

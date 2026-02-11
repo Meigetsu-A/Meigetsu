@@ -4,6 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
 import com.meigetsu.core.model.*
+import com.meigetsu.core.network.GetCharacterDetailsQuery
 import com.meigetsu.core.network.GetMediaDetailsQuery
 import com.meigetsu.core.network.GetTrendingMediaQuery
 import com.meigetsu.core.network.SearchMediaQuery
@@ -51,7 +52,7 @@ class MediaRepositoryImpl @Inject constructor(
                 page = com.apollographql.apollo.api.Optional.present(page)
             )).execute()
             val animeList = response.data?.Page?.media?.filterNotNull()?.map {
-                it.toAnime()
+                it.toAnimeSearch()
             } ?: emptyList()
             emit(Resource.Success(animeList))
         } catch (e: Exception) {
@@ -68,7 +69,7 @@ class MediaRepositoryImpl @Inject constructor(
                 page = com.apollographql.apollo.api.Optional.present(page)
             )).execute()
             val mangaList = response.data?.Page?.media?.filterNotNull()?.map {
-                it.toManga()
+                it.toMangaSearch()
             } ?: emptyList()
             emit(Resource.Success(mangaList))
         } catch (e: Exception) {
@@ -80,11 +81,11 @@ class MediaRepositoryImpl @Inject constructor(
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(id.toInt()))).execute()
-            val anime = response.data?.Media?.toAnime()
+            val anime = response.data?.Media?.toAnimeDetails()
             if (anime != null) {
                 emit(Resource.Success(anime))
             } else {
-                emit(Resource.Error("Media not found"))
+                emit(Resource.Error("Anime not found"))
             }
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "An error occurred"))
@@ -95,11 +96,11 @@ class MediaRepositoryImpl @Inject constructor(
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(id.toInt()))).execute()
-            val manga = response.data?.Media?.toManga()
+            val manga = response.data?.Media?.toMangaDetails()
             if (manga != null) {
                 emit(Resource.Success(manga))
             } else {
-                emit(Resource.Error("Media not found"))
+                emit(Resource.Error("Manga not found"))
             }
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "An error occurred"))
@@ -108,7 +109,22 @@ class MediaRepositoryImpl @Inject constructor(
 
     override fun getCharacterDetails(id: String): Flow<Resource<Character>> = flow {
         emit(Resource.Loading())
-        emit(Resource.Error("Not implemented"))
+        try {
+            val response = apolloClient.query(GetCharacterDetailsQuery(id = com.apollographql.apollo.api.Optional.present(id.toInt()))).execute()
+            val char = response.data?.Character
+            if (char != null) {
+                emit(Resource.Success(Character(
+                    id = char.id.toString(),
+                    name = char.name?.full ?: "Unknown",
+                    image = char.image?.large,
+                    description = char.description
+                )))
+            } else {
+                emit(Resource.Error("Character not found"))
+            }
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An error occurred"))
+        }
     }
 
     private fun GetTrendingMediaQuery.Medium.toAnime() = Anime(
@@ -146,7 +162,7 @@ class MediaRepositoryImpl @Inject constructor(
         popularity = popularity
     )
 
-    private fun SearchMediaQuery.Medium.toAnime() = Anime(
+    private fun SearchMediaQuery.Medium.toAnimeSearch() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = null,
@@ -165,7 +181,7 @@ class MediaRepositoryImpl @Inject constructor(
         studio = null
     )
 
-    private fun SearchMediaQuery.Medium.toManga() = Manga(
+    private fun SearchMediaQuery.Medium.toMangaSearch() = Manga(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = null,
@@ -181,7 +197,7 @@ class MediaRepositoryImpl @Inject constructor(
         popularity = null
     )
 
-    private fun GetMediaDetailsQuery.Media.toAnime() = Anime(
+    private fun GetMediaDetailsQuery.Media.toAnimeDetails() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = description,
@@ -194,13 +210,13 @@ class MediaRepositoryImpl @Inject constructor(
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null,
+        popularity = popularity,
         season = season?.name,
         year = seasonYear,
         studio = null
     )
 
-    private fun GetMediaDetailsQuery.Media.toManga() = Manga(
+    private fun GetMediaDetailsQuery.Media.toMangaDetails() = Manga(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = description,
@@ -213,6 +229,6 @@ class MediaRepositoryImpl @Inject constructor(
         volumes = null,
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null
+        popularity = popularity
     )
 }
