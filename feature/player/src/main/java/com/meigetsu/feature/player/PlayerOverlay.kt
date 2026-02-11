@@ -73,7 +73,7 @@ fun PlayerOverlay(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onDoubleTapLeft, modifier = Modifier.size(64.dp)) {
-                    Icon(Icons.Default.Replay10, contentDescription = "Rewind", tint = Color.White)
+                    Icon(Icons.Default.Refresh, contentDescription = "Rewind", tint = Color.White)
                 }
                 Spacer(modifier = Modifier.width(32.dp))
                 IconButton(onClick = onPlayPause, modifier = Modifier.size(80.dp)) {
@@ -85,7 +85,7 @@ fun PlayerOverlay(
                 }
                 Spacer(modifier = Modifier.width(32.dp))
                 IconButton(onClick = onDoubleTapRight, modifier = Modifier.size(64.dp)) {
-                    Icon(Icons.Default.Forward10, contentDescription = "Forward", tint = Color.White)
+                    Icon(Icons.Default.FastForward, contentDescription = "Forward", tint = Color.White)
                 }
             }
 
@@ -106,10 +106,10 @@ fun PlayerOverlay(
                     Text(text = "00:00 / 24:00", color = Color.White, style = MaterialTheme.typography.bodySmall)
                     Row {
                         IconButton(onClick = { /* Subtitles */ }) {
-                            Icon(Icons.Default.Subtitles, contentDescription = "Subtitles", tint = Color.White)
+                            Icon(Icons.Default.Info, contentDescription = "Subtitles", tint = Color.White)
                         }
                         IconButton(onClick = { /* Quality */ }) {
-                            Icon(Icons.Default.HighQuality, contentDescription = "Quality", tint = Color.White)
+                            Icon(Icons.Default.Hd, contentDescription = "Quality", tint = Color.White)
                         }
                     }
                 }

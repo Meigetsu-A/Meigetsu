@@ -19,7 +19,7 @@ fun PlayerScreen(
             factory = { context ->
                 PlayerView(context).apply {
                     player = viewModel.player
-                    useController = false // We use our custom overlay
+                    useController = false
                 }
             },
             modifier = Modifier.fillMaxSize()
@@ -39,7 +39,9 @@ fun PlayerScreen(
                 val currentPos = viewModel.player.currentPosition
                 viewModel.player.seekTo(currentPos + 10000)
             },
-            onBackClick = onBackClick
+            onBackClick = onBackClick,
+            onVolumeChange = { /* Handle volume */ },
+            onBrightnessChange = { /* Handle brightness */ }
         )
     }
 }

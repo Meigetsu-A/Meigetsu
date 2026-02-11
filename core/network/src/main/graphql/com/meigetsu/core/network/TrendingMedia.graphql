@@ -6,12 +6,20 @@ query GetTrendingMedia($type: MediaType) {
         romaji
         english
       }
+      description
       coverImage {
         extraLarge
       }
+      bannerImage
       averageScore
+      popularity
       status
       format
+      episodes
+      chapters
+      genres
+      season
+      seasonYear
     }
   }
 }

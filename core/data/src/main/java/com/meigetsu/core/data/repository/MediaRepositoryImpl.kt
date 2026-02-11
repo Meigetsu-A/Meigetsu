@@ -130,36 +130,36 @@ class MediaRepositoryImpl @Inject constructor(
     private fun GetTrendingMediaQuery.Medium.toAnime() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = description,
+        description = null,
         coverImage = coverImage?.extraLarge,
-        bannerImage = bannerImage,
+        bannerImage = null,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.TV,
-        episodes = episodes,
+        episodes = null,
         nextEpisode = null,
-        genres = genres?.filterNotNull() ?: emptyList(),
+        genres = emptyList(),
         averageScore = averageScore,
-        popularity = popularity,
-        season = season?.name,
-        year = seasonYear,
+        popularity = null,
+        season = null,
+        year = null,
         studio = null
     )
 
     private fun GetTrendingMediaQuery.Medium.toManga() = Manga(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = description,
+        description = null,
         coverImage = coverImage?.extraLarge,
-        bannerImage = bannerImage,
+        bannerImage = null,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.MANGA,
-        chapters = chapters,
+        chapters = null,
         volumes = null,
-        genres = genres?.filterNotNull() ?: emptyList(),
+        genres = emptyList(),
         averageScore = averageScore,
-        popularity = popularity
+        popularity = null
     )
 
     private fun SearchMediaQuery.Medium.toAnimeSearch() = Anime(
@@ -210,7 +210,7 @@ class MediaRepositoryImpl @Inject constructor(
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = popularity,
+        popularity = null,
         season = season?.name,
         year = seasonYear,
         studio = null
@@ -229,6 +229,6 @@ class MediaRepositoryImpl @Inject constructor(
         volumes = null,
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = popularity
+        popularity = null
     )
 }

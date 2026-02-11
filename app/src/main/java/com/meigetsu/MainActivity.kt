@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -84,11 +86,11 @@ fun MainScreen() {
 }
 
 sealed class Screen(val route: String, val label: String, val icon: androidx.compose.ui.graphics.vector.ImageVector) {
-    object Home : Screen("home", "Home", androidx.compose.material.icons.Icons.Filled.Home)
-    object Library : Screen("library", "Library", androidx.compose.material.icons.Icons.Filled.List)
-    object Updates : Screen("updates", "Updates", androidx.compose.material.icons.Icons.Filled.Refresh)
-    object Browse : Screen("browse", "Browse", androidx.compose.material.icons.Icons.Filled.Search)
-    object Settings : Screen("settings", "Settings", androidx.compose.material.icons.Icons.Filled.Settings)
+    object Home : Screen("home", "Home", Icons.Default.Home)
+    object Library : Screen("library", "Library", Icons.Default.List)
+    object Updates : Screen("updates", "Updates", Icons.Default.Refresh)
+    object Browse : Screen("browse", "Browse", Icons.Default.Search)
+    object Settings : Screen("settings", "Settings", Icons.Default.Settings)
 }
 
 val items = listOf(
