@@ -19,12 +19,14 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onManageExtensionsClick: () -> Unit
+    onManageExtensionsClick: () -> Unit,
+    onStatsClick: () -> Unit
 ) {
     val primaryColor by viewModel.primaryColor.collectAsState()
     val cornerRadius by viewModel.cornerRadius.collectAsState()
     val incognito by viewModel.incognitoMode.collectAsState()
     val adultContent by viewModel.adultContent.collectAsState()
+    val biometricEnabled by viewModel.biometricEnabled.collectAsState()
     val watchTime by viewModel.watchTime.collectAsState()
     val readCount by viewModel.readCount.collectAsState()
     val uriHandler = LocalUriHandler.current
@@ -38,16 +40,12 @@ fun SettingsScreen(
         // Statistics Section
         item {
             SettingsCategory(title = "Statistics", icon = Icons.Rounded.BarChart) {
-                Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceAround) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = watchTime, style = MaterialTheme.typography.titleLarge)
-                        Text(text = "Watch Time", style = MaterialTheme.typography.labelSmall)
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(text = readCount.toString(), style = MaterialTheme.typography.titleLarge)
-                        Text(text = "Chapters Read", style = MaterialTheme.typography.labelSmall)
-                    }
-                }
+                ListItem(
+                    headlineContent = { Text("View Detailed Stats") },
+                    supportingContent = { Text("Watch time and reading activity") },
+                    modifier = Modifier.clickable { onStatsClick() },
+                    trailingContent = { Icon(Icons.Rounded.ChevronRight, contentDescription = null) }
+                )
             }
         }
 
@@ -91,6 +89,11 @@ fun SettingsScreen(
                         supportingContent = { Text("Include NSFW sources") },
                         trailingContent = { Switch(checked = adultContent, onCheckedChange = { viewModel.setAdultContent(it) }) }
                     )
+                    ListItem(
+                        headlineContent = { Text("Biometric Lock") },
+                        supportingContent = { Text("Secure app with fingerprint/face") },
+                        trailingContent = { Switch(checked = biometricEnabled, onCheckedChange = { viewModel.setBiometricEnabled(it) }) }
+                    )
                 }
             }
         }
@@ -124,6 +127,12 @@ fun SettingsScreen(
                     ListItem(
                         headlineContent = { Text("Clear Cache") },
                         modifier = Modifier.clickable { /* Clear cache logic */ }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Cloud Sync (WebDAV)") },
+                        supportingContent = { Text("Sync library via custom server") },
+                        modifier = Modifier.clickable { /* WebDAV Setup */ },
+                        trailingContent = { Icon(Icons.Rounded.CloudSync, contentDescription = null) }
                     )
                 }
             }

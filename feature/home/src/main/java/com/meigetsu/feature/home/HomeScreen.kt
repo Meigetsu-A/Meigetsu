@@ -21,6 +21,8 @@ fun HomeScreen(
     onMediaClick: (String) -> Unit
 ) {
     val trendingAnime by viewModel.trendingAnime.collectAsState()
+    val popularAnime by viewModel.popularAnime.collectAsState()
+    val recommendedAnime by viewModel.recommendedAnime.collectAsState()
     val continueWatching by viewModel.continueWatching.collectAsState()
 
     Scaffold(
@@ -60,7 +62,7 @@ fun HomeScreen(
             item {
                 HomeSection(
                     title = "Popular on Meigetsu",
-                    resource = trendingAnime, // Simulated
+                    resource = popularAnime,
                     onMediaClick = onMediaClick
                 )
             }
@@ -68,7 +70,7 @@ fun HomeScreen(
             item {
                 HomeSection(
                     title = "Recommended For You",
-                    resource = trendingAnime, // Simulated
+                    resource = recommendedAnime,
                     onMediaClick = onMediaClick
                 )
             }

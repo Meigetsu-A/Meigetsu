@@ -17,6 +17,10 @@ query SearchMedia($search: String, $type: MediaType, $page: Int) {
       format
       episodes
       chapters
+      trailer {
+        id
+        site
+      }
       genres
       season
       seasonYear

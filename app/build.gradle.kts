@@ -65,6 +65,7 @@ dependencies {
     implementation(project(":feature:player"))
     implementation(project(":feature:reader"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:news"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -81,6 +82,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.hilt.work)
     implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.biometric)
     implementation(libs.material)
 
     testImplementation(libs.junit)

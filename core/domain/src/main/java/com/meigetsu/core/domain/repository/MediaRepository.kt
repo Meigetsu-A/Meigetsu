@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.Flow
 interface MediaRepository {
     fun getTrendingAnime(): Flow<Resource<List<Anime>>>
     fun getTrendingManga(): Flow<Resource<List<Manga>>>
+    fun getPopularAnime(): Flow<Resource<List<Anime>>>
+    fun getPopularManga(): Flow<Resource<List<Manga>>>
+    fun getRecommendedAnime(): Flow<Resource<List<Anime>>>
     fun searchAnime(query: String, page: Int): Flow<Resource<List<Anime>>>
     fun searchManga(query: String, page: Int): Flow<Resource<List<Manga>>>
     fun getAnimeDetails(id: String): Flow<Resource<Anime>>

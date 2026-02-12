@@ -36,15 +36,20 @@ class ExtensionManager @Inject constructor(
     private val _mangaProviders = MutableStateFlow<Map<String, MangaProvider>>(emptyMap())
     val mangaProviders = _mangaProviders.asStateFlow()
 
+    private val _availableExtensions = MutableStateFlow<List<ExtensionRemote>>(emptyList())
+    val availableExtensions = _availableExtensions.asStateFlow()
+
     init {
         registerExtension(SampleAnimeExtension())
     }
 
-    suspend fun fetchExtensions(repoUrl: String): List<ExtensionMetadata> {
-        return try {
-            client.get(repoUrl).body()
+    suspend fun fetchExtensions(repoUrl: String) {
+        try {
+            val url = if (repoUrl.endsWith("index.json")) repoUrl else "$repoUrl/index.json"
+            val response: List<ExtensionRemote> = client.get(url).body()
+            _availableExtensions.value = (_availableExtensions.value + response.map { it.copy(repoUrl = repoUrl) }).distinctBy { it.pkg }
         } catch (e: Exception) {
-            emptyList()
+            e.printStackTrace()
         }
     }
 
@@ -55,6 +60,17 @@ class ExtensionManager @Inject constructor(
         }
         if (extension is MangaProvider) {
             _mangaProviders.value += (extension.metadata.id to extension)
+        }
+    }
+
+    suspend fun installExtension(remote: ExtensionRemote) {
+        try {
+            val apkFile = File(context.cacheDir, "${remote.pkg}.apk")
+            val bytes: ByteArray = client.get(remote.apk).body()
+            apkFile.writeBytes(bytes)
+            loadExtensionFromApk(apkFile)
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
 

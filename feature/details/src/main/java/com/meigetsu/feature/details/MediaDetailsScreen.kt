@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -31,6 +32,7 @@ fun MediaDetailsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val streamUrls by viewModel.streamUrls.collectAsState()
+    val uriHandler = LocalUriHandler.current
     val episodes by viewModel.episodes.collectAsState()
     val selectedIds by viewModel.selectedEpisodeIds.collectAsState()
     val isSelectionMode by viewModel.isSelectionMode.collectAsState()
@@ -142,6 +144,16 @@ fun MediaDetailsScreen(
                                     Icon(if (anime.format.name == "MANGA") Icons.Rounded.MenuBook else Icons.Rounded.PlayArrow, contentDescription = null)
                                     Spacer(modifier = Modifier.width(8.dp))
                                     Text(if (anime.format.name == "MANGA") "Read" else "Watch")
+                                }
+                                val trailerUrl = anime.trailerUrl
+                                if (trailerUrl != null) {
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    FilledTonalButton(
+                                        onClick = { uriHandler.openUri(trailerUrl) },
+                                        shape = MaterialTheme.shapes.medium
+                                    ) {
+                                        Icon(Icons.Rounded.SmartDisplay, contentDescription = null)
+                                    }
                                 }
                                 Spacer(modifier = Modifier.width(12.dp))
                                 FilledTonalIconButton(

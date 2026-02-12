@@ -11,6 +11,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
 
@@ -22,8 +23,17 @@ class PlayerViewModel @Inject constructor(
 
     val player = ExoPlayer.Builder(context).build()
 
+    private val _currentPosition = MutableStateFlow(0L)
+    val currentPosition = _currentPosition.asStateFlow()
+
     private val _playbackSpeed = MutableStateFlow(1.0f)
     val playbackSpeed = _playbackSpeed.asStateFlow()
+
+    private val _currentUrl = MutableStateFlow<String?>(null)
+    val currentUrl = _currentUrl.asStateFlow()
+
+    private val _introRange = MutableStateFlow<Pair<Long, Long>?>(Pair(10000L, 85000L)) // Simulated
+    val introRange = _introRange.asStateFlow()
 
     init {
         val encodedUrl: String? = savedStateHandle["url"]
@@ -33,7 +43,19 @@ class PlayerViewModel @Inject constructor(
         }
     }
 
+    init {
+        // Update current position every second
+        kotlinx.coroutines.MainScope().launch {
+            while (true) {
+                _currentPosition.value = player.currentPosition
+                kotlinx.coroutines.delay(1000)
+            }
+        }
+    }
+
     fun playVideo(url: String) {
+        _currentUrl.value = url
+        com.meigetsu.core.common.DiscordRPC.updatePresence("Watching Anime", url)
         val mediaItem = MediaItem.fromUri(url)
         player.setMediaItem(mediaItem)
         player.prepare()

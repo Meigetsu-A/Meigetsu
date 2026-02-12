@@ -27,6 +27,10 @@ fun PlayerOverlay(
     onBrightnessChange: (Float) -> Unit,
     onSpeedClick: () -> Unit,
     onEpisodesClick: () -> Unit,
+    onExternalPlayerClick: () -> Unit,
+    onSnapshotClick: () -> Unit = {},
+    showSkipIntro: Boolean = false,
+    onSkipIntro: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var isVisible by remember { mutableStateOf(true) }
@@ -86,6 +90,12 @@ fun PlayerOverlay(
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(text = "Now Playing", color = Color.White, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onSnapshotClick) {
+                    Icon(Icons.Rounded.CameraAlt, contentDescription = "Take Snapshot", tint = Color.White)
+                }
+                IconButton(onClick = onExternalPlayerClick) {
+                    Icon(Icons.Rounded.OpenInNew, contentDescription = "External Player", tint = Color.White)
+                }
                 IconButton(onClick = onEpisodesClick) {
                     Icon(Icons.Rounded.PlaylistPlay, contentDescription = "Episodes", tint = Color.White)
                 }
@@ -114,6 +124,19 @@ fun PlayerOverlay(
                 Spacer(modifier = Modifier.width(32.dp))
                 IconButton(onClick = onDoubleTapRight, modifier = Modifier.size(64.dp)) {
                     Icon(Icons.Rounded.Forward10, contentDescription = "Forward", tint = Color.White)
+                }
+            }
+
+            if (showSkipIntro) {
+                Button(
+                    onClick = onSkipIntro,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = 100.dp, end = 32.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.8f), contentColor = Color.Black),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Text("Skip Intro")
                 }
             }
 

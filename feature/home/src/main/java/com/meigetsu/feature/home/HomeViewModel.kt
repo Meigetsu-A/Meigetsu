@@ -21,6 +21,12 @@ class HomeViewModel @Inject constructor(
     private val _trendingAnime = MutableStateFlow<Resource<List<Anime>>>(Resource.Loading())
     val trendingAnime: StateFlow<Resource<List<Anime>>> = _trendingAnime.asStateFlow()
 
+    private val _popularAnime = MutableStateFlow<Resource<List<Anime>>>(Resource.Loading())
+    val popularAnime: StateFlow<Resource<List<Anime>>> = _popularAnime.asStateFlow()
+
+    private val _recommendedAnime = MutableStateFlow<Resource<List<Anime>>>(Resource.Loading())
+    val recommendedAnime: StateFlow<Resource<List<Anime>>> = _recommendedAnime.asStateFlow()
+
     private val _continueWatching = MutableStateFlow<Resource<List<Anime>>>(Resource.Success(emptyList()))
     val continueWatching: StateFlow<Resource<List<Anime>>> = _continueWatching.asStateFlow()
 
@@ -30,12 +36,26 @@ class HomeViewModel @Inject constructor(
 
     fun refresh() {
         loadTrending()
+        loadPopular()
+        loadRecommended()
         loadContinueWatching()
     }
 
     private fun loadTrending() {
         mediaRepository.getTrendingAnime().onEach {
             _trendingAnime.value = it
+        }.launchIn(viewModelScope)
+    }
+
+    private fun loadPopular() {
+        mediaRepository.getPopularAnime().onEach {
+            _popularAnime.value = it
+        }.launchIn(viewModelScope)
+    }
+
+    private fun loadRecommended() {
+        mediaRepository.getRecommendedAnime().onEach {
+            _recommendedAnime.value = it
         }.launchIn(viewModelScope)
     }
 

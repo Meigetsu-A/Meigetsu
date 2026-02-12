@@ -22,4 +22,7 @@ class MainViewModel @Inject constructor(
 
     val cornerRadius: StateFlow<Int> = preferenceRepository.getCornerRadius()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 8)
+
+    val biometricEnabled: StateFlow<Boolean> = preferenceRepository.getBiometricEnabled()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 }

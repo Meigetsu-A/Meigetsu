@@ -16,7 +16,8 @@ data class Anime(
     val popularity: Int?,
     val season: String?,
     val year: Int?,
-    val studio: String?
+    val studio: String?,
+    val trailerUrl: String? = null
 )
 
 enum class MediaStatus {

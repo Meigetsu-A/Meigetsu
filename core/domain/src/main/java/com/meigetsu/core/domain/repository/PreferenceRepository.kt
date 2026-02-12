@@ -18,6 +18,9 @@ interface PreferenceRepository {
     fun getAdultContent(): Flow<Boolean>
     suspend fun setAdultContent(enabled: Boolean)
 
+    fun getBiometricEnabled(): Flow<Boolean>
+    suspend fun setBiometricEnabled(enabled: Boolean)
+
     suspend fun exportBackup(): String
     suspend fun importBackup(json: String)
 }

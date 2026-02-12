@@ -17,6 +17,10 @@ query GetMultipleMedia($ids: [Int], $type: MediaType) {
       format
       episodes
       chapters
+      trailer {
+        id
+        site
+      }
       genres
       season
       seasonYear

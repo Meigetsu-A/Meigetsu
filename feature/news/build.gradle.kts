@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.meigetsu.feature.reader"
+    namespace = "com.meigetsu.feature.news"
     compileSdk = 34
 
     defaultConfig {
@@ -39,6 +39,7 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:common"))
+    implementation(project(":core:domain"))
     implementation(project(":core:ui"))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
@@ -47,5 +48,6 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coil.compose)
 }

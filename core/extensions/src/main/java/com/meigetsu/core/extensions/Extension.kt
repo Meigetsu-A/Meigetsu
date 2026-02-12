@@ -15,7 +15,8 @@ data class ExtensionMetadata(
     val pkgName: String,
     val author: String,
     val isNsfw: Boolean = false,
-    val lang: String = "en"
+    val lang: String = "en",
+    val isTrusted: Boolean = false
 )
 
 enum class ExtensionType {
@@ -57,4 +58,18 @@ data class MediaSearchResult(
     val imageUrl: String?,
     val type: String,
     val extensionId: String
+)
+
+@Serializable
+data class ExtensionRemote(
+    val pkg: String,
+    val name: String,
+    val version: String,
+    val versionCode: Long,
+    val libVersion: Double,
+    val apk: String,
+    val icon: String,
+    val lang: String = "en",
+    val isNsfw: Boolean = false,
+    val repoUrl: String? = null
 )

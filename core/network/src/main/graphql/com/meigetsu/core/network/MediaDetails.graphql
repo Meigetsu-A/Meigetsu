@@ -16,6 +16,10 @@ query GetMediaDetails($id: Int) {
     format
     episodes
     chapters
+    trailer {
+      id
+      site
+    }
     genres
     season
     seasonYear

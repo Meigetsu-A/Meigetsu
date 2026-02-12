@@ -11,6 +11,7 @@ import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -25,6 +26,8 @@ fun ExtensionManagementScreen(
     onBackClick: () -> Unit
 ) {
     val animeProviders by viewModel.extensionManager.animeProviders.collectAsState()
+    val availableExtensions by viewModel.extensionManager.availableExtensions.collectAsState()
+    val repos by viewModel.repos.collectAsState()
     var repoUrl by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
@@ -48,15 +51,27 @@ fun ExtensionManagementScreen(
                 placeholder = { Text("Repository URL") },
                 trailingIcon = {
                     IconButton(onClick = {
-                        scope.launch {
-                            viewModel.extensionManager.fetchExtensions(repoUrl)
-                        }
+                        viewModel.addRepo(repoUrl)
+                        repoUrl = ""
                     }) {
                         Icon(Icons.Default.Add, contentDescription = "Add")
                     }
                 },
                 shape = MaterialTheme.shapes.medium
             )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Repositories", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(8.dp))
+            repos.forEach { repo ->
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = repo.url, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
+                    Checkbox(checked = repo.isTrusted, onCheckedChange = { viewModel.toggleTrust(repo) })
+                    IconButton(onClick = { viewModel.deleteRepo(repo) }) {
+                        Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error)
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -68,11 +83,31 @@ fun ExtensionManagementScreen(
                     ElevatedCard {
                         ListItem(
                             headlineContent = { Text(source.metadata.name, fontWeight = FontWeight.Bold) },
-                            supportingContent = { Text("v${source.metadata.version} • ${source.metadata.author}") },
+                            supportingContent = { Text("v${source.metadata.version} • ${source.metadata.author} ${if (source.metadata.isTrusted) "✓" else "⚠"}") },
                             leadingContent = { Icon(Icons.Rounded.Extension, contentDescription = null) },
                             trailingContent = {
                                 IconButton(onClick = { /* Remove */ }) {
                                     Icon(Icons.Default.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        )
+                    }
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(text = "Available Extensions", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+
+                items(availableExtensions) { extension ->
+                    ElevatedCard {
+                        ListItem(
+                            headlineContent = { Text(extension.name) },
+                            supportingContent = { Text("${extension.pkg} • v${extension.version}") },
+                            trailingContent = {
+                                Button(onClick = { scope.launch { viewModel.extensionManager.installExtension(extension) } }) {
+                                    Text("Install")
                                 }
                             }
                         )

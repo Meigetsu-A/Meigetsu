@@ -25,6 +25,7 @@ class PreferenceRepositoryImpl @Inject constructor(
     private val readingModeKey = stringPreferencesKey("reading_mode")
     private val incognitoKey = booleanPreferencesKey("incognito_mode")
     private val adultContentKey = booleanPreferencesKey("adult_content")
+    private val biometricEnabledKey = booleanPreferencesKey("biometric_enabled")
 
     override fun getPrimaryColor(): Flow<Int> = context.dataStore.data.map { it[primaryColorKey] ?: 0xFFE50914.toInt() }
     override suspend fun setPrimaryColor(color: Int) {
@@ -49,6 +50,11 @@ class PreferenceRepositoryImpl @Inject constructor(
     override fun getAdultContent(): Flow<Boolean> = context.dataStore.data.map { it[adultContentKey] ?: false }
     override suspend fun setAdultContent(enabled: Boolean) {
         context.dataStore.edit { it[adultContentKey] = enabled }
+    }
+
+    override fun getBiometricEnabled(): Flow<Boolean> = context.dataStore.data.map { it[biometricEnabledKey] ?: false }
+    override suspend fun setBiometricEnabled(enabled: Boolean) {
+        context.dataStore.edit { it[biometricEnabledKey] = enabled }
     }
 
     override suspend fun exportBackup(): String {

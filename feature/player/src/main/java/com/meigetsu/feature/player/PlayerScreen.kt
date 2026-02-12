@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.ui.PlayerView
 
@@ -16,6 +17,10 @@ fun PlayerScreen(
 ) {
     var isPlaying by remember { mutableStateOf(true) }
     var showEpisodeSheet by remember { mutableStateOf(false) }
+    val currentUrl by viewModel.currentUrl.collectAsState()
+    val currentPos by viewModel.currentPosition.collectAsState()
+    val introRange by viewModel.introRange.collectAsState()
+    val context = LocalContext.current
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         AndroidView(
@@ -48,7 +53,16 @@ fun PlayerScreen(
             },
             onBrightnessChange = { /* Need Context/Activity for brightness */ },
             onSpeedClick = { /* Show speed menu */ },
-            onEpisodesClick = { showEpisodeSheet = true }
+            onEpisodesClick = { showEpisodeSheet = true },
+            showSkipIntro = introRange != null && currentPos in introRange!!.first..introRange!!.second,
+            onSkipIntro = { introRange?.let { viewModel.player.seekTo(it.second) } },
+            onExternalPlayerClick = {
+                currentUrl?.let { url ->
+                    val intent = android.content.Intent(android.content.Intent.ACTION_VIEW)
+                    intent.setDataAndType(android.net.Uri.parse(url), "video/*")
+                    context.startActivity(intent)
+                }
+            }
         )
 
         if (showEpisodeSheet) {

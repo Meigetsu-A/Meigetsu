@@ -33,8 +33,15 @@ type Media {
   genres: [String]
   season: MediaSeason
   seasonYear: Int
+  trailer: MediaTrailer
   characters(role: CharacterRole, sort: [CharacterSort]): CharacterConnection
   recommendations(sort: [RecommendationSort], page: Int, perPage: Int): RecommendationConnection
+}
+
+type MediaTrailer {
+  id: String
+  site: String
+  thumbnail: String
 }
 
 type MediaTitle {

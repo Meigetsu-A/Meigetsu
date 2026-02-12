@@ -5,6 +5,7 @@ import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
 import com.meigetsu.core.model.*
 import com.meigetsu.core.network.*
+import com.meigetsu.core.network.type.MediaSort
 import com.meigetsu.core.network.type.MediaType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -17,7 +18,10 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getTrendingAnime(): Flow<Resource<List<Anime>>> = flow {
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(GetTrendingMediaQuery(type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME))).execute()
+            val response = apolloClient.query(GetMediaListQuery(
+                type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME),
+                sort = com.apollographql.apollo.api.Optional.present(listOf(MediaSort.TRENDING_DESC))
+            )).execute()
             val animeList = response.data?.Page?.media?.filterNotNull()?.map {
                 it.toAnime()
             } ?: emptyList()
@@ -30,11 +34,62 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getTrendingManga(): Flow<Resource<List<Manga>>> = flow {
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(GetTrendingMediaQuery(type = com.apollographql.apollo.api.Optional.present(MediaType.MANGA))).execute()
+            val response = apolloClient.query(GetMediaListQuery(
+                type = com.apollographql.apollo.api.Optional.present(MediaType.MANGA),
+                sort = com.apollographql.apollo.api.Optional.present(listOf(MediaSort.TRENDING_DESC))
+            )).execute()
             val mangaList = response.data?.Page?.media?.filterNotNull()?.map {
                 it.toManga()
             } ?: emptyList()
             emit(Resource.Success(mangaList))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An error occurred"))
+        }
+    }
+
+    override fun getPopularAnime(): Flow<Resource<List<Anime>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = apolloClient.query(GetMediaListQuery(
+                type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME),
+                sort = com.apollographql.apollo.api.Optional.present(listOf(MediaSort.POPULARITY_DESC))
+            )).execute()
+            val animeList = response.data?.Page?.media?.filterNotNull()?.map {
+                it.toAnime()
+            } ?: emptyList()
+            emit(Resource.Success(animeList))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An error occurred"))
+        }
+    }
+
+    override fun getPopularManga(): Flow<Resource<List<Manga>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = apolloClient.query(GetMediaListQuery(
+                type = com.apollographql.apollo.api.Optional.present(MediaType.MANGA),
+                sort = com.apollographql.apollo.api.Optional.present(listOf(MediaSort.POPULARITY_DESC))
+            )).execute()
+            val mangaList = response.data?.Page?.media?.filterNotNull()?.map {
+                it.toManga()
+            } ?: emptyList()
+            emit(Resource.Success(mangaList))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An error occurred"))
+        }
+    }
+
+    override fun getRecommendedAnime(): Flow<Resource<List<Anime>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = apolloClient.query(GetMediaListQuery(
+                type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME),
+                sort = com.apollographql.apollo.api.Optional.present(listOf(MediaSort.SCORE_DESC))
+            )).execute()
+            val animeList = response.data?.Page?.media?.filterNotNull()?.map {
+                it.toAnime()
+            } ?: emptyList()
+            emit(Resource.Success(animeList))
         } catch (e: Exception) {
             emit(Resource.Error(e.message ?: "An error occurred"))
         }
@@ -164,7 +219,7 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    private fun GetTrendingMediaQuery.Medium.toAnime() = Anime(
+    private fun GetMediaListQuery.Medium.toAnime() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = description,
@@ -180,10 +235,13 @@ class MediaRepositoryImpl @Inject constructor(
         popularity = popularity,
         season = season?.name,
         year = seasonYear,
-        studio = null
+        studio = null,
+        trailerUrl = trailer?.let {
+            if (it.site == "youtube") "https://www.youtube.com/watch?v=${it.id}" else null
+        }
     )
 
-    private fun GetTrendingMediaQuery.Medium.toManga() = Manga(
+    private fun GetMediaListQuery.Medium.toManga() = Manga(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = description,
@@ -215,7 +273,10 @@ class MediaRepositoryImpl @Inject constructor(
         popularity = popularity,
         season = season?.name,
         year = seasonYear,
-        studio = null
+        studio = null,
+        trailerUrl = trailer?.let {
+            if (it.site == "youtube") "https://www.youtube.com/watch?v=${it.id}" else null
+        }
     )
 
     private fun SearchMediaQuery.Medium.toMangaSearch() = Manga(
@@ -250,7 +311,8 @@ class MediaRepositoryImpl @Inject constructor(
         popularity = popularity,
         season = season?.name,
         year = seasonYear,
-        studio = null
+        studio = null,
+        trailerUrl = null
     )
 
     private fun GetMediaDetailsQuery.Media.toMangaDetails() = Manga(

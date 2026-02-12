@@ -1,13 +1,7 @@
 package com.meigetsu.core.data
 
-import com.meigetsu.core.data.repository.DownloadRepositoryImpl
-import com.meigetsu.core.data.repository.LibraryRepositoryImpl
-import com.meigetsu.core.data.repository.MediaRepositoryImpl
-import com.meigetsu.core.data.repository.PreferenceRepositoryImpl
-import com.meigetsu.core.domain.repository.DownloadRepository
-import com.meigetsu.core.domain.repository.LibraryRepository
-import com.meigetsu.core.domain.repository.MediaRepository
-import com.meigetsu.core.domain.repository.PreferenceRepository
+import com.meigetsu.core.data.repository.*
+import com.meigetsu.core.domain.repository.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -40,4 +34,10 @@ abstract class DataModule {
     abstract fun bindDownloadRepository(
         downloadRepositoryImpl: DownloadRepositoryImpl
     ): DownloadRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNewsRepository(
+        newsRepositoryImpl: NewsRepositoryImpl
+    ): NewsRepository
 }
