@@ -58,7 +58,25 @@ class ExtensionManager @Inject constructor(
         }
     }
 
-    suspend fun loadExtensionFromApk(apkFile: File) { }
+    suspend fun loadExtensionFromApk(apkFile: File) {
+        val dexDir = File(context.codeCacheDir, "extensions_dex").apply { mkdirs() }
+        val classLoader = dalvik.system.DexClassLoader(
+            apkFile.absolutePath,
+            dexDir.absolutePath,
+            null,
+            context.classLoader
+        )
+
+        // In a real app, we would scan the APK for classes implementing Extension
+        // For this demo/scaffold, we assume a specific class name or use a manifest
+        try {
+            val extensionClass = classLoader.loadClass("com.meigetsu.extension.ExternalExtension")
+            val extension = extensionClass.getDeclaredConstructor().newInstance() as Extension
+            registerExtension(extension)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     fun getAnimeProvider(id: String): AnimeProvider? = _animeProviders.value[id]
     fun getMangaProvider(id: String): MangaProvider? = _mangaProviders.value[id]
@@ -76,11 +94,23 @@ class SampleAnimeExtension : AnimeProvider {
         author = "Meigetsu Team"
     )
 
+    override suspend fun getEpisodes(animeId: String): List<Episode> = listOf(
+        Episode("1", animeId, 1, "The Beginning", "https://img.aniworld.to/media/episode/cover/1.jpg", "2024-01-01"),
+        Episode("2", animeId, 2, "The Journey", "https://img.aniworld.to/media/episode/cover/2.jpg", "2024-01-08")
+    )
+
     override suspend fun getStreamUrls(episode: Episode): List<StreamUrl> = listOf(
         StreamUrl("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8", "Auto", "m3u8")
     )
 
-    override suspend fun search(query: String, page: Int): List<MediaSearchResult> = emptyList()
+    override suspend fun search(query: String, page: Int): List<MediaSearchResult> {
+        if (query.lowercase().contains("sample")) {
+            return listOf(
+                MediaSearchResult("1", "Sample Anime", null, "ANIME", metadata.id)
+            )
+        }
+        return emptyList()
+    }
     override suspend fun getPopular(page: Int): List<MediaSearchResult> = emptyList()
     override suspend fun getLatest(page: Int): List<MediaSearchResult> = emptyList()
 }

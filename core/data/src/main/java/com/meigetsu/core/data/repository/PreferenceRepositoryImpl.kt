@@ -26,12 +26,12 @@ class PreferenceRepositoryImpl @Inject constructor(
     private val incognitoKey = booleanPreferencesKey("incognito_mode")
     private val adultContentKey = booleanPreferencesKey("adult_content")
 
-    override fun getPrimaryColor(): Flow<Int> = context.dataStore.data.map { it[primaryColorKey] ?: 0xFF6650a4.toInt() }
+    override fun getPrimaryColor(): Flow<Int> = context.dataStore.data.map { it[primaryColorKey] ?: 0xFFE50914.toInt() }
     override suspend fun setPrimaryColor(color: Int) {
         context.dataStore.edit { it[primaryColorKey] = color }
     }
 
-    override fun getCornerRadius(): Flow<Int> = context.dataStore.data.map { it[cornerRadiusKey] ?: 8 }
+    override fun getCornerRadius(): Flow<Int> = context.dataStore.data.map { it[cornerRadiusKey] ?: 12 }
     override suspend fun setCornerRadius(radius: Int) {
         context.dataStore.edit { it[cornerRadiusKey] = radius }
     }
@@ -49,5 +49,13 @@ class PreferenceRepositoryImpl @Inject constructor(
     override fun getAdultContent(): Flow<Boolean> = context.dataStore.data.map { it[adultContentKey] ?: false }
     override suspend fun setAdultContent(enabled: Boolean) {
         context.dataStore.edit { it[adultContentKey] = enabled }
+    }
+
+    override suspend fun exportBackup(): String {
+        return "{ \"version\": 1, \"settings\": {} }"
+    }
+
+    override suspend fun importBackup(json: String) {
+        // Parse and apply settings
     }
 }

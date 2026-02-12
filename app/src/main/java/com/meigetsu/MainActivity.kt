@@ -109,13 +109,13 @@ fun MainScreen() {
                 UpdatesScreen(hiltViewModel())
             }
             composable(Screen.Browse.route) {
-                BrowseScreen(hiltViewModel(), onMediaClick = { id -> navController.navigate("details/$id") })
+                BrowseScreen(hiltViewModel(), hiltViewModel(), onMediaClick = { id -> navController.navigate("details/$id") })
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(hiltViewModel(), onManageExtensionsClick = { navController.navigate("extensions") })
             }
             composable("extensions") {
-                ExtensionManagementScreen(hiltViewModel())
+                ExtensionManagementScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
             composable(
                 "details/{mediaId}",

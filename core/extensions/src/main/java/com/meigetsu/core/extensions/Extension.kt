@@ -27,6 +27,7 @@ interface Extension {
 }
 
 interface AnimeProvider : Extension {
+    suspend fun getEpisodes(animeId: String): List<Episode>
     suspend fun getStreamUrls(episode: Episode): List<StreamUrl>
     suspend fun search(query: String, page: Int): List<MediaSearchResult>
     suspend fun getPopular(page: Int): List<MediaSearchResult>
@@ -34,6 +35,7 @@ interface AnimeProvider : Extension {
 }
 
 interface MangaProvider : Extension {
+    suspend fun getChapters(mangaId: String): List<Chapter>
     suspend fun getPages(chapter: Chapter): List<String>
     suspend fun search(query: String, page: Int): List<MediaSearchResult>
     suspend fun getPopular(page: Int): List<MediaSearchResult>

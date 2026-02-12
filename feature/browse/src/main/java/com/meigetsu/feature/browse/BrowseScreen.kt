@@ -9,8 +9,11 @@ import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.meigetsu.core.common.Resource
+import com.meigetsu.core.extensions.MediaSearchResult
 import com.meigetsu.core.ui.components.MediaCard
 import com.meigetsu.core.ui.components.LoadingSkeleton
 
@@ -18,51 +21,97 @@ import com.meigetsu.core.ui.components.LoadingSkeleton
 @Composable
 fun BrowseScreen(
     viewModel: BrowseViewModel,
+    globalSearchViewModel: GlobalSearchViewModel,
     onMediaClick: (String) -> Unit
 ) {
     val searchResult by viewModel.searchResult.collectAsState()
+    val globalResults by globalSearchViewModel.searchResults.collectAsState()
+    val isGlobalLoading by globalSearchViewModel.isLoading.collectAsState()
     var query by remember { mutableStateOf("") }
     var activeTab by remember { mutableStateOf(0) }
 
-    Column {
-        TabRow(selectedTabIndex = activeTab) {
-            Tab(selected = activeTab == 0, onClick = { activeTab = 0 }, text = { Text("Search") })
-            Tab(selected = activeTab == 1, onClick = { activeTab = 1 }, text = { Text("Extensions") })
-            Tab(selected = activeTab == 2, onClick = { activeTab = 2 }, text = { Text("Migrate") })
+    Scaffold(
+        topBar = {
+            Column {
+                TabRow(selectedTabIndex = activeTab) {
+                    Tab(selected = activeTab == 0, onClick = { activeTab = 0 }, text = { Text("AniList") })
+                    Tab(selected = activeTab == 1, onClick = { activeTab = 1 }, text = { Text("Global") })
+                }
+                SearchBar(
+                    query = query,
+                    onQueryChange = { query = it },
+                    onSearch = {
+                        if (activeTab == 0) viewModel.search(it)
+                        else globalSearchViewModel.search(it)
+                    },
+                    active = false,
+                    onActiveChange = {},
+                    placeholder = { Text(if (activeTab == 0) "Search AniList..." else "Search all extensions...") },
+                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth().padding(16.dp),
+                    shape = MaterialTheme.shapes.medium
+                ) { }
+            }
         }
+    ) { innerPadding ->
+        if (activeTab == 0) {
+            AniListSearchResults(searchResult, innerPadding, onMediaClick)
+        } else {
+            GlobalSearchResults(globalResults, isGlobalLoading, innerPadding, onMediaClick)
+        }
+    }
+}
 
-        SearchBar(
-            query = query,
-            onQueryChange = { query = it },
-            onSearch = { viewModel.search(it) },
-            active = false,
-            onActiveChange = {},
-            placeholder = { Text("Search Anime & Manga...") },
-            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        ) { }
-
-        when (val result = searchResult) {
-            is Resource.Loading -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(3), contentPadding = PaddingValues(8.dp)) {
-                    items(12) { LoadingSkeleton(Modifier.padding(4.dp)) }
+@Composable
+fun AniListSearchResults(
+    result: Resource<List<com.meigetsu.core.model.Anime>>,
+    innerPadding: PaddingValues,
+    onMediaClick: (String) -> Unit
+) {
+    when (result) {
+        is Resource.Loading -> {
+            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+                items(12) { LoadingSkeleton(Modifier.padding(4.dp)) }
+            }
+        }
+        is Resource.Success -> {
+            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+                items(result.data ?: emptyList()) { anime ->
+                    MediaCard(
+                        title = anime.title,
+                        imageUrl = anime.coverImage,
+                        type = anime.format.name,
+                        onClick = { onMediaClick(anime.id) }
+                    )
                 }
             }
-            is Resource.Success -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(3), contentPadding = PaddingValues(8.dp)) {
-                    items(result.data ?: emptyList()) { anime ->
-                        MediaCard(
-                            title = anime.title,
-                            imageUrl = anime.coverImage,
-                            type = anime.format.name,
-                            onClick = { onMediaClick(anime.id) },
-                            modifier = Modifier.padding(4.dp)
-                        )
-                    }
-                }
-            }
-            is Resource.Error -> {
-                Text(text = result.message ?: "Search failed", modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error)
+        }
+        is Resource.Error -> {
+            Text(text = result.message ?: "Error", modifier = Modifier.padding(innerPadding))
+        }
+    }
+}
+
+@Composable
+fun GlobalSearchResults(
+    results: List<MediaSearchResult>,
+    isLoading: Boolean,
+    innerPadding: PaddingValues,
+    onMediaClick: (String) -> Unit
+) {
+    if (isLoading) {
+        LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+            items(12) { LoadingSkeleton(Modifier.padding(4.dp)) }
+        }
+    } else {
+        LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+            items(results) { item ->
+                MediaCard(
+                    title = item.title,
+                    imageUrl = item.imageUrl,
+                    type = item.type,
+                    onClick = { onMediaClick(item.id) }
+                )
             }
         }
     }

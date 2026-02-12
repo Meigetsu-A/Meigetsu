@@ -1,4 +1,4 @@
-package com.meigetsu.core.data.usecase
+package com.meigetsu.core.domain.usecase
 
 import com.meigetsu.core.extensions.*
 import dagger.hilt.android.scopes.ViewModelScoped

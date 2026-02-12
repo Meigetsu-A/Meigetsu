@@ -1,9 +1,11 @@
 package com.meigetsu.feature.player
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.media3.ui.PlayerView
 
@@ -14,10 +16,8 @@ fun PlayerScreen(
 ) {
     var isPlaying by remember { mutableStateOf(true) }
     var showEpisodeSheet by remember { mutableStateOf(false) }
-    var volume by remember { mutableStateOf(1f) }
-    var brightness by remember { mutableStateOf(1f) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
         AndroidView(
             factory = { context ->
                 PlayerView(context).apply {
@@ -44,13 +44,9 @@ fun PlayerScreen(
             },
             onBackClick = onBackClick,
             onVolumeChange = { delta ->
-                volume = (volume + delta).coerceIn(0f, 1f)
-                viewModel.player.volume = volume
+                viewModel.player.volume = (viewModel.player.volume + delta).coerceIn(0f, 1f)
             },
-            onBrightnessChange = { delta ->
-                brightness = (brightness + delta).coerceIn(0f, 1f)
-                // In real app: update Activity window brightness
-            },
+            onBrightnessChange = { /* Need Context/Activity for brightness */ },
             onSpeedClick = { /* Show speed menu */ },
             onEpisodesClick = { showEpisodeSheet = true }
         )

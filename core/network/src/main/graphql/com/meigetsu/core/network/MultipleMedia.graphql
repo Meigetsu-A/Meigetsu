@@ -6,12 +6,20 @@ query GetMultipleMedia($ids: [Int], $type: MediaType) {
         romaji
         english
       }
+      description
       coverImage {
         extraLarge
       }
+      bannerImage
       averageScore
+      popularity
       status
       format
+      episodes
+      chapters
+      genres
+      season
+      seasonYear
     }
   }
 }

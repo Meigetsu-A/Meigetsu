@@ -41,6 +41,10 @@ class MediaRepositoryImpl @Inject constructor(
     }
 
     override fun searchAnime(query: String, page: Int): Flow<Resource<List<Anime>>> = flow {
+        if (query.isBlank()) {
+            emit(Resource.Success(emptyList()))
+            return@flow
+        }
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(SearchMediaQuery(
@@ -58,6 +62,10 @@ class MediaRepositoryImpl @Inject constructor(
     }
 
     override fun searchManga(query: String, page: Int): Flow<Resource<List<Manga>>> = flow {
+        if (query.isBlank()) {
+            emit(Resource.Success(emptyList()))
+            return@flow
+        }
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(SearchMediaQuery(
@@ -77,7 +85,11 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getAnimeDetails(id: String): Flow<Resource<Anime>> = flow {
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(id.toInt()))).execute()
+            val intId = id.toIntOrNull() ?: run {
+                emit(Resource.Error("Invalid ID format"))
+                return@flow
+            }
+            val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(intId))).execute()
             val anime = response.data?.Media?.toAnimeDetails()
             if (anime != null) {
                 emit(Resource.Success(anime))
@@ -92,7 +104,11 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getMangaDetails(id: String): Flow<Resource<Manga>> = flow {
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(id.toInt()))).execute()
+            val intId = id.toIntOrNull() ?: run {
+                emit(Resource.Error("Invalid ID format"))
+                return@flow
+            }
+            val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(intId))).execute()
             val manga = response.data?.Media?.toMangaDetails()
             if (manga != null) {
                 emit(Resource.Success(manga))
@@ -107,7 +123,11 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getCharacterDetails(id: String): Flow<Resource<Character>> = flow {
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(GetCharacterDetailsQuery(id = com.apollographql.apollo.api.Optional.present(id.toInt()))).execute()
+            val intId = id.toIntOrNull() ?: run {
+                emit(Resource.Error("Invalid ID format"))
+                return@flow
+            }
+            val response = apolloClient.query(GetCharacterDetailsQuery(id = com.apollographql.apollo.api.Optional.present(intId))).execute()
             val char = response.data?.Character
             if (char != null) {
                 emit(Resource.Success(Character(
@@ -125,10 +145,14 @@ class MediaRepositoryImpl @Inject constructor(
     }
 
     override fun getMultipleAnime(ids: List<String>): Flow<Resource<List<Anime>>> = flow {
+        if (ids.isEmpty()) {
+            emit(Resource.Success(emptyList()))
+            return@flow
+        }
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(GetMultipleMediaQuery(
-                ids = com.apollographql.apollo.api.Optional.present(ids.map { it.toInt() }),
+                ids = com.apollographql.apollo.api.Optional.present(ids.mapNotNull { it.toIntOrNull() }),
                 type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME)
             )).execute()
             val animeList = response.data?.Page?.media?.filterNotNull()?.map {
@@ -143,71 +167,71 @@ class MediaRepositoryImpl @Inject constructor(
     private fun GetTrendingMediaQuery.Medium.toAnime() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = null,
+        description = description,
         coverImage = coverImage?.extraLarge,
-        bannerImage = null,
+        bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.TV,
-        episodes = null,
+        episodes = episodes,
         nextEpisode = null,
-        genres = emptyList(),
+        genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null,
-        season = null,
-        year = null,
+        popularity = popularity,
+        season = season?.name,
+        year = seasonYear,
         studio = null
     )
 
     private fun GetTrendingMediaQuery.Medium.toManga() = Manga(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = null,
+        description = description,
         coverImage = coverImage?.extraLarge,
-        bannerImage = null,
+        bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.MANGA,
-        chapters = null,
+        chapters = chapters,
         volumes = null,
-        genres = emptyList(),
+        genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null
+        popularity = popularity
     )
 
     private fun SearchMediaQuery.Medium.toAnimeSearch() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = null,
+        description = description,
         coverImage = coverImage?.extraLarge,
-        bannerImage = null,
+        bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.TV,
-        episodes = null,
+        episodes = episodes,
         nextEpisode = null,
-        genres = emptyList(),
+        genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null,
-        season = null,
-        year = null,
+        popularity = popularity,
+        season = season?.name,
+        year = seasonYear,
         studio = null
     )
 
     private fun SearchMediaQuery.Medium.toMangaSearch() = Manga(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = null,
+        description = description,
         coverImage = coverImage?.extraLarge,
-        bannerImage = null,
+        bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.MANGA,
-        chapters = null,
+        chapters = chapters,
         volumes = null,
-        genres = emptyList(),
+        genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null
+        popularity = popularity
     )
 
     private fun GetMediaDetailsQuery.Media.toAnimeDetails() = Anime(
@@ -223,7 +247,7 @@ class MediaRepositoryImpl @Inject constructor(
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null,
+        popularity = popularity,
         season = season?.name,
         year = seasonYear,
         studio = null
@@ -242,25 +266,25 @@ class MediaRepositoryImpl @Inject constructor(
         volumes = null,
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null
+        popularity = popularity
     )
 
     private fun GetMultipleMediaQuery.Medium.toAnimeMultiple() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
-        description = null,
+        description = description,
         coverImage = coverImage?.extraLarge,
-        bannerImage = null,
+        bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
         status = MediaStatus.RELEASING,
         format = MediaFormat.TV,
-        episodes = null,
+        episodes = episodes,
         nextEpisode = null,
-        genres = emptyList(),
+        genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
-        popularity = null,
-        season = null,
-        year = null,
+        popularity = popularity,
+        season = season?.name,
+        year = seasonYear,
         studio = null
     )
 }

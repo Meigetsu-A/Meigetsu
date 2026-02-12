@@ -4,11 +4,9 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.meigetsu.core.database.dao.DownloadDao
 import com.meigetsu.core.database.dao.LibraryDao
-import com.meigetsu.core.database.entity.CategoryEntity
-import com.meigetsu.core.database.entity.LibraryEntity
-import com.meigetsu.core.database.entity.WatchHistoryEntity
-import com.meigetsu.core.database.entity.ReadHistoryEntity
+import com.meigetsu.core.database.entity.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -16,9 +14,19 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-@Database(entities = [LibraryEntity::class, CategoryEntity::class, WatchHistoryEntity::class, ReadHistoryEntity::class], version = 2)
+@Database(
+    entities = [
+        LibraryEntity::class,
+        CategoryEntity::class,
+        WatchHistoryEntity::class,
+        ReadHistoryEntity::class,
+        DownloadEntity::class
+    ],
+    version = 3
+)
 abstract class MeigetsuDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
+    abstract fun downloadDao(): DownloadDao
 }
 
 @Module
@@ -38,4 +46,7 @@ object DatabaseModule {
 
     @Provides
     fun provideLibraryDao(db: MeigetsuDatabase): LibraryDao = db.libraryDao()
+
+    @Provides
+    fun provideDownloadDao(db: MeigetsuDatabase): DownloadDao = db.downloadDao()
 }

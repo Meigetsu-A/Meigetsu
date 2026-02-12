@@ -11,6 +11,7 @@ query GetMediaDetails($id: Int) {
     }
     bannerImage
     averageScore
+    popularity
     status
     format
     episodes

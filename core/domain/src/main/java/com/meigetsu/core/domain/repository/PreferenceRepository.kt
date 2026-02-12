@@ -17,4 +17,7 @@ interface PreferenceRepository {
 
     fun getAdultContent(): Flow<Boolean>
     suspend fun setAdultContent(enabled: Boolean)
+
+    suspend fun exportBackup(): String
+    suspend fun importBackup(json: String)
 }

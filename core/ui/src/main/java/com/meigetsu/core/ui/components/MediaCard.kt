@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -34,10 +33,11 @@ fun MediaCard(
 ) {
     Card(
         modifier = modifier
-            .width(140.dp)
+            .width(160.dp) // Slightly wider
             .clickable { onClick() },
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column {
             Box {
@@ -46,37 +46,38 @@ fun MediaCard(
                     contentDescription = title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp),
+                        .aspectRatio(0.7f), // Standard media ratio
                     contentScale = ContentScale.Crop
                 )
 
-                // Gradient overlay for better text visibility if needed
+                // Gradient overlay
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp)
+                        .height(80.dp)
                         .align(Alignment.BottomCenter)
                         .background(
                             Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.5f))
+                                colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
                             )
                         )
                 )
 
-                // Type Badge
+                // Type Badge (Premium look)
                 if (type != null) {
                     Surface(
                         modifier = Modifier
                             .align(Alignment.TopStart)
                             .padding(8.dp),
-                        color = MaterialTheme.colorScheme.primaryContainer,
+                        color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(4.dp)
                     ) {
                         Text(
                             text = type,
                             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                             fontSize = 10.sp,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                     }
                 }
@@ -84,7 +85,7 @@ fun MediaCard(
                 // Progress Bar
                 if (progress != null) {
                     LinearProgressIndicator(
-                        progress = progress,
+                        progress = { progress },
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
@@ -95,13 +96,13 @@ fun MediaCard(
                 }
             }
 
-            Column(modifier = Modifier.padding(8.dp)) {
+            Column(modifier = Modifier.padding(10.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    maxLines = 2,
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.Bold
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -117,13 +118,13 @@ fun MediaCard(
                                 imageVector = Icons.Default.Star,
                                 contentDescription = null,
                                 tint = Color(0xFFFFB300),
-                                modifier = Modifier.size(12.dp)
+                                modifier = Modifier.size(14.dp)
                             )
-                            Spacer(modifier = Modifier.width(2.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = rating.toString(),
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }
@@ -131,7 +132,8 @@ fun MediaCard(
                         Text(
                             text = status,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.outline
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }

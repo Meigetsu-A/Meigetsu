@@ -79,6 +79,8 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.material)
 
     testImplementation(libs.junit)
