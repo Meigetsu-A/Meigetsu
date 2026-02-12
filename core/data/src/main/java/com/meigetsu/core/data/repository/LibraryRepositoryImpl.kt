@@ -61,6 +61,10 @@ class LibraryRepositoryImpl @Inject constructor(
         libraryDao.deleteLibraryItem(id)
     }
 
+    override fun getWatchHistory(): Flow<List<String>> {
+        return libraryDao.getWatchHistory().map { list -> list.map { it.mediaId } }
+    }
+
     private fun LibraryEntity.toAnime() = Anime(
         id = id,
         title = title,

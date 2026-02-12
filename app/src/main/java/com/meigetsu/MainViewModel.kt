@@ -1,7 +1,6 @@
-package com.meigetsu.feature.settings
+package com.meigetsu
 
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.domain.repository.PreferenceRepository
@@ -10,11 +9,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(
+class MainViewModel @Inject constructor(
     private val preferenceRepository: PreferenceRepository
 ) : ViewModel() {
 
@@ -24,16 +22,4 @@ class SettingsViewModel @Inject constructor(
 
     val cornerRadius: StateFlow<Int> = preferenceRepository.getCornerRadius()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 8)
-
-    fun updatePrimaryColor(color: Color) {
-        viewModelScope.launch {
-            preferenceRepository.setPrimaryColor(color.toArgb())
-        }
-    }
-
-    fun updateCornerRadius(radius: Int) {
-        viewModelScope.launch {
-            preferenceRepository.setCornerRadius(radius)
-        }
-    }
 }

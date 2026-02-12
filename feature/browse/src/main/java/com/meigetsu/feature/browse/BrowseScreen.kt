@@ -19,32 +19,50 @@ fun BrowseScreen(
 ) {
     val searchResult by viewModel.searchResult.collectAsState()
     var query by remember { mutableStateOf("") }
+    var showFilters by remember { mutableStateOf(false) }
 
     Column {
-        TextField(
-            value = query,
-            onValueChange = {
-                query = it
-                viewModel.search(it)
-            },
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            placeholder = { Text("Search Anime...") }
-        )
+        Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+            TextField(
+                value = query,
+                onValueChange = {
+                    query = it
+                    viewModel.search(it)
+                },
+                modifier = Modifier.weight(1f),
+                placeholder = { Text("Search Anime...") }
+            )
+            IconButton(onClick = { showFilters = !showFilters }) {
+                // Filter icon would go here
+                Text("F")
+            }
+        }
+
+        if (showFilters) {
+            // Advanced Filters UI
+            Row(modifier = Modifier.padding(horizontal = 16.dp)) {
+                AssistChip(onClick = { }, label = { Text("Genre") })
+                Spacer(modifier = Modifier.width(8.dp))
+                AssistChip(onClick = { }, label = { Text("Year") })
+                Spacer(modifier = Modifier.width(8.dp))
+                AssistChip(onClick = { }, label = { Text("Format") })
+            }
+        }
 
         when (val result = searchResult) {
             is Resource.Loading -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
-                    items(6) { LoadingSkeleton(Modifier.padding(8.dp)) }
+                LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                    items(9) { LoadingSkeleton(Modifier.padding(4.dp)) }
                 }
             }
             is Resource.Success -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(2)) {
+                LazyVerticalGrid(columns = GridCells.Fixed(3)) {
                     items(result.data ?: emptyList()) { anime ->
                         MediaCard(
                             title = anime.title,
                             imageUrl = anime.coverImage,
                             onClick = { onMediaClick(anime.id) },
-                            modifier = Modifier.padding(8.dp)
+                            modifier = Modifier.padding(4.dp)
                         )
                     }
                 }

@@ -5,44 +5,33 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
-import com.meigetsu.core.domain.repository.LibraryRepository
-import com.meigetsu.core.model.Anime
-import com.meigetsu.core.model.Manga
+import com.meigetsu.core.model.Character
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class DetailsViewModel @Inject constructor(
+class CharacterDetailsViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
-    private val libraryRepository: LibraryRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val mediaId: String = checkNotNull(savedStateHandle["mediaId"])
+    private val charId: String = checkNotNull(savedStateHandle["charId"])
 
-    private val _uiState = MutableStateFlow<Resource<Anime>>(Resource.Loading())
-    val uiState: StateFlow<Resource<Anime>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<Resource<Character>>(Resource.Loading())
+    val uiState: StateFlow<Resource<Character>> = _uiState.asStateFlow()
 
     init {
         loadDetails()
     }
 
     private fun loadDetails() {
-        mediaRepository.getAnimeDetails(mediaId).onEach {
+        mediaRepository.getCharacterDetails(charId).onEach {
             _uiState.value = it
         }.launchIn(viewModelScope)
-    }
-
-    fun addToLibrary() {
-        viewModelScope.launch {
-            val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
-            libraryRepository.addToLibrary(anime)
-        }
     }
 }

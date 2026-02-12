@@ -13,6 +13,9 @@ fun PlayerScreen(
     onBackClick: () -> Unit
 ) {
     var isPlaying by remember { mutableStateOf(true) }
+    var showEpisodeSheet by remember { mutableStateOf(false) }
+    var volume by remember { mutableStateOf(1f) }
+    var brightness by remember { mutableStateOf(1f) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
@@ -40,8 +43,24 @@ fun PlayerScreen(
                 viewModel.player.seekTo(currentPos + 10000)
             },
             onBackClick = onBackClick,
-            onVolumeChange = { /* Handle volume */ },
-            onBrightnessChange = { /* Handle brightness */ }
+            onVolumeChange = { delta ->
+                volume = (volume + delta).coerceIn(0f, 1f)
+                viewModel.player.volume = volume
+            },
+            onBrightnessChange = { delta ->
+                brightness = (brightness + delta).coerceIn(0f, 1f)
+                // In real app: update Activity window brightness
+            },
+            onSpeedClick = { /* Show speed menu */ },
+            onEpisodesClick = { showEpisodeSheet = true }
         )
+
+        if (showEpisodeSheet) {
+            EpisodeBottomSheet(
+                episodes = emptyList(),
+                onEpisodeClick = { /* Change episode */ },
+                onDismiss = { showEpisodeSheet = false }
+            )
+        }
     }
 }

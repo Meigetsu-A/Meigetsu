@@ -6,7 +6,7 @@ type Query {
 
 type Page {
   pageInfo: PageInfo
-  media(type: MediaType, sort: [MediaSort], search: String): [Media]
+  media(type: MediaType, sort: [MediaSort], search: String, id_in: [Int]): [Media]
   characters(search: String): [Character]
 }
 

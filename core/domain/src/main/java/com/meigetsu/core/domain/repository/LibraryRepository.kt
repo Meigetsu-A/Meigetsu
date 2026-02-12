@@ -10,4 +10,6 @@ interface LibraryRepository {
     suspend fun addToLibrary(anime: Anime)
     suspend fun addToLibrary(manga: Manga)
     suspend fun removeFromLibrary(id: String)
+
+    fun getWatchHistory(): Flow<List<String>> // Returns IDs
 }

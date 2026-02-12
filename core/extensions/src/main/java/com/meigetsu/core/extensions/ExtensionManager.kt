@@ -1,32 +1,53 @@
 package com.meigetsu.core.extensions
 
+import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.request.*
+import io.ktor.serialization.kotlinx.json.*
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.decodeFromString
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 @Singleton
 class ExtensionManager @Inject constructor() {
-    private val animeSources = mutableMapOf<String, AnimeSource>()
-    private val mangaSources = mutableMapOf<String, MangaSource>()
+    private val client = HttpClient {
+        install(ContentNegotiation) {
+            json(Json {
+                ignoreUnknownKeys = true
+            })
+        }
+    }
+
+    private val _animeSources = MutableStateFlow<Map<String, AnimeSource>>(emptyMap())
+    val animeSources = _animeSources.asStateFlow()
+
+    private val _mangaSources = MutableStateFlow<Map<String, MangaSource>>(emptyMap())
+    val mangaSources = _mangaSources.asStateFlow()
+
+    init {
+        // Register default sample source
+        registerAnimeSource(SampleAnimeSource())
+    }
+
+    suspend fun fetchExtensions(repoUrl: String): List<ExtensionMetadata> {
+        return try {
+            client.get(repoUrl).body()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 
     fun registerAnimeSource(source: AnimeSource) {
-        animeSources[source.id] = source
+        _animeSources.value = _animeSources.value + (source.metadata.id to source)
     }
 
     fun registerMangaSource(source: MangaSource) {
-        mangaSources[source.id] = source
+        _mangaSources.value = _mangaSources.value + (source.metadata.id to source)
     }
 
-    // Simulate loading from JSON string
-    fun loadExtensionFromJson(json: String) {
-        // In a real app, this would use reflection or a DEX loader
-        // Here we just parse the metadata
-    }
-
-    fun getAnimeSource(id: String): AnimeSource? = animeSources[id]
-    fun getMangaSource(id: String): MangaSource? = mangaSources[id]
-
-    fun getAllAnimeSources(): List<AnimeSource> = animeSources.values.toList()
-    fun getAllMangaSources(): List<MangaSource> = mangaSources.values.toList()
+    fun getAnimeSource(id: String): AnimeSource? = _animeSources.value[id]
+    fun getMangaSource(id: String): MangaSource? = _mangaSources.value[id]
 }

@@ -14,4 +14,5 @@ interface MediaRepository {
     fun getAnimeDetails(id: String): Flow<Resource<Anime>>
     fun getMangaDetails(id: String): Flow<Resource<Manga>>
     fun getCharacterDetails(id: String): Flow<Resource<Character>>
+    fun getMultipleAnime(ids: List<String>): Flow<Resource<List<Anime>>>
 }

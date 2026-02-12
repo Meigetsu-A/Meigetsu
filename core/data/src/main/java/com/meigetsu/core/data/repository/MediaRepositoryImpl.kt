@@ -4,10 +4,7 @@ import com.apollographql.apollo.ApolloClient
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
 import com.meigetsu.core.model.*
-import com.meigetsu.core.network.GetCharacterDetailsQuery
-import com.meigetsu.core.network.GetMediaDetailsQuery
-import com.meigetsu.core.network.GetTrendingMediaQuery
-import com.meigetsu.core.network.SearchMediaQuery
+import com.meigetsu.core.network.*
 import com.meigetsu.core.network.type.MediaType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -127,6 +124,22 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun getMultipleAnime(ids: List<String>): Flow<Resource<List<Anime>>> = flow {
+        emit(Resource.Loading())
+        try {
+            val response = apolloClient.query(GetMultipleMediaQuery(
+                ids = com.apollographql.apollo.api.Optional.present(ids.map { it.toInt() }),
+                type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME)
+            )).execute()
+            val animeList = response.data?.Page?.media?.filterNotNull()?.map {
+                it.toAnimeMultiple()
+            } ?: emptyList()
+            emit(Resource.Success(animeList))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An error occurred"))
+        }
+    }
+
     private fun GetTrendingMediaQuery.Medium.toAnime() = Anime(
         id = id.toString(),
         title = title?.english ?: title?.romaji ?: "Unknown",
@@ -230,5 +243,24 @@ class MediaRepositoryImpl @Inject constructor(
         genres = genres?.filterNotNull() ?: emptyList(),
         averageScore = averageScore,
         popularity = null
+    )
+
+    private fun GetMultipleMediaQuery.Medium.toAnimeMultiple() = Anime(
+        id = id.toString(),
+        title = title?.english ?: title?.romaji ?: "Unknown",
+        description = null,
+        coverImage = coverImage?.extraLarge,
+        bannerImage = null,
+        rating = averageScore?.toDouble()?.div(10.0),
+        status = MediaStatus.RELEASING,
+        format = MediaFormat.TV,
+        episodes = null,
+        nextEpisode = null,
+        genres = emptyList(),
+        averageScore = averageScore,
+        popularity = null,
+        season = null,
+        year = null,
+        studio = null
     )
 }

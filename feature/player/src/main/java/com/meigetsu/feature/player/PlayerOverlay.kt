@@ -1,6 +1,7 @@
 package com.meigetsu.feature.player
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.*
@@ -23,6 +24,8 @@ fun PlayerOverlay(
     onBackClick: () -> Unit,
     onVolumeChange: (Float) -> Unit,
     onBrightnessChange: (Float) -> Unit,
+    onSpeedClick: () -> Unit,
+    onEpisodesClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var isVisible by remember { mutableStateOf(true) }
@@ -60,8 +63,11 @@ fun PlayerOverlay(
                     Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                Text(text = "Episode Title", color = Color.White, style = MaterialTheme.typography.titleMedium)
+                Text(text = "Now Playing", color = Color.White, style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onEpisodesClick) {
+                    Icon(Icons.Default.FormatListBulleted, contentDescription = "Episodes", tint = Color.White)
+                }
                 IconButton(onClick = { /* Settings */ }) {
                     Icon(Icons.Default.Settings, contentDescription = "Settings", tint = Color.White)
                 }
@@ -93,11 +99,15 @@ fun PlayerOverlay(
             Column(
                 modifier = Modifier.fillMaxWidth().padding(16.dp).align(Alignment.BottomCenter)
             ) {
-                Slider(
-                    value = 0.5f,
-                    onValueChange = { /* Seek */ },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "1.0x", modifier = Modifier.clickable { onSpeedClick() }, color = Color.White)
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Slider(
+                        value = 0.5f,
+                        onValueChange = { /* Seek */ },
+                        modifier = Modifier.weight(1f)
+                    )
+                }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,

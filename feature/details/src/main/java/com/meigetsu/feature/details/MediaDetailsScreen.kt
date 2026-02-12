@@ -12,7 +12,9 @@ import com.meigetsu.core.ui.components.LoadingSkeleton
 @Composable
 fun MediaDetailsScreen(
     viewModel: DetailsViewModel,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onWatchClick: (String) -> Unit,
+    onReadClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -26,11 +28,20 @@ fun MediaDetailsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(text = anime.description ?: "No description available", style = MaterialTheme.typography.bodyMedium)
                     Spacer(modifier = Modifier.height(16.dp))
-                    Button(onClick = { /* Add to library */ }) {
-                        Text("Add to Library")
+
+                    Row {
+                        Button(onClick = {
+                            if (anime.format.name == "MANGA") onReadClick(anime.id)
+                            else onWatchClick("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8")
+                        }) {
+                            Text(if (anime.format.name == "MANGA") "Read Now" else "Watch Now")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        OutlinedButton(onClick = { viewModel.addToLibrary() }) {
+                            Text("Add to Library")
+                        }
                     }
                 }
-                // Episodes list could go here
             }
         }
         is Resource.Error -> {
