@@ -1,5 +1,8 @@
 package com.meigetsu.core.extensions
 
+import android.content.Context
+import com.meigetsu.core.model.Episode
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -10,9 +13,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.File
 
 @Singleton
-class ExtensionManager @Inject constructor() {
+class ExtensionManager @Inject constructor(
+    @ApplicationContext private val context: Context
+) {
     private val client = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -21,15 +27,17 @@ class ExtensionManager @Inject constructor() {
         }
     }
 
-    private val _animeSources = MutableStateFlow<Map<String, AnimeSource>>(emptyMap())
-    val animeSources = _animeSources.asStateFlow()
+    private val _installedExtensions = MutableStateFlow<List<Extension>>(emptyList())
+    val installedExtensions = _installedExtensions.asStateFlow()
 
-    private val _mangaSources = MutableStateFlow<Map<String, MangaSource>>(emptyMap())
-    val mangaSources = _mangaSources.asStateFlow()
+    private val _animeProviders = MutableStateFlow<Map<String, AnimeProvider>>(emptyMap())
+    val animeProviders = _animeProviders.asStateFlow()
+
+    private val _mangaProviders = MutableStateFlow<Map<String, MangaProvider>>(emptyMap())
+    val mangaProviders = _mangaProviders.asStateFlow()
 
     init {
-        // Register default sample source
-        registerAnimeSource(SampleAnimeSource())
+        registerExtension(SampleAnimeExtension())
     }
 
     suspend fun fetchExtensions(repoUrl: String): List<ExtensionMetadata> {
@@ -40,14 +48,39 @@ class ExtensionManager @Inject constructor() {
         }
     }
 
-    fun registerAnimeSource(source: AnimeSource) {
-        _animeSources.value = _animeSources.value + (source.metadata.id to source)
+    fun registerExtension(extension: Extension) {
+        _installedExtensions.value += extension
+        if (extension is AnimeProvider) {
+            _animeProviders.value += (extension.metadata.id to extension)
+        }
+        if (extension is MangaProvider) {
+            _mangaProviders.value += (extension.metadata.id to extension)
+        }
     }
 
-    fun registerMangaSource(source: MangaSource) {
-        _mangaSources.value = _mangaSources.value + (source.metadata.id to source)
-    }
+    suspend fun loadExtensionFromApk(apkFile: File) { }
 
-    fun getAnimeSource(id: String): AnimeSource? = _animeSources.value[id]
-    fun getMangaSource(id: String): MangaSource? = _mangaSources.value[id]
+    fun getAnimeProvider(id: String): AnimeProvider? = _animeProviders.value[id]
+    fun getMangaProvider(id: String): MangaProvider? = _mangaProviders.value[id]
+}
+
+class SampleAnimeExtension : AnimeProvider {
+    override val metadata = ExtensionMetadata(
+        id = "sample-anime",
+        name = "Meigetsu Sample",
+        version = "1.0.0",
+        description = "Official sample provider",
+        iconUrl = null,
+        type = ExtensionType.ANIME,
+        pkgName = "com.meigetsu.extension.sample",
+        author = "Meigetsu Team"
+    )
+
+    override suspend fun getStreamUrls(episode: Episode): List<StreamUrl> = listOf(
+        StreamUrl("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8", "Auto", "m3u8")
+    )
+
+    override suspend fun search(query: String, page: Int): List<MediaSearchResult> = emptyList()
+    override suspend fun getPopular(page: Int): List<MediaSearchResult> = emptyList()
+    override suspend fun getLatest(page: Int): List<MediaSearchResult> = emptyList()
 }

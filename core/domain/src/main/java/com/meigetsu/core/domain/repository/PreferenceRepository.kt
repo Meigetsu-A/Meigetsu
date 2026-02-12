@@ -11,4 +11,10 @@ interface PreferenceRepository {
 
     fun getReadingMode(): Flow<String>
     suspend fun setReadingMode(mode: String)
+
+    fun getIncognitoMode(): Flow<Boolean>
+    suspend fun setIncognitoMode(enabled: Boolean)
+
+    fun getAdultContent(): Flow<Boolean>
+    suspend fun setAdultContent(enabled: Boolean)
 }

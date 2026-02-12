@@ -43,6 +43,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:extensions"))
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

@@ -5,6 +5,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -21,6 +23,10 @@ fun SettingsScreen(
 ) {
     val primaryColor by viewModel.primaryColor.collectAsState()
     val cornerRadius by viewModel.cornerRadius.collectAsState()
+    val incognito by viewModel.incognitoMode.collectAsState()
+    val adultContent by viewModel.adultContent.collectAsState()
+    val watchTime by viewModel.watchTime.collectAsState()
+    val readCount by viewModel.readCount.collectAsState()
     val uriHandler = LocalUriHandler.current
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -29,26 +35,39 @@ fun SettingsScreen(
             Spacer(modifier = Modifier.height(16.dp))
         }
 
+        // Statistics Section
         item {
-            Card(modifier = Modifier.fillMaxWidth()) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "Theme Builder", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.height(8.dp))
+            SettingsCategory(title = "Statistics", icon = Icons.Rounded.BarChart) {
+                Row(modifier = Modifier.fillMaxWidth().padding(16.dp), horizontalArrangement = Arrangement.SpaceAround) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = watchTime, style = MaterialTheme.typography.titleLarge)
+                        Text(text = "Watch Time", style = MaterialTheme.typography.labelSmall)
+                    }
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(text = readCount.toString(), style = MaterialTheme.typography.titleLarge)
+                        Text(text = "Chapters Read", style = MaterialTheme.typography.labelSmall)
+                    }
+                }
+            }
+        }
 
+        // Appearance Section
+        item {
+            SettingsCategory(title = "Appearance", icon = Icons.Rounded.Palette) {
+                Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "Primary Color")
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.weight(1f))
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(32.dp)
                                 .clip(CircleShape)
                                 .background(primaryColor)
                                 .clickable { viewModel.updatePrimaryColor(Color.Cyan) }
                         )
                     }
-
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(text = "Corner Radius: $cornerRadius dp")
+                    Text(text = "Corner Radius: $cornerRadius dp", style = MaterialTheme.typography.bodyMedium)
                     Slider(
                         value = cornerRadius.toFloat(),
                         onValueChange = { viewModel.updateCornerRadius(it.toInt()) },
@@ -58,34 +77,104 @@ fun SettingsScreen(
             }
         }
 
+        // Behavior Section
         item {
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(text = "Extensions", style = MaterialTheme.typography.titleMedium)
-            Button(onClick = onManageExtensionsClick, modifier = Modifier.fillMaxWidth()) {
-                Text("Manage Extension Repositories")
+            SettingsCategory(title = "Behavior", icon = Icons.Rounded.SettingsSuggest) {
+                Column {
+                    ListItem(
+                        headlineContent = { Text("Incognito Mode") },
+                        supportingContent = { Text("Don't save history or progress") },
+                        trailingContent = { Switch(checked = incognito, onCheckedChange = { viewModel.setIncognito(it) }) }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Show Adult Content") },
+                        supportingContent = { Text("Include NSFW sources") },
+                        trailingContent = { Switch(checked = adultContent, onCheckedChange = { viewModel.setAdultContent(it) }) }
+                    )
+                }
             }
         }
 
+        // Extensions Section
         item {
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(text = "About & Contact", style = MaterialTheme.typography.titleMedium)
-            Column {
+            SettingsCategory(title = "Extensions", icon = Icons.Rounded.Extension) {
                 ListItem(
-                    headlineContent = { Text("Email") },
-                    supportingContent = { Text("meigetsu.app@gmail.com") },
-                    modifier = Modifier.clickable { uriHandler.openUri("mailto:meigetsu.app@gmail.com") }
-                )
-                ListItem(
-                    headlineContent = { Text("Discord") },
-                    supportingContent = { Text("Join our community") },
-                    modifier = Modifier.clickable { uriHandler.openUri("https://discord.gg/JskMdb4cS") }
-                )
-                ListItem(
-                    headlineContent = { Text("GitHub") },
-                    supportingContent = { Text("Source code and issues") },
-                    modifier = Modifier.clickable { uriHandler.openUri("https://github.com/Azu-na/Meigetsu-") }
+                    headlineContent = { Text("Manage Extensions") },
+                    supportingContent = { Text("Install or update providers") },
+                    modifier = Modifier.clickable { onManageExtensionsClick() },
+                    trailingContent = { Icon(Icons.Rounded.ChevronRight, contentDescription = null) }
                 )
             }
+        }
+
+        // Backup Section
+        item {
+            SettingsCategory(title = "Data", icon = Icons.Rounded.Storage) {
+                Column {
+                    ListItem(
+                        headlineContent = { Text("Backup") },
+                        supportingContent = { Text("Export library and settings") },
+                        modifier = Modifier.clickable { /* Backup logic */ }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Restore") },
+                        supportingContent = { Text("Import from backup file") },
+                        modifier = Modifier.clickable { /* Restore logic */ }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Clear Cache") },
+                        modifier = Modifier.clickable { /* Clear cache logic */ }
+                    )
+                }
+            }
+        }
+
+        // About & Contact Section
+        item {
+            SettingsCategory(title = "About Meigetsu", icon = Icons.Rounded.Info) {
+                Column {
+                    ListItem(
+                        headlineContent = { Text("Version") },
+                        supportingContent = { Text("1.0.0-stable") }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Email") },
+                        supportingContent = { Text("meigetsu.app@gmail.com") },
+                        modifier = Modifier.clickable { uriHandler.openUri("mailto:meigetsu.app@gmail.com") }
+                    )
+                    ListItem(
+                        headlineContent = { Text("Discord") },
+                        supportingContent = { Text("Join our community") },
+                        modifier = Modifier.clickable { uriHandler.openUri("https://discord.gg/JskMdb4cS") }
+                    )
+                    ListItem(
+                        headlineContent = { Text("GitHub") },
+                        supportingContent = { Text("Source code and issues") },
+                        modifier = Modifier.clickable { uriHandler.openUri("https://github.com/Azu-na/Meigetsu-") }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SettingsCategory(
+    title: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    content: @Composable () -> Unit
+) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)) {
+            Icon(imageVector = icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.width(12.dp))
+            Text(text = title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+        }
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+        ) {
+            content()
         }
     }
 }

@@ -11,14 +11,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.meigetsu.core.extensions.ExtensionManager
-import com.meigetsu.core.extensions.ExtensionMetadata
 import kotlinx.coroutines.launch
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class ExtensionViewModel @Inject constructor(
+    val extensionManager: ExtensionManager
+) : ViewModel()
 
 @Composable
 fun ExtensionManagementScreen(
-    extensionManager: ExtensionManager
+    viewModel: ExtensionViewModel
 ) {
-    val animeSources by extensionManager.animeSources.collectAsState()
+    val animeProviders by viewModel.extensionManager.animeProviders.collectAsState()
     var repoUrl by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
 
@@ -34,8 +41,7 @@ fun ExtensionManagementScreen(
             )
             IconButton(onClick = {
                 scope.launch {
-                    val metadataList = extensionManager.fetchExtensions(repoUrl)
-                    // Logic to register dynamic sources
+                    viewModel.extensionManager.fetchExtensions(repoUrl)
                 }
             }) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
@@ -46,7 +52,7 @@ fun ExtensionManagementScreen(
 
         Text(text = "Installed Extensions", style = MaterialTheme.typography.titleMedium)
         LazyColumn {
-            items(animeSources.values.toList()) { source ->
+            items(animeProviders.values.toList()) { source ->
                 ListItem(
                     headlineContent = { Text(source.metadata.name) },
                     supportingContent = { Text("Version ${source.metadata.version}") },

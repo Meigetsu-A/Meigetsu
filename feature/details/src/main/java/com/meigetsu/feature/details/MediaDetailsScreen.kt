@@ -17,6 +17,13 @@ fun MediaDetailsScreen(
     onReadClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val streamUrls by viewModel.streamUrls.collectAsState()
+
+    LaunchedEffect(streamUrls) {
+        if (streamUrls.isNotEmpty()) {
+            onWatchClick(streamUrls.first().url)
+        }
+    }
 
     when (val state = uiState) {
         is Resource.Loading -> LoadingSkeleton()
@@ -32,7 +39,7 @@ fun MediaDetailsScreen(
                     Row {
                         Button(onClick = {
                             if (anime.format.name == "MANGA") onReadClick(anime.id)
-                            else onWatchClick("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8")
+                            else viewModel.fetchStreams()
                         }) {
                             Text(if (anime.format.name == "MANGA") "Read Now" else "Watch Now")
                         }

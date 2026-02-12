@@ -1,6 +1,6 @@
 # Meigetsu
 
-Meigetsu is a production-ready content aggregator application for Android, built with Kotlin, Jetpack Compose, and Clean Architecture.
+Meigetsu is an advanced, production-ready content aggregator for Android, built with Kotlin, Jetpack Compose, and Clean Architecture. Inspired by Mihon and Cloudstream, it offers a sophisticated plugin-based extension system and a premium media consumption experience.
 
 ## ⚖️ LEGAL / DMCA SAFETY REQUIREMENTS
 
@@ -30,24 +30,28 @@ This project is licensed under the **MIT License**.
 
 ## 📱 Features
 
-*   **Home:** Smart recommendations, trending anime/manga, and continue watching/reading sections.
-*   **Library:** Manage your collection with custom categories and local persistence (Room).
-*   **Browse:** Powerful search and filtering using the AniList API.
-*   **Video Player:** Netflix-style ExoPlayer with gesture controls, PIP, and subtitle support.
-*   **Manga Reader:** Advanced reader with Webtoon, Vertical, and Horizontal modes.
-*   **Extension System:** Plugin-based architecture for dynamic source loading.
-*   **Settings:** Advanced Theme Builder with instant primary/secondary color customization.
+*   **Home:** Smart recommendation engine, vertical/horizontal carousels, and "Continue Watching/Reading" with persistent progress tracking.
+*   **Library:** Advanced collection management with custom categories, drag-and-drop reordering, and Room persistence.
+*   **Browse & Global Search:** Unified search across all installed providers and powerful AniList-powered metadata browsing.
+*   **Video Player (Netflix-Style):** Custom ExoPlayer implementation with volume/brightness gestures, double-tap seek, PIP, and advanced playback controls.
+*   **Manga Reader:** Multi-mode reader (Webtoon, Vertical, Paged Horizontal) with smooth animations and pinch-to-zoom.
+*   **Plugin System (Mihon/Cloudstream Style):** Dynamic extension loading with sophisticated metadata, lang support, and auto-update capabilities.
+*   **Advanced Settings:**
+    *   **Theme Builder:** Real-time primary/secondary color customization and corner radius adjustments.
+    *   **Incognito Mode:** Browse without history or progress saving.
+    *   **Detailed Statistics:** Track your watch time and reading history.
+    *   **Security:** Parental controls and NSFW toggles.
+    *   **Data Management:** JSON-based backup and restore functionality.
 
 ## 🏗️ Architecture
 
-*   **Clean Architecture** (app, core, data, domain, ui, features)
-*   **MVVM** Pattern
-*   **Hilt** for Dependency Injection
-*   **Coroutines + Flow** for asynchronous operations
-*   **Apollo GraphQL** for AniList API integration
-*   **Room** for local database
-*   **Media3/ExoPlayer** for video playback
-*   **Coil** for image loading
+*   **Clean Architecture & Modularization**
+*   **MVVM** with StateFlow
+*   **Hilt** for DI
+*   **Apollo GraphQL** (AniList)
+*   **Ktor & Retrofit** (Networking)
+*   **Room & DataStore** (Persistence)
+*   **Media3/ExoPlayer** (Playback)
 
 ## 🚀 Getting Started
 
@@ -57,10 +61,7 @@ This project is licensed under the **MIT License**.
 3.  Sync Gradle and run the `:app` module.
 
 ### How to Add Extensions
-Extensions are dynamically loaded via the `ExtensionManager`. To add a new source:
-1.  Implement the `AnimeSource` or `MangaSource` interface.
-2.  Register the source in the `ExtensionManager`.
-3.  The app will automatically display content from the registered source.
+Meigetsu supports dynamic APK and JSON-based extensions. Register your provider in the `ExtensionManager` or host a repository for remote fetching.
 
 ## 🤝 Contact
 *   **Discord:** [https://discord.gg/JskMdb4cS](https://discord.gg/JskMdb4cS)

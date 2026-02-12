@@ -11,23 +11,33 @@ data class ExtensionMetadata(
     val version: String,
     val description: String,
     val iconUrl: String?,
-    val type: String, // "ANIME" or "MANGA"
-    val baseUrl: String,
-    val apiUrl: String? = null
+    val type: ExtensionType,
+    val pkgName: String,
+    val author: String,
+    val isNsfw: Boolean = false,
+    val lang: String = "en"
 )
+
+enum class ExtensionType {
+    ANIME, MANGA, BOTH
+}
 
 interface Extension {
     val metadata: ExtensionMetadata
 }
 
-interface AnimeSource : Extension {
+interface AnimeProvider : Extension {
     suspend fun getStreamUrls(episode: Episode): List<StreamUrl>
     suspend fun search(query: String, page: Int): List<MediaSearchResult>
+    suspend fun getPopular(page: Int): List<MediaSearchResult>
+    suspend fun getLatest(page: Int): List<MediaSearchResult>
 }
 
-interface MangaSource : Extension {
+interface MangaProvider : Extension {
     suspend fun getPages(chapter: Chapter): List<String>
     suspend fun search(query: String, page: Int): List<MediaSearchResult>
+    suspend fun getPopular(page: Int): List<MediaSearchResult>
+    suspend fun getLatest(page: Int): List<MediaSearchResult>
 }
 
 @Serializable
@@ -43,5 +53,6 @@ data class MediaSearchResult(
     val id: String,
     val title: String,
     val imageUrl: String?,
-    val type: String
+    val type: String,
+    val extensionId: String
 )

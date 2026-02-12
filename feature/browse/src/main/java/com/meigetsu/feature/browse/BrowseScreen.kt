@@ -4,6 +4,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -12,6 +14,7 @@ import com.meigetsu.core.common.Resource
 import com.meigetsu.core.ui.components.MediaCard
 import com.meigetsu.core.ui.components.LoadingSkeleton
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowseScreen(
     viewModel: BrowseViewModel,
@@ -19,48 +22,39 @@ fun BrowseScreen(
 ) {
     val searchResult by viewModel.searchResult.collectAsState()
     var query by remember { mutableStateOf("") }
-    var showFilters by remember { mutableStateOf(false) }
+    var activeTab by remember { mutableStateOf(0) }
 
     Column {
-        Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-            TextField(
-                value = query,
-                onValueChange = {
-                    query = it
-                    viewModel.search(it)
-                },
-                modifier = Modifier.weight(1f),
-                placeholder = { Text("Search Anime...") }
-            )
-            IconButton(onClick = { showFilters = !showFilters }) {
-                // Filter icon would go here
-                Text("F")
-            }
+        TabRow(selectedTabIndex = activeTab) {
+            Tab(selected = activeTab == 0, onClick = { activeTab = 0 }, text = { Text("Search") })
+            Tab(selected = activeTab == 1, onClick = { activeTab = 1 }, text = { Text("Extensions") })
+            Tab(selected = activeTab == 2, onClick = { activeTab = 2 }, text = { Text("Migrate") })
         }
 
-        if (showFilters) {
-            // Advanced Filters UI
-            Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-                AssistChip(onClick = { }, label = { Text("Genre") })
-                Spacer(modifier = Modifier.width(8.dp))
-                AssistChip(onClick = { }, label = { Text("Year") })
-                Spacer(modifier = Modifier.width(8.dp))
-                AssistChip(onClick = { }, label = { Text("Format") })
-            }
-        }
+        SearchBar(
+            query = query,
+            onQueryChange = { query = it },
+            onSearch = { viewModel.search(it) },
+            active = false,
+            onActiveChange = {},
+            placeholder = { Text("Search Anime & Manga...") },
+            leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) { }
 
         when (val result = searchResult) {
             is Resource.Loading -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(3)) {
-                    items(9) { LoadingSkeleton(Modifier.padding(4.dp)) }
+                LazyVerticalGrid(columns = GridCells.Fixed(3), contentPadding = PaddingValues(8.dp)) {
+                    items(12) { LoadingSkeleton(Modifier.padding(4.dp)) }
                 }
             }
             is Resource.Success -> {
-                LazyVerticalGrid(columns = GridCells.Fixed(3)) {
+                LazyVerticalGrid(columns = GridCells.Fixed(3), contentPadding = PaddingValues(8.dp)) {
                     items(result.data ?: emptyList()) { anime ->
                         MediaCard(
                             title = anime.title,
                             imageUrl = anime.coverImage,
+                            type = anime.format.name,
                             onClick = { onMediaClick(anime.id) },
                             modifier = Modifier.padding(4.dp)
                         )
@@ -68,7 +62,7 @@ fun BrowseScreen(
                 }
             }
             is Resource.Error -> {
-                Text(text = result.message ?: "Unknown error", modifier = Modifier.padding(16.dp))
+                Text(text = result.message ?: "Search failed", modifier = Modifier.padding(16.dp), color = MaterialTheme.colorScheme.error)
             }
         }
     }
