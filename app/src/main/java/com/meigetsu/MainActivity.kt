@@ -166,7 +166,12 @@ fun MainScreen() {
                 NewsScreen(hiltViewModel())
             }
             composable(Screen.Browse.route) {
-                BrowseScreen(hiltViewModel(), hiltViewModel(), onMediaClick = { id -> navController.navigate("details/$id") })
+                BrowseScreen(
+                    hiltViewModel(),
+                    hiltViewModel(),
+                    onMediaClick = { id -> navController.navigate("details/$id") },
+                    onCharacterClick = { id -> navController.navigate("character/$id") }
+                )
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(

@@ -39,10 +39,6 @@ class ExtensionManager @Inject constructor(
     private val _availableExtensions = MutableStateFlow<List<ExtensionRemote>>(emptyList())
     val availableExtensions = _availableExtensions.asStateFlow()
 
-    init {
-        registerExtension(SampleAnimeExtension())
-    }
-
     suspend fun fetchExtensions(repoUrl: String) {
         try {
             val url = if (repoUrl.endsWith("index.json")) repoUrl else "$repoUrl/index.json"
@@ -96,37 +92,4 @@ class ExtensionManager @Inject constructor(
 
     fun getAnimeProvider(id: String): AnimeProvider? = _animeProviders.value[id]
     fun getMangaProvider(id: String): MangaProvider? = _mangaProviders.value[id]
-}
-
-class SampleAnimeExtension : AnimeProvider {
-    override val metadata = ExtensionMetadata(
-        id = "sample-anime",
-        name = "Meigetsu Sample",
-        version = "1.0.0",
-        description = "Official sample provider",
-        iconUrl = null,
-        type = ExtensionType.ANIME,
-        pkgName = "com.meigetsu.extension.sample",
-        author = "Meigetsu Team"
-    )
-
-    override suspend fun getEpisodes(animeId: String): List<Episode> = listOf(
-        Episode("1", animeId, 1, "The Beginning", "https://img.aniworld.to/media/episode/cover/1.jpg", "2024-01-01"),
-        Episode("2", animeId, 2, "The Journey", "https://img.aniworld.to/media/episode/cover/2.jpg", "2024-01-08")
-    )
-
-    override suspend fun getStreamUrls(episode: Episode): List<StreamUrl> = listOf(
-        StreamUrl("https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8", "Auto", "m3u8")
-    )
-
-    override suspend fun search(query: String, page: Int): List<MediaSearchResult> {
-        if (query.lowercase().contains("sample")) {
-            return listOf(
-                MediaSearchResult("1", "Sample Anime", null, "ANIME", metadata.id)
-            )
-        }
-        return emptyList()
-    }
-    override suspend fun getPopular(page: Int): List<MediaSearchResult> = emptyList()
-    override suspend fun getLatest(page: Int): List<MediaSearchResult> = emptyList()
 }

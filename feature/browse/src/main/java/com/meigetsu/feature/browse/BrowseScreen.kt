@@ -26,33 +26,76 @@ import com.meigetsu.core.ui.components.LoadingSkeleton
 fun BrowseScreen(
     viewModel: BrowseViewModel,
     globalSearchViewModel: GlobalSearchViewModel,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String) -> Unit,
+    onCharacterClick: (String) -> Unit
 ) {
     val searchResult by viewModel.searchResult.collectAsState()
+    val characterSearchResult by viewModel.characterSearchResult.collectAsState()
     val globalResults by globalSearchViewModel.searchResults.collectAsState()
     val isGlobalLoading by globalSearchViewModel.isLoading.collectAsState()
     val availableExtensions by viewModel.availableExtensions.collectAsState()
     var query by remember { mutableStateOf("") }
     var activeTab by remember { mutableStateOf(0) }
+    var searchType by remember { mutableStateOf("ANIME") }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is BrowseUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column {
                 TabRow(selectedTabIndex = activeTab) {
-                    Tab(selected = activeTab == 0, onClick = { activeTab = 0 }, text = { Text("AniList") })
-                    Tab(selected = activeTab == 1, onClick = { activeTab = 1 }, text = { Text("Global") })
-                    Tab(selected = activeTab == 2, onClick = { activeTab = 2 }, text = { Text("Extensions") })
+                    Tab(
+                        selected = activeTab == 0,
+                        onClick = { activeTab = 0 },
+                        icon = { Icon(Icons.Rounded.Source, null) },
+                        text = { Text("Sources") }
+                    )
+                    Tab(
+                        selected = activeTab == 1,
+                        onClick = { activeTab = 1 },
+                        icon = { Icon(Icons.Rounded.Extension, null) },
+                        text = { Text("Extensions") }
+                    )
+                }
+                if (activeTab == 0) {
+                    Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+                        FilterChip(
+                            selected = searchType == "ANIME",
+                            onClick = { searchType = "ANIME" },
+                            label = { Text("Anime") }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        FilterChip(
+                            selected = searchType == "CHARACTER",
+                            onClick = { searchType = "CHARACTER" },
+                            label = { Text("Characters") }
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        FilterChip(
+                            selected = searchType == "GLOBAL",
+                            onClick = { searchType = "GLOBAL" },
+                            label = { Text("Global") }
+                        )
+                    }
                 }
                 SearchBar(
                     query = query,
                     onQueryChange = { query = it },
                     onSearch = {
-                        if (activeTab == 0) viewModel.search(it)
-                        else globalSearchViewModel.search(it)
+                        if (searchType == "GLOBAL") globalSearchViewModel.search(it)
+                        else viewModel.search(it, searchType)
                     },
                     active = false,
                     onActiveChange = {},
-                    placeholder = { Text(if (activeTab == 0) "Search AniList..." else "Search all extensions...") },
+                    placeholder = { Text("Search $searchType...") },
                     leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
                     trailingIcon = {
                         IconButton(onClick = { /* Start Voice Intent */ }) {
@@ -66,9 +109,43 @@ fun BrowseScreen(
         }
     ) { innerPadding ->
         when (activeTab) {
-            0 -> AniListSearchResults(searchResult, innerPadding, onMediaClick)
-            1 -> GlobalSearchResults(globalResults, isGlobalLoading, innerPadding, onMediaClick)
-            2 -> ExtensionsList(availableExtensions, innerPadding) { viewModel.installExtension(it) }
+            0 -> {
+                when (searchType) {
+                    "ANIME" -> AniListSearchResults(searchResult, innerPadding, onMediaClick)
+                    "CHARACTER" -> CharacterSearchResults(characterSearchResult, innerPadding, onCharacterClick)
+                    "GLOBAL" -> GlobalSearchResults(globalResults, isGlobalLoading, innerPadding, onMediaClick)
+                }
+            }
+            1 -> ExtensionsList(availableExtensions, innerPadding) { viewModel.installExtension(it) }
+        }
+    }
+}
+
+@Composable
+fun CharacterSearchResults(
+    result: Resource<List<com.meigetsu.core.model.Character>>,
+    innerPadding: PaddingValues,
+    onCharacterClick: (String) -> Unit
+) {
+    when (result) {
+        is Resource.Loading -> {
+            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+                items(12) { LoadingSkeleton(Modifier.padding(4.dp)) }
+            }
+        }
+        is Resource.Success -> {
+            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+                items(result.data ?: emptyList()) { char ->
+                    MediaCard(
+                        title = char.name,
+                        imageUrl = char.image,
+                        onClick = { onCharacterClick(char.id) }
+                    )
+                }
+            }
+        }
+        is Resource.Error -> {
+            Text(text = result.message ?: "Error", modifier = Modifier.padding(innerPadding))
         }
     }
 }

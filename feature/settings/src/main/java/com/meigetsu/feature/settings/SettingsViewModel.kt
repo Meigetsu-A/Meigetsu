@@ -33,8 +33,8 @@ class SettingsViewModel @Inject constructor(
     val biometricEnabled: StateFlow<Boolean> = preferenceRepository.getBiometricEnabled()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val watchTime: StateFlow<String> = flow { emit("124h 32m") }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "0h 0m")
-    val readCount: StateFlow<Int> = flow { emit(1458) }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val libraryLayout: StateFlow<String> = preferenceRepository.getLibraryLayout()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "GRID")
 
     fun updatePrimaryColor(color: Color) {
         viewModelScope.launch { preferenceRepository.setPrimaryColor(color.toArgb()) }
@@ -54,5 +54,9 @@ class SettingsViewModel @Inject constructor(
 
     fun setBiometricEnabled(enabled: Boolean) {
         viewModelScope.launch { preferenceRepository.setBiometricEnabled(enabled) }
+    }
+
+    fun setLibraryLayout(layout: String) {
+        viewModelScope.launch { preferenceRepository.setLibraryLayout(layout) }
     }
 }

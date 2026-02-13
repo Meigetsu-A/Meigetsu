@@ -14,44 +14,108 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
     onManageExtensionsClick: () -> Unit,
     onStatsClick: () -> Unit
 ) {
-    val primaryColor by viewModel.primaryColor.collectAsState()
-    val cornerRadius by viewModel.cornerRadius.collectAsState()
+    var selectedTab by remember { mutableStateOf(0) }
+    val tabs = listOf("General", "Appearance", "Extensions", "Security", "About")
+
+    Scaffold(
+        topBar = {
+            Column {
+                LargeTopAppBar(title = { Text("Settings", fontWeight = FontWeight.Bold) })
+                ScrollableTabRow(
+                    selectedTabIndex = selectedTab,
+                    edgePadding = 16.dp,
+                    containerColor = MaterialTheme.colorScheme.background,
+                    divider = {}
+                ) {
+                    tabs.forEachIndexed { index, title ->
+                        Tab(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            text = { Text(title) }
+                        )
+                    }
+                }
+            }
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding).fillMaxSize()) {
+            when (selectedTab) {
+                0 -> GeneralSettings(viewModel, onStatsClick)
+                1 -> AppearanceSettings(viewModel)
+                2 -> ExtensionSettings(onManageExtensionsClick)
+                3 -> SecuritySettings(viewModel)
+                4 -> AboutSettings()
+            }
+        }
+    }
+}
+
+@Composable
+fun GeneralSettings(viewModel: SettingsViewModel, onStatsClick: () -> Unit) {
     val incognito by viewModel.incognitoMode.collectAsState()
-    val adultContent by viewModel.adultContent.collectAsState()
-    val biometricEnabled by viewModel.biometricEnabled.collectAsState()
-    val watchTime by viewModel.watchTime.collectAsState()
-    val readCount by viewModel.readCount.collectAsState()
-    val uriHandler = LocalUriHandler.current
+    val libraryLayout by viewModel.libraryLayout.collectAsState()
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
-            Text(text = "Settings", style = MaterialTheme.typography.headlineSmall)
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
-        // Statistics Section
-        item {
-            SettingsCategory(title = "Statistics", icon = Icons.Rounded.BarChart) {
+            SettingsCategory(title = "Library", icon = Icons.Rounded.LibraryBooks) {
                 ListItem(
-                    headlineContent = { Text("View Detailed Stats") },
-                    supportingContent = { Text("Watch time and reading activity") },
-                    modifier = Modifier.clickable { onStatsClick() },
-                    trailingContent = { Icon(Icons.Rounded.ChevronRight, contentDescription = null) }
+                    headlineContent = { Text("Library Layout") },
+                    supportingContent = { Text("Current: $libraryLayout") },
+                    modifier = Modifier.clickable {
+                        viewModel.setLibraryLayout(if (libraryLayout == "GRID") "LIST" else "GRID")
+                    },
+                    trailingContent = { Icon(if (libraryLayout == "GRID") Icons.Rounded.GridView else Icons.Rounded.List, null) }
+                )
+                ListItem(
+                    headlineContent = { Text("Incognito Mode") },
+                    supportingContent = { Text("Don't save history or progress") },
+                    trailingContent = { Switch(checked = incognito, onCheckedChange = { viewModel.setIncognito(it) }) }
                 )
             }
         }
-
-        // Appearance Section
         item {
-            SettingsCategory(title = "Appearance", icon = Icons.Rounded.Palette) {
+            SettingsCategory(title = "Statistics", icon = Icons.Rounded.BarChart) {
+                ListItem(
+                    headlineContent = { Text("Activity Log") },
+                    supportingContent = { Text("View detailed watch/read history") },
+                    modifier = Modifier.clickable { onStatsClick() },
+                    trailingContent = { Icon(Icons.Rounded.ChevronRight, null) }
+                )
+            }
+        }
+        item {
+            SettingsCategory(title = "Data", icon = Icons.Rounded.Storage) {
+                ListItem(
+                    headlineContent = { Text("Backup & Restore") },
+                    modifier = Modifier.clickable { }
+                )
+                ListItem(
+                    headlineContent = { Text("Clear Cache") },
+                    modifier = Modifier.clickable { }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AppearanceSettings(viewModel: SettingsViewModel) {
+    val primaryColor by viewModel.primaryColor.collectAsState()
+    val cornerRadius by viewModel.cornerRadius.collectAsState()
+
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        item {
+            SettingsCategory(title = "Theme", icon = Icons.Rounded.Palette) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(text = "Primary Color")
@@ -74,94 +138,61 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+}
 
-        // Behavior Section
+@Composable
+fun ExtensionSettings(onManageExtensionsClick: () -> Unit) {
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
-            SettingsCategory(title = "Behavior", icon = Icons.Rounded.SettingsSuggest) {
-                Column {
-                    ListItem(
-                        headlineContent = { Text("Incognito Mode") },
-                        supportingContent = { Text("Don't save history or progress") },
-                        trailingContent = { Switch(checked = incognito, onCheckedChange = { viewModel.setIncognito(it) }) }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Show Adult Content") },
-                        supportingContent = { Text("Include NSFW sources") },
-                        trailingContent = { Switch(checked = adultContent, onCheckedChange = { viewModel.setAdultContent(it) }) }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Biometric Lock") },
-                        supportingContent = { Text("Secure app with fingerprint/face") },
-                        trailingContent = { Switch(checked = biometricEnabled, onCheckedChange = { viewModel.setBiometricEnabled(it) }) }
-                    )
-                }
-            }
-        }
-
-        // Extensions Section
-        item {
-            SettingsCategory(title = "Extensions", icon = Icons.Rounded.Extension) {
+            SettingsCategory(title = "Management", icon = Icons.Rounded.Extension) {
                 ListItem(
-                    headlineContent = { Text("Manage Extensions") },
-                    supportingContent = { Text("Install or update providers") },
+                    headlineContent = { Text("Extensions & Repositories") },
+                    supportingContent = { Text("Add sources and install plugins") },
                     modifier = Modifier.clickable { onManageExtensionsClick() },
-                    trailingContent = { Icon(Icons.Rounded.ChevronRight, contentDescription = null) }
+                    trailingContent = { Icon(Icons.Rounded.ChevronRight, null) }
                 )
             }
         }
+    }
+}
 
-        // Backup Section
+@Composable
+fun SecuritySettings(viewModel: SettingsViewModel) {
+    val adultContent by viewModel.adultContent.collectAsState()
+    val biometricEnabled by viewModel.biometricEnabled.collectAsState()
+
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
-            SettingsCategory(title = "Data", icon = Icons.Rounded.Storage) {
-                Column {
-                    ListItem(
-                        headlineContent = { Text("Backup") },
-                        supportingContent = { Text("Export library and settings") },
-                        modifier = Modifier.clickable { /* Backup logic */ }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Restore") },
-                        supportingContent = { Text("Import from backup file") },
-                        modifier = Modifier.clickable { /* Restore logic */ }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Clear Cache") },
-                        modifier = Modifier.clickable { /* Clear cache logic */ }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Cloud Sync (WebDAV)") },
-                        supportingContent = { Text("Sync library via custom server") },
-                        modifier = Modifier.clickable { /* WebDAV Setup */ },
-                        trailingContent = { Icon(Icons.Rounded.CloudSync, contentDescription = null) }
-                    )
-                }
+            SettingsCategory(title = "Privacy", icon = Icons.Rounded.Security) {
+                ListItem(
+                    headlineContent = { Text("Show Adult Content") },
+                    trailingContent = { Switch(checked = adultContent, onCheckedChange = { viewModel.setAdultContent(it) }) }
+                )
+                ListItem(
+                    headlineContent = { Text("Biometric Lock") },
+                    trailingContent = { Switch(checked = biometricEnabled, onCheckedChange = { viewModel.setBiometricEnabled(it) }) }
+                )
             }
         }
+    }
+}
 
-        // About & Contact Section
+@Composable
+fun AboutSettings() {
+    val uriHandler = LocalUriHandler.current
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
-            SettingsCategory(title = "About Meigetsu", icon = Icons.Rounded.Info) {
-                Column {
-                    ListItem(
-                        headlineContent = { Text("Version") },
-                        supportingContent = { Text("1.0.0-stable") }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Email") },
-                        supportingContent = { Text("meigetsu.app@gmail.com") },
-                        modifier = Modifier.clickable { uriHandler.openUri("mailto:meigetsu.app@gmail.com") }
-                    )
-                    ListItem(
-                        headlineContent = { Text("Discord") },
-                        supportingContent = { Text("Join our community") },
-                        modifier = Modifier.clickable { uriHandler.openUri("https://discord.gg/JskMdb4cS") }
-                    )
-                    ListItem(
-                        headlineContent = { Text("GitHub") },
-                        supportingContent = { Text("Source code and issues") },
-                        modifier = Modifier.clickable { uriHandler.openUri("https://github.com/Azu-na/Meigetsu-") }
-                    )
-                }
+            SettingsCategory(title = "Meigetsu", icon = Icons.Rounded.Info) {
+                ListItem(headlineContent = { Text("Version") }, supportingContent = { Text("1.0.0-stable") })
+                ListItem(
+                    headlineContent = { Text("GitHub") },
+                    modifier = Modifier.clickable { uriHandler.openUri("https://github.com/Azu-na/Meigetsu-") }
+                )
+                ListItem(
+                    headlineContent = { Text("Discord") },
+                    modifier = Modifier.clickable { uriHandler.openUri("https://discord.gg/JskMdb4cS") }
+                )
             }
         }
     }

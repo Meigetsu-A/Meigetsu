@@ -1,18 +1,18 @@
 package com.meigetsu.core.data.repository
 
+import com.meigetsu.core.database.dao.CharacterDao
 import com.meigetsu.core.database.dao.LibraryDao
+import com.meigetsu.core.database.entity.CharacterEntity
 import com.meigetsu.core.database.entity.LibraryEntity
 import com.meigetsu.core.domain.repository.LibraryRepository
-import com.meigetsu.core.model.Anime
-import com.meigetsu.core.model.Manga
-import com.meigetsu.core.model.MediaFormat
-import com.meigetsu.core.model.MediaStatus
+import com.meigetsu.core.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class LibraryRepositoryImpl @Inject constructor(
-    private val libraryDao: LibraryDao
+    private val libraryDao: LibraryDao,
+    private val characterDao: CharacterDao
 ) : LibraryRepository {
 
     override fun getLibraryAnime(): Flow<List<Anime>> {
@@ -61,6 +61,20 @@ class LibraryRepositoryImpl @Inject constructor(
         libraryDao.deleteLibraryItem(id)
     }
 
+    override fun getFavoriteCharacters(): Flow<List<Character>> {
+        return characterDao.getAllFavoriteCharacters().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun addCharacterToLibrary(character: Character) {
+        characterDao.insertCharacter(character.toEntity())
+    }
+
+    override suspend fun removeCharacterFromLibrary(id: String) {
+        // characterDao.deleteCharacter(...) - need to fetch first or add a deleteById
+    }
+
     override fun getWatchHistory(): Flow<List<String>> {
         return libraryDao.getWatchHistory().map { list -> list.map { it.mediaId } }
     }
@@ -98,5 +112,19 @@ class LibraryRepositoryImpl @Inject constructor(
         genres = emptyList(),
         averageScore = null,
         popularity = null
+    )
+
+    private fun CharacterEntity.toDomain() = Character(
+        id = id,
+        name = name,
+        image = image,
+        description = description
+    )
+
+    private fun Character.toEntity() = CharacterEntity(
+        id = id,
+        name = name,
+        image = image,
+        description = description
     )
 }

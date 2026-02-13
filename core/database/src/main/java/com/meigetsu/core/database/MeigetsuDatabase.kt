@@ -22,15 +22,17 @@ import javax.inject.Singleton
         DownloadEntity::class,
         ExtensionRepoEntity::class,
         ReadingStatsEntity::class,
-        TrackerEntity::class
+        TrackerEntity::class,
+        CharacterEntity::class
     ],
-    version = 6
+    version = 7
 )
 abstract class MeigetsuDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
     abstract fun downloadDao(): DownloadDao
     abstract fun repoDao(): RepoDao
     abstract fun statsDao(): ReadingStatsDao
+    abstract fun characterDao(): CharacterDao
 }
 
 @Module
@@ -59,4 +61,7 @@ object DatabaseModule {
 
     @Provides
     fun provideStatsDao(db: MeigetsuDatabase): ReadingStatsDao = db.statsDao()
+
+    @Provides
+    fun provideCharacterDao(db: MeigetsuDatabase): CharacterDao = db.characterDao()
 }

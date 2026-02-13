@@ -23,6 +23,7 @@ class PreferenceRepositoryImpl @Inject constructor(
     private val primaryColorKey = intPreferencesKey("primary_color")
     private val cornerRadiusKey = intPreferencesKey("corner_radius")
     private val readingModeKey = stringPreferencesKey("reading_mode")
+    private val libraryLayoutKey = stringPreferencesKey("library_layout")
     private val incognitoKey = booleanPreferencesKey("incognito_mode")
     private val adultContentKey = booleanPreferencesKey("adult_content")
     private val biometricEnabledKey = booleanPreferencesKey("biometric_enabled")
@@ -40,6 +41,11 @@ class PreferenceRepositoryImpl @Inject constructor(
     override fun getReadingMode(): Flow<String> = context.dataStore.data.map { it[readingModeKey] ?: "VERTICAL" }
     override suspend fun setReadingMode(mode: String) {
         context.dataStore.edit { it[readingModeKey] = mode }
+    }
+
+    override fun getLibraryLayout(): Flow<String> = context.dataStore.data.map { it[libraryLayoutKey] ?: "GRID" }
+    override suspend fun setLibraryLayout(layout: String) {
+        context.dataStore.edit { it[libraryLayoutKey] = layout }
     }
 
     override fun getIncognitoMode(): Flow<Boolean> = context.dataStore.data.map { it[incognitoKey] ?: false }

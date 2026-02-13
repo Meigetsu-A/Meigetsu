@@ -31,6 +31,30 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun searchCharacters(query: String): Flow<Resource<List<Character>>> = flow {
+        if (query.isBlank()) {
+            emit(Resource.Success(emptyList()))
+            return@flow
+        }
+        emit(Resource.Loading())
+        try {
+            val response = apolloClient.query(SearchMediaQuery(
+                search = com.apollographql.apollo.api.Optional.present(query)
+            )).execute()
+            val charList = response.data?.Page?.characters?.filterNotNull()?.map {
+                Character(
+                    id = it.id.toString(),
+                    name = it.name?.full ?: "Unknown",
+                    image = it.image?.large,
+                    description = it.description
+                )
+            } ?: emptyList()
+            emit(Resource.Success(charList))
+        } catch (e: Exception) {
+            emit(Resource.Error(e.message ?: "An error occurred"))
+        }
+    }
+
     override fun getTrendingManga(): Flow<Resource<List<Manga>>> = flow {
         emit(Resource.Loading())
         try {

@@ -11,9 +11,14 @@ import com.meigetsu.core.model.*
 import com.meigetsu.core.extensions.ExtensionManager
 import com.meigetsu.core.extensions.StreamUrl
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+sealed class DetailsUiEvent {
+    data class ShowSnackbar(val message: String) : DetailsUiEvent()
+}
 
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
@@ -40,6 +45,9 @@ class DetailsViewModel @Inject constructor(
 
     private val _isSelectionMode = MutableStateFlow(false)
     val isSelectionMode = _isSelectionMode.asStateFlow()
+
+    private val _eventChannel = Channel<DetailsUiEvent>()
+    val events = _eventChannel.receiveAsFlow()
 
     init {
         loadDetails()
@@ -85,6 +93,7 @@ class DetailsViewModel @Inject constructor(
             val providerId = extensionManager.animeProviders.value.keys.firstOrNull() ?: return@launch
 
             downloadItemsUseCase.execute(anime, itemsToDownload, providerId)
+            _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added ${itemsToDownload.size} items to downloads"))
             clearSelection()
         }
     }
@@ -103,6 +112,7 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
             libraryRepository.addToLibrary(anime)
+            _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added to Library"))
         }
     }
 }

@@ -25,5 +25,15 @@ query SearchMedia($search: String, $type: MediaType, $page: Int) {
       season
       seasonYear
     }
+    characters(search: $search) {
+      id
+      name {
+        full
+      }
+      image {
+        large
+      }
+      description
+    }
   }
 }

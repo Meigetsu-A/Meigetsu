@@ -36,6 +36,15 @@ fun MediaDetailsScreen(
     val episodes by viewModel.episodes.collectAsState()
     val selectedIds by viewModel.selectedEpisodeIds.collectAsState()
     val isSelectionMode by viewModel.isSelectionMode.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is DetailsUiEvent.ShowSnackbar -> snackbarHostState.showSnackbar(event.message)
+            }
+        }
+    }
 
     LaunchedEffect(streamUrls) {
         if (streamUrls.isNotEmpty()) {
@@ -44,6 +53,7 @@ fun MediaDetailsScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             if (isSelectionMode) {
                 TopAppBar(
@@ -201,7 +211,10 @@ fun MediaDetailsScreen(
                                 }
                             },
                             trailingContent = {
-                                IconButton(onClick = { /* Download single */ }) {
+                                IconButton(onClick = {
+                                    viewModel.toggleSelection(episode.id)
+                                    viewModel.downloadSelected()
+                                }) {
                                     Icon(Icons.Rounded.Download, contentDescription = null)
                                 }
                             },

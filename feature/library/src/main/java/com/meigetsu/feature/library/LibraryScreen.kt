@@ -24,9 +24,14 @@ fun LibraryScreen(
     onMediaClick: (String) -> Unit
 ) {
     val libraryAnime by viewModel.libraryAnime.collectAsState()
+    val libraryManga by viewModel.libraryManga.collectAsState()
+    val favoriteCharacters by viewModel.favoriteCharacters.collectAsState()
     var selectedTab by remember { mutableStateOf(0) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column {
                 LargeTopAppBar(
@@ -39,14 +44,81 @@ fun LibraryScreen(
                 ) {
                     Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("Anime") })
                     Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("Manga") })
-                    Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("Downloads") })
+                    Tab(selected = selectedTab == 2, onClick = { selectedTab = 2 }, text = { Text("Characters") })
+                    Tab(selected = selectedTab == 3, onClick = { selectedTab = 3 }, text = { Text("Downloads") })
                 }
             }
         }
     ) { innerPadding ->
         when (selectedTab) {
-            0, 1 -> LibraryGrid(libraryAnime, innerPadding, onMediaClick)
-            2 -> DownloadsList(viewModel, innerPadding)
+            0 -> LibraryGrid(libraryAnime, innerPadding, onMediaClick)
+            1 -> LibraryMangaGrid(libraryManga, innerPadding, onMediaClick)
+            2 -> CharacterLibraryGrid(favoriteCharacters, innerPadding)
+            3 -> DownloadsList(viewModel, innerPadding)
+        }
+    }
+}
+
+@Composable
+fun LibraryMangaGrid(
+    libraryManga: List<com.meigetsu.core.model.Manga>,
+    innerPadding: PaddingValues,
+    onMediaClick: (String) -> Unit
+) {
+    if (libraryManga.isEmpty()) {
+        EmptyLibraryView(innerPadding)
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(libraryManga) { manga ->
+                MediaCard(
+                    title = manga.title,
+                    imageUrl = manga.coverImage,
+                    onClick = { onMediaClick(manga.id) }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun CharacterLibraryGrid(
+    characters: List<com.meigetsu.core.model.Character>,
+    innerPadding: PaddingValues
+) {
+    if (characters.isEmpty()) {
+        EmptyLibraryView(innerPadding)
+    } else {
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(2),
+            modifier = Modifier.fillMaxSize().padding(innerPadding),
+            contentPadding = PaddingValues(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(characters) { char ->
+                MediaCard(
+                    title = char.name,
+                    imageUrl = char.image,
+                    onClick = { /* Char details */ }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun EmptyLibraryView(innerPadding: PaddingValues) {
+    Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(text = "Your library is empty", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = "Start adding some media!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
         }
     }
 }
