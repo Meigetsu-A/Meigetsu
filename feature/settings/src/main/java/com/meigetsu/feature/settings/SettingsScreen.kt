@@ -52,7 +52,7 @@ fun SettingsScreen(
             when (selectedTab) {
                 0 -> GeneralSettings(viewModel, onStatsClick)
                 1 -> AppearanceSettings(viewModel)
-                2 -> ExtensionSettings(onManageExtensionsClick)
+                2 -> ExtensionSettings(viewModel, onManageExtensionsClick)
                 3 -> SecuritySettings(viewModel)
                 4 -> AboutSettings()
             }
@@ -142,18 +142,87 @@ fun AppearanceSettings(viewModel: SettingsViewModel) {
 }
 
 @Composable
-fun ExtensionSettings(onManageExtensionsClick: () -> Unit) {
+fun ExtensionSettings(viewModel: SettingsViewModel, onManageExtensionsClick: () -> Unit) {
+    val repositories by viewModel.repositories.collectAsState()
+    var showAddDialog by remember { mutableStateOf(false) }
+    var newRepoUrl by remember { mutableStateOf("") }
+    var newRepoName by remember { mutableStateOf("") }
+
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
             SettingsCategory(title = "Management", icon = Icons.Rounded.Extension) {
                 ListItem(
-                    headlineContent = { Text("Extensions & Repositories") },
-                    supportingContent = { Text("Add sources and install plugins") },
+                    headlineContent = { Text("Browse Extensions") },
+                    supportingContent = { Text("Install and update plugins") },
                     modifier = Modifier.clickable { onManageExtensionsClick() },
                     trailingContent = { Icon(Icons.Rounded.ChevronRight, null) }
                 )
             }
         }
+        item {
+            SettingsCategory(title = "Repositories", icon = Icons.Rounded.Source) {
+                Column {
+                    repositories.forEach { repo ->
+                        ListItem(
+                            headlineContent = { Text(repo.name) },
+                            supportingContent = { Text(repo.url) },
+                            trailingContent = {
+                                IconButton(onClick = { viewModel.removeRepository(repo.url) }) {
+                                    Icon(Icons.Rounded.Delete, contentDescription = "Delete")
+                                }
+                            }
+                        )
+                    }
+                    Button(
+                        onClick = { showAddDialog = true },
+                        modifier = Modifier.fillMaxWidth().padding(16.dp)
+                    ) {
+                        Icon(Icons.Rounded.Add, null)
+                        Spacer(Modifier.width(8.dp))
+                        Text("Add Repository")
+                    }
+                }
+            }
+        }
+    }
+
+    if (showAddDialog) {
+        AlertDialog(
+            onDismissRequest = { showAddDialog = false },
+            title = { Text("Add Repository") },
+            text = {
+                Column {
+                    TextField(
+                        value = newRepoName,
+                        onValueChange = { newRepoName = it },
+                        label = { Text("Name") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    TextField(
+                        value = newRepoUrl,
+                        onValueChange = { newRepoUrl = it },
+                        label = { Text("URL") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.addRepository(newRepoUrl, newRepoName)
+                    showAddDialog = false
+                    newRepoUrl = ""
+                    newRepoName = ""
+                }) {
+                    Text("Add")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showAddDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 }
 

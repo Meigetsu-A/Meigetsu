@@ -3,6 +3,12 @@ package com.meigetsu.core.data.repository
 import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
+import io.ktor.client.plugins.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
 import com.meigetsu.core.database.dao.DownloadDao
 import com.meigetsu.core.database.entity.DownloadEntity
 import com.meigetsu.core.domain.repository.DownloadRepository
@@ -107,27 +113,44 @@ class DownloadWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result {
         val id = inputData.getString("download_id") ?: return Result.failure()
+        val download = downloadDao.getDownloadById(id) ?: return Result.failure()
 
         try {
             updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, 0f)
 
-            // In a real production app, we would fetch the actual download URL here
-            // val url = provider.getStreamUrls(episode).first().url
-            // For now, we simulate a 10MB download
-            val totalBytes = 1024L * 1024L * 10L
-            var downloadedBytes = 0L
+            val file = java.io.File(context.getExternalFilesDir(null), download.filePath)
+            file.parentFile?.mkdirs()
 
-            while (downloadedBytes < totalBytes) {
-                kotlinx.coroutines.delay(200)
-                downloadedBytes += 1024L * 512L // 512KB chunks
-                val progress = downloadedBytes.toFloat() / totalBytes
-                updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, progress, downloadedBytes)
-                if (isStopped) return Result.retry()
+            val response = client.prepareGet(download.url).execute { httpResponse ->
+                val totalBytes = httpResponse.contentLength() ?: -1L
+                var downloadedBytes = 0L
+                val channel = httpResponse.bodyAsChannel()
+
+                file.outputStream().use { output ->
+                    val buffer = ByteArray(1024 * 8)
+                    while (!channel.isClosedForRead) {
+                        val read = channel.readAvailable(buffer)
+                        if (read == -1) break
+                        output.write(buffer, 0, read)
+                        downloadedBytes += read
+                        if (totalBytes > 0) {
+                            val progress = downloadedBytes.toFloat() / totalBytes
+                            updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, progress, downloadedBytes)
+                        }
+                        if (isStopped) break
+                    }
+                }
             }
 
-            updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.COMPLETED, 1f, totalBytes)
+            if (isStopped) {
+                updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.PAUSED, 0f)
+                return Result.retry()
+            }
+
+            updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.COMPLETED, 1f)
             return Result.success()
         } catch (e: Exception) {
+            e.printStackTrace()
             updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.FAILED, 0f)
             return Result.failure()
         }

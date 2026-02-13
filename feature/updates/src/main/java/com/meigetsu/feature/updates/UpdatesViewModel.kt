@@ -2,15 +2,18 @@ package com.meigetsu.feature.updates
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.meigetsu.core.domain.repository.LibraryRepository
+import com.meigetsu.core.extensions.ExtensionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UpdatesViewModel @Inject constructor() : ViewModel() {
+class UpdatesViewModel @Inject constructor(
+    private val libraryRepository: LibraryRepository,
+    private val extensionManager: ExtensionManager
+) : ViewModel() {
     private val _updates = MutableStateFlow<List<UpdateItem>>(emptyList())
     val updates: StateFlow<List<UpdateItem>> = _updates.asStateFlow()
 
@@ -18,13 +21,24 @@ class UpdatesViewModel @Inject constructor() : ViewModel() {
         loadUpdates()
     }
 
-    private fun loadUpdates() {
+    fun loadUpdates() {
         viewModelScope.launch {
-            // Simulated fetch of recent activity
-            _updates.value = listOf(
-                UpdateItem("1", "One Piece", "Episode 1100 released", System.currentTimeMillis()),
-                UpdateItem("2", "Solo Leveling", "Chapter 180 updated", System.currentTimeMillis() - 3600000)
-            )
+            combine(
+                libraryRepository.getLibraryAnime(),
+                libraryRepository.getLibraryManga()
+            ) { anime, manga ->
+                val allItems = (anime.map { it.id to it.title } + manga.map { it.id to it.title })
+                allItems.map { (id, title) ->
+                    UpdateItem(
+                        id = id,
+                        title = title,
+                        updateInfo = "Checked for updates",
+                        timestamp = System.currentTimeMillis()
+                    )
+                }
+            }.collect {
+                _updates.value = it
+            }
         }
     }
 }

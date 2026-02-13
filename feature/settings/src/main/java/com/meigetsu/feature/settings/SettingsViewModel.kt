@@ -4,8 +4,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.meigetsu.core.database.entity.ExtensionRepoEntity
 import com.meigetsu.core.domain.repository.PreferenceRepository
 import com.meigetsu.core.domain.repository.LibraryRepository
+import com.meigetsu.core.extensions.ExtensionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -14,7 +16,8 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val preferenceRepository: PreferenceRepository,
-    private val libraryRepository: LibraryRepository
+    private val libraryRepository: LibraryRepository,
+    private val extensionManager: ExtensionManager
 ) : ViewModel() {
 
     val primaryColor: StateFlow<Color> = preferenceRepository.getPrimaryColor()
@@ -58,5 +61,16 @@ class SettingsViewModel @Inject constructor(
 
     fun setLibraryLayout(layout: String) {
         viewModelScope.launch { preferenceRepository.setLibraryLayout(layout) }
+    }
+
+    val repositories: StateFlow<List<ExtensionRepoEntity>> = extensionManager.getRepositories()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun addRepository(url: String, name: String) {
+        extensionManager.addRepository(url, name)
+    }
+
+    fun removeRepository(url: String) {
+        extensionManager.removeRepository(url)
     }
 }

@@ -33,7 +33,10 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
+    implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation(project(":core:common"))
+    implementation(libs.apollo.runtime)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.kotlinx.coroutines.android)
