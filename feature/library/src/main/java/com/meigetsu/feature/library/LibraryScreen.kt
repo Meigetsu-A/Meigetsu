@@ -37,10 +37,11 @@ fun LibraryScreen(
                 LargeTopAppBar(
                     title = { Text("Library", fontWeight = FontWeight.Bold) }
                 )
-                TabRow(
+                ScrollableTabRow(
                     selectedTabIndex = selectedTab,
                     containerColor = MaterialTheme.colorScheme.background,
-                    divider = {}
+                    divider = {},
+                    edgePadding = 16.dp
                 ) {
                     Tab(selected = selectedTab == 0, onClick = { selectedTab = 0 }, text = { Text("Anime") })
                     Tab(selected = selectedTab == 1, onClick = { selectedTab = 1 }, text = { Text("Manga") })

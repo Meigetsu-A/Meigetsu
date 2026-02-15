@@ -30,7 +30,8 @@ class ExtensionManager @Inject constructor(
     private val repoDao: RepoDao,
     private val aniListProvider: AniListProvider,
     private val mangaDexProvider: MangaDexProvider,
-    private val consumetProvider: ConsumetProvider
+    private val consumetProvider: ConsumetProvider,
+    private val enterpriseExtensions: Set<@JvmSuppressWildcards Extension>
 ) {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
@@ -50,6 +51,7 @@ class ExtensionManager @Inject constructor(
         registerExtension(aniListProvider)
         registerExtension(mangaDexProvider)
         registerExtension(consumetProvider)
+        enterpriseExtensions.forEach { registerExtension(it) }
 
         scope.launch {
             repoDao.getAllRepos().collect { repos ->

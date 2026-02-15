@@ -128,8 +128,17 @@ fun MainScreen() {
                                     contentDescription = null
                                 )
                             },
-                            label = { Text(screen.label) },
+                            label = {
+                                Text(
+                                    text = screen.label,
+                                    fontSize = 10.sp,
+                                    maxLines = 1,
+                                    softWrap = false,
+                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                                )
+                            },
                             selected = selected,
+                            alwaysShowLabel = false,
                             onClick = {
                                 navController.navigate(screen.route) {
                                     popUpTo(navController.graph.findStartDestination().id) {
