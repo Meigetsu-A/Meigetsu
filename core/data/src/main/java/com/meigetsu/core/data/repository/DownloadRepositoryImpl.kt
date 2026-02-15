@@ -16,6 +16,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import com.meigetsu.core.model.Download
 import com.meigetsu.core.model.DownloadStatus
+import com.meigetsu.core.model.Episode
+import com.meigetsu.core.model.Chapter
+import com.meigetsu.core.extensions.ExtensionManager
+import com.meigetsu.core.extensions.AnimeProvider
+import com.meigetsu.core.extensions.MangaProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -106,22 +111,53 @@ class DownloadRepositoryImpl @Inject constructor(
 class DownloadWorker @AssistedInject constructor(
     @Assisted private val context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val downloadDao: DownloadDao
+    private val downloadDao: DownloadDao,
+    private val extensionManager: ExtensionManager
 ) : CoroutineWorker(context, workerParams) {
 
     private val client = io.ktor.client.HttpClient(io.ktor.client.engine.okhttp.OkHttp)
 
     override suspend fun doWork(): Result {
         val id = inputData.getString("download_id") ?: return Result.failure()
-        val download = downloadDao.getDownloadById(id) ?: return Result.failure()
+        var download = downloadDao.getDownloadById(id) ?: return Result.failure()
 
         try {
             updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, 0f)
 
-            val file = java.io.File(context.getExternalFilesDir(null), download.filePath)
+            var downloadUrl = download.url
+            if (downloadUrl.isBlank()) {
+                // Try to resolve URL using extension
+                val provider = extensionManager.animeProviders.value[download.extensionId]
+                    ?: extensionManager.mangaProviders.value[download.extensionId]
+
+                if (provider != null) {
+                    if (download.mediaType == "ANIME" && provider is AnimeProvider) {
+                        val streams = provider.getStreamUrls(Episode(download.itemId, download.mediaId, 0, download.itemTitle, null, null))
+                        downloadUrl = streams.firstOrNull()?.url ?: ""
+                    } else if (provider is MangaProvider) {
+                        val pages = provider.getPages(Chapter(download.itemId, download.mediaId, 0.0, download.itemTitle, null))
+                        // For manga, we might need a different download logic (multiple pages),
+                        // but for simplicity we'll assume a single zip/cbz if url is provided or handle it later.
+                        downloadUrl = pages.firstOrNull() ?: ""
+                    }
+
+                    if (downloadUrl.isNotBlank()) {
+                        downloadDao.updateUrl(id, downloadUrl)
+                    } else {
+                        updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.FAILED, 0f)
+                        return Result.failure()
+                    }
+                } else {
+                    updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.FAILED, 0f)
+                    return Result.failure()
+                }
+            }
+
+            val filePath = download.filePath ?: "${download.mediaId}/${download.itemId}.mp4"
+            val file = java.io.File(context.getExternalFilesDir(null), filePath)
             file.parentFile?.mkdirs()
 
-            val response = client.prepareGet(download.url).execute { httpResponse ->
+            val response = client.prepareGet(downloadUrl).execute { httpResponse ->
                 val totalBytes = httpResponse.contentLength() ?: -1L
                 var downloadedBytes = 0L
                 val channel = httpResponse.bodyAsChannel()

@@ -41,6 +41,7 @@ dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:domain"))
     implementation(project(":core:ui"))
+    implementation(project(":core:network"))
     implementation(project(":core:extensions"))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)

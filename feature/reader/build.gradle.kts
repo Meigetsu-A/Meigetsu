@@ -39,7 +39,9 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:common"))
+    implementation(project(":core:domain"))
     implementation(project(":core:ui"))
+    implementation(project(":core:extensions"))
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui)

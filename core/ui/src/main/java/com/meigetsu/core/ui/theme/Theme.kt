@@ -9,20 +9,28 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MeigetsuTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    primaryColor: Color = Color(0xFFE50914), // Netflix Red
+    themeMode: String = "SYSTEM",
+    primaryColor: Color = Color(0xFFE50914),
     cornerRadius: Int = 12,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (themeMode) {
+        "DARK", "OLED" -> true
+        "LIGHT" -> false
+        else -> isSystemInDarkTheme()
+    }
+
+    val isOled = themeMode == "OLED"
+
     val colorScheme = if (darkTheme) {
         darkColorScheme(
             primary = primaryColor,
             onPrimary = Color.White,
-            surface = Color(0xFF141414), // Netflix Black
+            surface = if (isOled) Color.Black else Color(0xFF141414),
             onSurface = Color.White,
-            background = Color.Black,
+            background = if (isOled) Color.Black else Color.Black,
             onBackground = Color.White,
-            surfaceVariant = Color(0xFF2F2F2F)
+            surfaceVariant = if (isOled) Color(0xFF1A1A1A) else Color(0xFF2F2F2F)
         )
     } else {
         lightColorScheme(

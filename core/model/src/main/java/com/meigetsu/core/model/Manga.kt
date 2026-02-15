@@ -13,5 +13,6 @@ data class Manga(
     val volumes: Int?,
     val genres: List<String>,
     val averageScore: Int?,
-    val popularity: Int?
+    val popularity: Int?,
+    val idMal: Int? = null
 )

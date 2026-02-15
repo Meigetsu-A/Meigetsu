@@ -19,10 +19,11 @@ fun StatsScreen(
     viewModel: SettingsViewModel,
     onBackClick: () -> Unit
 ) {
-    // We would fetch stats from a StatsViewModel, but we'll use SettingsViewModel for now
-    // Actually let's just show some hardcoded data for the UI look
-
+    val stats by viewModel.stats.collectAsState()
     val dateDf = SimpleDateFormat("MMM dd", Locale.getDefault())
+
+    val totalAnime = stats.filter { it.mediaType == "ANIME" }.sumOf { it.chaptersRead }
+    val totalManga = stats.filter { it.mediaType == "MANGA" }.sumOf { it.chaptersRead }
 
     Scaffold(
         topBar = {
@@ -41,23 +42,23 @@ fun StatsScreen(
                 Text(text = "Overview", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    StatBox("Anime", "45 ep")
-                    StatBox("Manga", "124 ch")
+                    StatBox("Anime", "$totalAnime ep")
+                    StatBox("Manga", "$totalManga ch")
                 }
                 Spacer(modifier = Modifier.height(24.dp))
             }
 
             item {
-                Text(text = "Daily Activity", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                Text(text = "Recent Activity", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
-            items(7) { i ->
-                val date = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -i) }.time
+            items(stats) { stat ->
+                val date = Date(stat.date)
                 ListItem(
                     headlineContent = { Text(dateDf.format(date)) },
-                    supportingContent = { Text("3 episodes watched") },
-                    trailingContent = { Text("45m spent") }
+                    supportingContent = { Text("${stat.chaptersRead} items consumed") },
+                    trailingContent = { Text("${stat.minutesSpent}m spent") }
                 )
             }
         }

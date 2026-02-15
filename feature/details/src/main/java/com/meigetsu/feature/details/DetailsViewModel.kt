@@ -29,7 +29,8 @@ class DetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val mediaId: String = checkNotNull(savedStateHandle["mediaId"])
+    private val mediaId: String? = savedStateHandle["mediaId"]
+    private val malId: Int? = savedStateHandle["malId"]
 
     private val _uiState = MutableStateFlow<Resource<Anime>>(Resource.Loading())
     val uiState: StateFlow<Resource<Anime>> = _uiState.asStateFlow()
@@ -54,7 +55,7 @@ class DetailsViewModel @Inject constructor(
     }
 
     private fun loadDetails() {
-        mediaRepository.getAnimeDetails(mediaId).onEach { resource ->
+        mediaRepository.getAnimeDetails(id = mediaId, idMal = malId).onEach { resource ->
             _uiState.value = resource
             if (resource is Resource.Success) {
                 fetchEpisodes(resource.data!!)
@@ -64,8 +65,12 @@ class DetailsViewModel @Inject constructor(
 
     private fun fetchEpisodes(anime: Anime) {
         viewModelScope.launch {
-            // Find a provider that has episodes for this anime (simulated)
-            val provider = extensionManager.animeProviders.value.values.firstOrNull()
+            // Prefer content providers over metadata providers
+            val providers = extensionManager.animeProviders.value.values
+            val provider = providers.find { it.metadata.id == "consumet" }
+                ?: providers.find { it.metadata.id != "anilist" }
+                ?: providers.firstOrNull()
+
             if (provider != null) {
                 _episodes.value = provider.getEpisodes(anime.id)
             }
@@ -90,7 +95,11 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
             val itemsToDownload = episodes.value.filter { selectedEpisodeIds.value.contains(it.id) }
-            val providerId = extensionManager.animeProviders.value.keys.firstOrNull() ?: return@launch
+
+            val providers = extensionManager.animeProviders.value
+            val providerId = providers.keys.find { it == "consumet" }
+                ?: providers.keys.find { it != "anilist" }
+                ?: providers.keys.firstOrNull() ?: return@launch
 
             downloadItemsUseCase.execute(anime, itemsToDownload, providerId)
             _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added ${itemsToDownload.size} items to downloads"))
@@ -102,8 +111,13 @@ class DetailsViewModel @Inject constructor(
         viewModelScope.launch {
             val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
             // Try to find a provider that can handle this anime
-            extensionManager.animeProviders.value.values.firstOrNull()?.let { provider ->
-                _streamUrls.value = provider.getStreamUrls(Episode("1", anime.id, 1, "Episode 1", null, null))
+            val providers = extensionManager.animeProviders.value.values
+            val provider = providers.find { it.metadata.id == "consumet" }
+                ?: providers.find { it.metadata.id != "anilist" }
+                ?: providers.firstOrNull()
+
+            provider?.let {
+                _streamUrls.value = it.getStreamUrls(Episode("1", anime.id, 1, "Episode 1", null, null))
             }
         }
     }

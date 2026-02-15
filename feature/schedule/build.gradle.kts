@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.meigetsu.feature.news"
+    namespace = "com.meigetsu.feature.schedule"
     compileSdk = 34
 
     defaultConfig {
@@ -39,15 +39,15 @@ android {
 dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:common"))
-    implementation(project(":core:domain"))
+    implementation(project(":core:network"))
     implementation(project(":core:ui"))
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.ui)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose)
 }

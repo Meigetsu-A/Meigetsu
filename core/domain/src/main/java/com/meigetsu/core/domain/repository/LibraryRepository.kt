@@ -2,6 +2,8 @@ package com.meigetsu.core.domain.repository
 
 import com.meigetsu.core.model.Anime
 import com.meigetsu.core.model.Manga
+import com.meigetsu.core.model.WatchHistory
+import com.meigetsu.core.model.ReadHistory
 import kotlinx.coroutines.flow.Flow
 
 interface LibraryRepository {
@@ -15,4 +17,10 @@ interface LibraryRepository {
     suspend fun removeCharacterFromLibrary(id: String)
 
     fun getWatchHistory(): Flow<List<String>> // Returns IDs
+    suspend fun getWatchHistoryById(mediaId: String): WatchHistory?
+    fun getReadHistory(): Flow<List<String>>
+    suspend fun getReadHistoryById(mediaId: String): ReadHistory?
+
+    suspend fun updateWatchHistory(mediaId: String, episode: Int, position: Long, duration: Long)
+    suspend fun updateReadHistory(mediaId: String, chapter: Double, page: Int)
 }

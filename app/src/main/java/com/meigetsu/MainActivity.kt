@@ -30,7 +30,7 @@ import com.meigetsu.feature.settings.SettingsScreen
 import com.meigetsu.feature.settings.ExtensionManagementScreen
 import com.meigetsu.feature.settings.StatsScreen
 import com.meigetsu.feature.updates.UpdatesScreen
-import com.meigetsu.feature.news.NewsScreen
+import com.meigetsu.feature.schedule.ScheduleScreen
 import com.meigetsu.feature.player.PlayerScreen
 import com.meigetsu.feature.reader.ReaderScreen
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,6 +45,7 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             val primaryColor by viewModel.primaryColor.collectAsState()
+            val themeMode by viewModel.themeMode.collectAsState()
             val cornerRadius by viewModel.cornerRadius.collectAsState()
             val biometricEnabled by viewModel.biometricEnabled.collectAsState()
             var isAuthenticated by remember { mutableStateOf(!biometricEnabled) }
@@ -57,7 +58,7 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
                 }
             }
 
-            MeigetsuTheme(primaryColor = primaryColor, cornerRadius = cornerRadius) {
+            MeigetsuTheme(themeMode = themeMode, primaryColor = primaryColor, cornerRadius = cornerRadius) {
                 if (isAuthenticated) {
                     MainScreen()
                 } else {
@@ -162,8 +163,8 @@ fun MainScreen() {
             composable(Screen.Updates.route) {
                 UpdatesScreen(hiltViewModel())
             }
-            composable(Screen.News.route) {
-                NewsScreen(hiltViewModel())
+            composable(Screen.Schedule.route) {
+                ScheduleScreen(hiltViewModel(), onMediaClick = { malId -> navController.navigate("details/null?malId=$malId") })
             }
             composable(Screen.Browse.route) {
                 BrowseScreen(
@@ -187,17 +188,29 @@ fun MainScreen() {
                 StatsScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
             composable(
-                "details/{mediaId}",
-                arguments = listOf(navArgument("mediaId") { type = NavType.StringType })
-            ) {
+                "details/{mediaId}?malId={malId}",
+                arguments = listOf(
+                    navArgument("mediaId") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                    navArgument("malId") {
+                        type = NavType.IntType
+                        defaultValue = -1
+                    }
+                )
+            ) { backStackEntry ->
+                val malId = backStackEntry.arguments?.getInt("malId")?.let { if (it == -1) null else it }
+
                 MediaDetailsScreen(
                     hiltViewModel(),
                     onBackClick = { navController.popBackStack() },
-                    onWatchClick = { url ->
+                    onWatchClick = { url, id ->
                         val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-                        navController.navigate("player/$encodedUrl")
+                        navController.navigate("player/$encodedUrl?mediaId=$id")
                     },
-                    onReadClick = { id -> navController.navigate("reader/$id") }
+                    onReadClick = { mangaId, chapterId -> navController.navigate("reader/$mangaId/$chapterId") }
                 )
             }
             composable(
@@ -207,16 +220,22 @@ fun MainScreen() {
                 CharacterDetailsScreen(hiltViewModel())
             }
             composable(
-                "player/{url}",
-                arguments = listOf(navArgument("url") { type = NavType.StringType })
+                "player/{url}?mediaId={mediaId}",
+                arguments = listOf(
+                    navArgument("url") { type = NavType.StringType },
+                    navArgument("mediaId") { type = NavType.StringType; nullable = true }
+                )
             ) {
                 PlayerScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
             composable(
-                "reader/{chapterId}",
-                arguments = listOf(navArgument("chapterId") { type = NavType.StringType })
+                "reader/{mangaId}/{chapterId}",
+                arguments = listOf(
+                    navArgument("mangaId") { type = NavType.StringType },
+                    navArgument("chapterId") { type = NavType.StringType }
+                )
             ) {
-                ReaderScreen(hiltViewModel())
+                ReaderScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
         }
     }
@@ -231,7 +250,7 @@ sealed class Screen(
     object Home : Screen("home", "Home", Icons.Rounded.Home, Icons.Rounded.Home)
     object Library : Screen("library", "Library", Icons.Rounded.AutoStories, Icons.Rounded.AutoStories)
     object Updates : Screen("updates", "Updates", Icons.Rounded.Update, Icons.Rounded.Update)
-    object News : Screen("news", "News", Icons.Rounded.Newspaper, Icons.Rounded.Newspaper)
+    object Schedule : Screen("schedule", "Schedule", Icons.Rounded.CalendarMonth, Icons.Rounded.CalendarMonth)
     object Browse : Screen("browse", "Browse", Icons.Rounded.Explore, Icons.Rounded.Explore)
     object Settings : Screen("settings", "Settings", Icons.Rounded.Settings, Icons.Rounded.Settings)
 }
@@ -240,7 +259,7 @@ val items = listOf(
     Screen.Home,
     Screen.Library,
     Screen.Updates,
-    Screen.News,
+    Screen.Schedule,
     Screen.Browse,
     Screen.Settings
 )

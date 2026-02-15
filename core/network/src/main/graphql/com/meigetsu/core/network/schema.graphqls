@@ -1,12 +1,12 @@
 type Query {
   Page(page: Int, perPage: Int): Page
-  Media(id: Int, type: MediaType): Media
+  Media(id: Int, idMal: Int, type: MediaType): Media
   Character(id: Int): Character
 }
 
 type Page {
   pageInfo: PageInfo
-  media(type: MediaType, sort: [MediaSort], search: String, id_in: [Int]): [Media]
+  media(type: MediaType, sort: [MediaSort], search: String, id: Int, idMal: Int, id_in: [Int]): [Media]
   characters(search: String): [Character]
 }
 
@@ -20,6 +20,7 @@ type PageInfo {
 
 type Media {
   id: Int!
+  idMal: Int
   title: MediaTitle
   description(asHtml: Boolean): String
   coverImage: MediaCoverImage

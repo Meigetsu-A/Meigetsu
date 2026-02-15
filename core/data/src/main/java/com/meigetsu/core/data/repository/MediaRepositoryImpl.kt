@@ -161,14 +161,18 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAnimeDetails(id: String): Flow<Resource<Anime>> = flow {
+    override fun getAnimeDetails(id: String?, idMal: Int?): Flow<Resource<Anime>> = flow {
         emit(Resource.Loading())
         try {
-            val intId = id.toIntOrNull() ?: run {
-                emit(Resource.Error("Invalid ID format"))
+            val intId = id?.toIntOrNull()
+            if (intId == null && idMal == null) {
+                emit(Resource.Error("Missing ID"))
                 return@flow
             }
-            val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(intId))).execute()
+            val response = apolloClient.query(GetMediaDetailsQuery(
+                id = com.apollographql.apollo.api.Optional.presentIfNotNull(intId),
+                idMal = com.apollographql.apollo.api.Optional.presentIfNotNull(idMal)
+            )).execute()
             val anime = response.data?.Media?.toAnimeDetails()
             if (anime != null) {
                 emit(Resource.Success(anime))
@@ -180,14 +184,18 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getMangaDetails(id: String): Flow<Resource<Manga>> = flow {
+    override fun getMangaDetails(id: String?, idMal: Int?): Flow<Resource<Manga>> = flow {
         emit(Resource.Loading())
         try {
-            val intId = id.toIntOrNull() ?: run {
-                emit(Resource.Error("Invalid ID format"))
+            val intId = id?.toIntOrNull()
+            if (intId == null && idMal == null) {
+                emit(Resource.Error("Missing ID"))
                 return@flow
             }
-            val response = apolloClient.query(GetMediaDetailsQuery(id = com.apollographql.apollo.api.Optional.present(intId))).execute()
+            val response = apolloClient.query(GetMediaDetailsQuery(
+                id = com.apollographql.apollo.api.Optional.presentIfNotNull(intId),
+                idMal = com.apollographql.apollo.api.Optional.presentIfNotNull(idMal)
+            )).execute()
             val manga = response.data?.Media?.toMangaDetails()
             if (manga != null) {
                 emit(Resource.Success(manga))
@@ -321,6 +329,7 @@ class MediaRepositoryImpl @Inject constructor(
 
     private fun GetMediaDetailsQuery.Media.toAnimeDetails() = Anime(
         id = id.toString(),
+        idMal = idMal,
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = description,
         coverImage = coverImage?.extraLarge,
@@ -341,6 +350,7 @@ class MediaRepositoryImpl @Inject constructor(
 
     private fun GetMediaDetailsQuery.Media.toMangaDetails() = Manga(
         id = id.toString(),
+        idMal = idMal,
         title = title?.english ?: title?.romaji ?: "Unknown",
         description = description,
         coverImage = coverImage?.extraLarge,

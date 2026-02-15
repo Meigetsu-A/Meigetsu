@@ -6,6 +6,9 @@ interface PreferenceRepository {
     fun getPrimaryColor(): Flow<Int>
     suspend fun setPrimaryColor(color: Int)
 
+    fun getThemeMode(): Flow<String>
+    suspend fun setThemeMode(mode: String)
+
     fun getCornerRadius(): Flow<Int>
     suspend fun setCornerRadius(radius: Int)
 
@@ -23,6 +26,9 @@ interface PreferenceRepository {
 
     fun getBiometricEnabled(): Flow<Boolean>
     suspend fun setBiometricEnabled(enabled: Boolean)
+
+    fun getAutoRefreshInterval(): Flow<Int> // in minutes, 0 means disabled
+    suspend fun setAutoRefreshInterval(minutes: Int)
 
     suspend fun exportBackup(): String
     suspend fun importBackup(json: String)

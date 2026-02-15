@@ -33,11 +33,11 @@ fun MediaCard(
 ) {
     Card(
         modifier = modifier
-            .width(160.dp) // Slightly wider
+            .width(150.dp)
             .clickable { onClick() },
-        shape = MaterialTheme.shapes.medium,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column {
             Box {
@@ -96,13 +96,14 @@ fun MediaCard(
                 }
             }
 
-            Column(modifier = Modifier.padding(10.dp)) {
+            Column(modifier = Modifier.padding(vertical = 8.dp)) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.SemiBold,
+                    lineHeight = 16.sp
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))

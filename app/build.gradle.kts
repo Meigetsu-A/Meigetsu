@@ -65,7 +65,7 @@ dependencies {
     implementation(project(":feature:player"))
     implementation(project(":feature:reader"))
     implementation(project(":feature:settings"))
-    implementation(project(":feature:news"))
+    implementation(project(":feature:schedule"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

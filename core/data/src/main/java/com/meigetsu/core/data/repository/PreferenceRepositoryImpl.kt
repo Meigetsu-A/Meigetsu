@@ -21,16 +21,23 @@ class PreferenceRepositoryImpl @Inject constructor(
 ) : PreferenceRepository {
 
     private val primaryColorKey = intPreferencesKey("primary_color")
+    private val themeModeKey = stringPreferencesKey("theme_mode")
     private val cornerRadiusKey = intPreferencesKey("corner_radius")
     private val readingModeKey = stringPreferencesKey("reading_mode")
     private val libraryLayoutKey = stringPreferencesKey("library_layout")
     private val incognitoKey = booleanPreferencesKey("incognito_mode")
     private val adultContentKey = booleanPreferencesKey("adult_content")
     private val biometricEnabledKey = booleanPreferencesKey("biometric_enabled")
+    private val autoRefreshIntervalKey = intPreferencesKey("auto_refresh_interval")
 
     override fun getPrimaryColor(): Flow<Int> = context.dataStore.data.map { it[primaryColorKey] ?: 0xFFE50914.toInt() }
     override suspend fun setPrimaryColor(color: Int) {
         context.dataStore.edit { it[primaryColorKey] = color }
+    }
+
+    override fun getThemeMode(): Flow<String> = context.dataStore.data.map { it[themeModeKey] ?: "SYSTEM" }
+    override suspend fun setThemeMode(mode: String) {
+        context.dataStore.edit { it[themeModeKey] = mode }
     }
 
     override fun getCornerRadius(): Flow<Int> = context.dataStore.data.map { it[cornerRadiusKey] ?: 12 }
@@ -61,6 +68,11 @@ class PreferenceRepositoryImpl @Inject constructor(
     override fun getBiometricEnabled(): Flow<Boolean> = context.dataStore.data.map { it[biometricEnabledKey] ?: false }
     override suspend fun setBiometricEnabled(enabled: Boolean) {
         context.dataStore.edit { it[biometricEnabledKey] = enabled }
+    }
+
+    override fun getAutoRefreshInterval(): Flow<Int> = context.dataStore.data.map { it[autoRefreshIntervalKey] ?: 0 }
+    override suspend fun setAutoRefreshInterval(minutes: Int) {
+        context.dataStore.edit { it[autoRefreshIntervalKey] = minutes }
     }
 
     override suspend fun exportBackup(): String {

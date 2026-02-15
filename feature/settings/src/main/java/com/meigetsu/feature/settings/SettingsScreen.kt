@@ -63,6 +63,7 @@ fun SettingsScreen(
 @Composable
 fun GeneralSettings(viewModel: SettingsViewModel, onStatsClick: () -> Unit) {
     val incognito by viewModel.incognitoMode.collectAsState()
+    val autoRefresh by viewModel.autoRefreshInterval.collectAsState()
     val libraryLayout by viewModel.libraryLayout.collectAsState()
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
@@ -80,6 +81,19 @@ fun GeneralSettings(viewModel: SettingsViewModel, onStatsClick: () -> Unit) {
                     headlineContent = { Text("Incognito Mode") },
                     supportingContent = { Text("Don't save history or progress") },
                     trailingContent = { Switch(checked = incognito, onCheckedChange = { viewModel.setIncognito(it) }) }
+                )
+            }
+        }
+        item {
+            SettingsCategory(title = "Updates", icon = Icons.Rounded.Update) {
+                ListItem(
+                    headlineContent = { Text("Auto Refresh Interval") },
+                    supportingContent = { Text(if (autoRefresh == 0) "Disabled" else "$autoRefresh minutes") },
+                    modifier = Modifier.clickable {
+                        // Simplified selection
+                        viewModel.setAutoRefreshInterval(if (autoRefresh == 0) 60 else 0)
+                    },
+                    trailingContent = { Icon(Icons.Rounded.Timer, null) }
                 )
             }
         }
@@ -111,22 +125,33 @@ fun GeneralSettings(viewModel: SettingsViewModel, onStatsClick: () -> Unit) {
 @Composable
 fun AppearanceSettings(viewModel: SettingsViewModel) {
     val primaryColor by viewModel.primaryColor.collectAsState()
+    val themeMode by viewModel.themeMode.collectAsState()
     val cornerRadius by viewModel.cornerRadius.collectAsState()
+    var showThemeMaker by remember { mutableStateOf(false) }
 
     LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
         item {
-            SettingsCategory(title = "Theme", icon = Icons.Rounded.Palette) {
+            SettingsCategory(title = "Theme Mode", icon = Icons.Rounded.Contrast) {
+                Column {
+                    listOf("SYSTEM", "LIGHT", "DARK", "OLED").forEach { mode ->
+                        ListItem(
+                            headlineContent = { Text(mode.lowercase().replaceFirstChar { it.uppercase() }) },
+                            trailingContent = { RadioButton(selected = themeMode == mode, onClick = { viewModel.setThemeMode(mode) }) },
+                            modifier = Modifier.clickable { viewModel.setThemeMode(mode) }
+                        )
+                    }
+                }
+            }
+        }
+        item {
+            SettingsCategory(title = "Customization", icon = Icons.Rounded.Palette) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(text = "Primary Color")
+                        Text(text = "Theme Maker")
                         Spacer(modifier = Modifier.weight(1f))
-                        Box(
-                            modifier = Modifier
-                                .size(32.dp)
-                                .clip(CircleShape)
-                                .background(primaryColor)
-                                .clickable { viewModel.updatePrimaryColor(Color.Cyan) }
-                        )
+                        Button(onClick = { showThemeMaker = true }) {
+                            Text("Open")
+                        }
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(text = "Corner Radius: $cornerRadius dp", style = MaterialTheme.typography.bodyMedium)
@@ -139,6 +164,62 @@ fun AppearanceSettings(viewModel: SettingsViewModel) {
             }
         }
     }
+
+    if (showThemeMaker) {
+        ThemeMakerDialog(
+            currentColor = primaryColor,
+            onColorChange = { viewModel.updatePrimaryColor(it) },
+            onDismiss = { showThemeMaker = false }
+        )
+    }
+}
+
+@Composable
+fun ThemeMakerDialog(
+    currentColor: Color,
+    onColorChange: (Color) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val colors = listOf(
+        Color(0xFFE50914), Color(0xFF2196F3), Color(0xFF4CAF50),
+        Color(0xFFFFC107), Color(0xFF9C27B0), Color(0xFF00BCD4),
+        Color(0xFFFF5722), Color(0xFF607D8B), Color(0xFFE91E63)
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Theme Maker") },
+        text = {
+            Column {
+                Text("Select Primary Color", style = MaterialTheme.typography.labelLarge)
+                Spacer(Modifier.height(16.dp))
+                androidx.compose.foundation.lazy.grid.LazyVerticalGrid(
+                    columns = androidx.compose.foundation.lazy.grid.GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.height(200.dp)
+                ) {
+                    items(colors.size) { index ->
+                        val color = colors[index]
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(color)
+                                .clickable { onColorChange(color) }
+                                .let {
+                                    if (color == currentColor) it.background(color, CircleShape).padding(4.dp).background(Color.White, CircleShape)
+                                    else it
+                                }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) { Text("Done") }
+        }
+    )
 }
 
 @Composable

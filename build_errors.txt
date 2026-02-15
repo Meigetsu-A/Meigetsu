@@ -1,0 +1,100 @@
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :core:common:mergeDebugShaders UP-TO-DATE
+> Task :core:common:compileDebugShaders NO-SOURCE
+> Task :core:common:generateDebugAssets UP-TO-DATE
+> Task :core:common:packageDebugAssets UP-TO-DATE
+> Task :core:data:mergeDebugShaders UP-TO-DATE
+> Task :core:data:compileDebugShaders NO-SOURCE
+> Task :core:data:generateDebugAssets UP-TO-DATE
+> Task :core:data:packageDebugAssets UP-TO-DATE
+> Task :core:database:mergeDebugShaders UP-TO-DATE
+> Task :core:database:compileDebugShaders NO-SOURCE
+> Task :core:database:generateDebugAssets UP-TO-DATE
+> Task :core:database:packageDebugAssets UP-TO-DATE
+> Task :core:domain:mergeDebugShaders UP-TO-DATE
+> Task :core:domain:compileDebugShaders NO-SOURCE
+> Task :core:domain:generateDebugAssets UP-TO-DATE
+> Task :core:domain:packageDebugAssets UP-TO-DATE
+> Task :core:extensions:mergeDebugShaders UP-TO-DATE
+> Task :core:extensions:compileDebugShaders NO-SOURCE
+> Task :core:extensions:generateDebugAssets UP-TO-DATE
+> Task :core:extensions:packageDebugAssets UP-TO-DATE
+> Task :core:model:mergeDebugShaders UP-TO-DATE
+> Task :core:model:compileDebugShaders NO-SOURCE
+> Task :core:model:generateDebugAssets UP-TO-DATE
+> Task :core:model:packageDebugAssets UP-TO-DATE
+> Task :core:network:mergeDebugShaders UP-TO-DATE
+> Task :core:network:compileDebugShaders NO-SOURCE
+> Task :core:network:generateDebugAssets UP-TO-DATE
+> Task :core:network:packageDebugAssets UP-TO-DATE
+> Task :core:ui:mergeDebugShaders UP-TO-DATE
+> Task :core:ui:compileDebugShaders NO-SOURCE
+> Task :core:ui:generateDebugAssets UP-TO-DATE
+> Task :core:ui:packageDebugAssets UP-TO-DATE
+> Task :feature:browse:mergeDebugShaders UP-TO-DATE
+> Task :feature:browse:compileDebugShaders NO-SOURCE
+> Task :feature:browse:generateDebugAssets UP-TO-DATE
+> Task :feature:browse:packageDebugAssets UP-TO-DATE
+> Task :feature:details:mergeDebugShaders UP-TO-DATE
+> Task :feature:details:compileDebugShaders NO-SOURCE
+> Task :feature:details:generateDebugAssets UP-TO-DATE
+> Task :feature:details:packageDebugAssets UP-TO-DATE
+> Task :feature:home:mergeDebugShaders UP-TO-DATE
+> Task :feature:home:compileDebugShaders NO-SOURCE
+> Task :feature:home:generateDebugAssets UP-TO-DATE
+> Task :feature:home:packageDebugAssets UP-TO-DATE
+> Task :feature:library:mergeDebugShaders UP-TO-DATE
+> Task :feature:library:compileDebugShaders NO-SOURCE
+> Task :feature:library:generateDebugAssets UP-TO-DATE
+> Task :feature:library:packageDebugAssets UP-TO-DATE
+> Task :feature:player:mergeDebugShaders UP-TO-DATE
+> Task :feature:player:compileDebugShaders NO-SOURCE
+> Task :feature:player:generateDebugAssets UP-TO-DATE
+> Task :feature:player:packageDebugAssets UP-TO-DATE
+> Task :feature:reader:mergeDebugShaders UP-TO-DATE
+> Task :feature:reader:compileDebugShaders NO-SOURCE
+> Task :feature:reader:generateDebugAssets UP-TO-DATE
+> Task :feature:reader:packageDebugAssets UP-TO-DATE
+> Task :feature:schedule:mergeDebugShaders UP-TO-DATE
+> Task :feature:schedule:compileDebugShaders NO-SOURCE
+> Task :feature:schedule:generateDebugAssets UP-TO-DATE
+> Task :feature:schedule:packageDebugAssets UP-TO-DATE
+> Task :feature:settings:mergeDebugShaders UP-TO-DATE
+> Task :feature:settings:compileDebugShaders NO-SOURCE
+> Task :feature:settings:generateDebugAssets UP-TO-DATE
+> Task :feature:settings:packageDebugAssets UP-TO-DATE
+> Task :feature:updates:mergeDebugShaders UP-TO-DATE
+> Task :feature:updates:compileDebugShaders NO-SOURCE
+> Task :feature:updates:generateDebugAssets UP-TO-DATE
+> Task :feature:updates:packageDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeDebugStartupProfile UP-TO-DATE
+> Task :core:network:generateServiceApolloSources FAILED
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :core:model:compileDebugKotlin
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':core:network:generateServiceApolloSources'.
+> A failure occurred while executing com.apollographql.apollo.gradle.internal.GenerateSources
+   > e: /app/core/network/src/main/graphql/com/meigetsu/core/network/MediaDetails.graphql: (2, 18): Unknown argument `idMal` on field `Media`
+     ----------------------------------------------------
+     [1]:query GetMediaDetails($id: Int, $idMal: Int) {
+     [2]:  Media(id: $id, idMal: $idMal) {
+     [3]:    id
+     ----------------------------------------------------
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 18s
+254 actionable tasks: 20 executed, 234 up-to-date

@@ -36,4 +36,10 @@ object NetworkModule {
             .serverUrl("https://graphql.anilist.co")
             .build()
     }
+
+    @Provides
+    @Singleton
+    fun provideJikanService(httpClient: HttpClient): JikanService {
+        return JikanService(httpClient)
+    }
 }

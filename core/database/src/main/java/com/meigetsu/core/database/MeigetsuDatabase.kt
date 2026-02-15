@@ -33,6 +33,7 @@ abstract class MeigetsuDatabase : RoomDatabase() {
     abstract fun repoDao(): RepoDao
     abstract fun statsDao(): ReadingStatsDao
     abstract fun characterDao(): CharacterDao
+    abstract fun historyDao(): HistoryDao
 }
 
 @Module
@@ -64,4 +65,7 @@ object DatabaseModule {
 
     @Provides
     fun provideCharacterDao(db: MeigetsuDatabase): CharacterDao = db.characterDao()
+
+    @Provides
+    fun provideHistoryDao(db: MeigetsuDatabase): HistoryDao = db.historyDao()
 }

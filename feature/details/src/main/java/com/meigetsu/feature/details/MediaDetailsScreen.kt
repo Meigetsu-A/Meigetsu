@@ -27,8 +27,8 @@ import com.meigetsu.core.ui.components.LoadingSkeleton
 fun MediaDetailsScreen(
     viewModel: DetailsViewModel,
     onBackClick: () -> Unit,
-    onWatchClick: (String) -> Unit,
-    onReadClick: (String) -> Unit
+    onWatchClick: (String, String) -> Unit,
+    onReadClick: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val streamUrls by viewModel.streamUrls.collectAsState()
@@ -48,7 +48,8 @@ fun MediaDetailsScreen(
 
     LaunchedEffect(streamUrls) {
         if (streamUrls.isNotEmpty()) {
-            onWatchClick(streamUrls.first().url)
+            val anime = (uiState as? Resource.Success)?.data
+            onWatchClick(streamUrls.first().url, anime?.id ?: "")
         }
     }
 
@@ -145,7 +146,10 @@ fun MediaDetailsScreen(
                             Row(modifier = Modifier.fillMaxWidth()) {
                                 Button(
                                     onClick = {
-                                        if (anime.format.name == "MANGA") onReadClick(anime.id)
+                                        if (anime.format.name == "MANGA") {
+                                            val firstChapterId = episodes.firstOrNull()?.id ?: anime.id
+                                            onReadClick(anime.id, firstChapterId)
+                                        }
                                         else viewModel.fetchStreams()
                                     },
                                     modifier = Modifier.weight(1f),
@@ -222,7 +226,10 @@ fun MediaDetailsScreen(
                                 .combinedClickable(
                                     onClick = {
                                         if (isSelectionMode) viewModel.toggleSelection(episode.id)
-                                        else viewModel.fetchStreams()
+                                        else {
+                                            if (anime.format.name == "MANGA") onReadClick(anime.id, episode.id)
+                                            else viewModel.fetchStreams()
+                                        }
                                     },
                                     onLongClick = { viewModel.toggleSelection(episode.id) }
                                 )

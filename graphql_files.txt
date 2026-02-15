@@ -1,0 +1,5 @@
+core/network/src/main/graphql/com/meigetsu/core/network/MediaDetails.graphql
+core/network/src/main/graphql/com/meigetsu/core/network/SearchMedia.graphql
+core/network/src/main/graphql/com/meigetsu/core/network/CharacterDetails.graphql
+core/network/src/main/graphql/com/meigetsu/core/network/MultipleMedia.graphql
+core/network/src/main/graphql/com/meigetsu/core/network/GetMediaList.graphql

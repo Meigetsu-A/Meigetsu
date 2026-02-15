@@ -17,7 +17,8 @@ data class Anime(
     val season: String?,
     val year: Int?,
     val studio: String?,
-    val trailerUrl: String? = null
+    val trailerUrl: String? = null,
+    val idMal: Int? = null
 )
 
 enum class MediaStatus {

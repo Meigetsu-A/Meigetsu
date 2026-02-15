@@ -3,8 +3,11 @@ package com.meigetsu.feature.updates
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.domain.repository.LibraryRepository
+import com.meigetsu.core.domain.repository.PreferenceRepository
 import com.meigetsu.core.extensions.ExtensionManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -12,13 +15,31 @@ import javax.inject.Inject
 @HiltViewModel
 class UpdatesViewModel @Inject constructor(
     private val libraryRepository: LibraryRepository,
-    private val extensionManager: ExtensionManager
+    private val extensionManager: ExtensionManager,
+    private val preferenceRepository: PreferenceRepository
 ) : ViewModel() {
     private val _updates = MutableStateFlow<List<UpdateItem>>(emptyList())
     val updates: StateFlow<List<UpdateItem>> = _updates.asStateFlow()
 
+    private var autoRefreshJob: Job? = null
+
     init {
         loadUpdates()
+        observeAutoRefresh()
+    }
+
+    private fun observeAutoRefresh() {
+        preferenceRepository.getAutoRefreshInterval().onEach { minutes ->
+            autoRefreshJob?.cancel()
+            if (minutes > 0) {
+                autoRefreshJob = viewModelScope.launch {
+                    while (true) {
+                        delay(minutes * 60 * 1000L)
+                        loadUpdates()
+                    }
+                }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun loadUpdates() {

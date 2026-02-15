@@ -1,0 +1,100 @@
+> Task :feature:updates:generateDebugRFile UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :core:common:checkKotlinGradlePluginConfigurationErrors
+> Task :core:common:kspDebugKotlin UP-TO-DATE
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:common:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:data:checkKotlinGradlePluginConfigurationErrors
+> Task :core:database:checkKotlinGradlePluginConfigurationErrors
+> Task :core:model:checkKotlinGradlePluginConfigurationErrors
+> Task :core:model:compileDebugKotlin UP-TO-DATE
+> Task :core:model:javaPreCompileDebug UP-TO-DATE
+> Task :core:model:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:model:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:database:kspDebugKotlin UP-TO-DATE
+> Task :core:database:compileDebugKotlin UP-TO-DATE
+> Task :core:database:javaPreCompileDebug UP-TO-DATE
+> Task :core:database:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:model:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:database:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:database:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:database:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:domain:checkKotlinGradlePluginConfigurationErrors
+> Task :core:extensions:checkKotlinGradlePluginConfigurationErrors
+> Task :core:network:checkKotlinGradlePluginConfigurationErrors
+> Task :core:network:checkApolloVersions UP-TO-DATE
+> Task :core:network:generateServiceApolloOptions UP-TO-DATE
+> Task :core:network:generateServiceApolloSources UP-TO-DATE
+> Task :core:network:kspDebugKotlin UP-TO-DATE
+> Task :core:network:compileDebugKotlin UP-TO-DATE
+> Task :core:network:javaPreCompileDebug UP-TO-DATE
+> Task :core:network:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:network:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:network:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:extensions:kspDebugKotlin UP-TO-DATE
+> Task :core:extensions:compileDebugKotlin UP-TO-DATE
+> Task :core:extensions:javaPreCompileDebug UP-TO-DATE
+> Task :core:extensions:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:network:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:extensions:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:extensions:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:domain:kspDebugKotlin UP-TO-DATE
+> Task :core:domain:compileDebugKotlin UP-TO-DATE
+> Task :core:domain:javaPreCompileDebug UP-TO-DATE
+> Task :core:domain:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:extensions:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:domain:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:domain:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:data:kspDebugKotlin UP-TO-DATE
+> Task :core:data:javaPreCompileDebug UP-TO-DATE
+> Task :core:domain:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:ui:checkKotlinGradlePluginConfigurationErrors
+> Task :core:ui:kspDebugKotlin UP-TO-DATE
+> Task :core:ui:compileDebugKotlin UP-TO-DATE
+> Task :core:ui:javaPreCompileDebug UP-TO-DATE
+> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:ui:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:browse:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:browse:javaPreCompileDebug UP-TO-DATE
+> Task :feature:details:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:details:kspDebugKotlin UP-TO-DATE
+> Task :feature:details:javaPreCompileDebug UP-TO-DATE
+> Task :feature:home:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:home:kspDebugKotlin
+> Task :feature:browse:kspDebugKotlin
+
+> Task :core:data:compileDebugKotlin
+e: file:///app/core/data/src/main/java/com/meigetsu/core/data/repository/DownloadRepositoryImpl.kt:132:48 Unresolved reference: getStreamUrls
+e: file:///app/core/data/src/main/java/com/meigetsu/core/data/repository/DownloadRepositoryImpl.kt:135:46 Unresolved reference: getChapterPages
+
+> Task :core:data:compileDebugKotlin FAILED
+> Task :feature:home:compileDebugKotlin
+
+> Task :feature:details:compileDebugKotlin
+w: file:///app/feature/details/src/main/java/com/meigetsu/feature/details/MediaDetailsScreen.kt:77:48 'ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.ArrowBack
+w: file:///app/feature/details/src/main/java/com/meigetsu/feature/details/MediaDetailsScreen.kt:100:9 Parameter 'innerPadding' is never used, could be renamed to _
+w: file:///app/feature/details/src/main/java/com/meigetsu/feature/details/MediaDetailsScreen.kt:157:90 'MenuBook: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.MenuBook
+
+> Task :feature:browse:compileDebugKotlin
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':core:data:compileDebugKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Compilation error. See log for more details
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 23s
+237 actionable tasks: 18 executed, 219 up-to-date

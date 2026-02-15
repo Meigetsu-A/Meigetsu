@@ -22,7 +22,12 @@ fun UpdatesScreen(
     Scaffold(
         topBar = {
             LargeTopAppBar(
-                title = { Text("Updates", fontWeight = FontWeight.Bold) }
+                title = { Text("Updates", fontWeight = FontWeight.Bold) },
+                actions = {
+                    IconButton(onClick = { viewModel.loadUpdates() }) {
+                        Icon(Icons.Rounded.Refresh, contentDescription = "Refresh")
+                    }
+                }
             )
         }
     ) { innerPadding ->

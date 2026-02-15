@@ -1,6 +1,7 @@
-query GetMediaDetails($id: Int) {
-  Media(id: $id) {
+query GetMediaDetails($id: Int, $idMal: Int) {
+  Media(id: $id, idMal: $idMal) {
     id
+    idMal
     title {
       romaji
       english

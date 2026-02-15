@@ -3,14 +3,15 @@ package com.meigetsu.feature.home
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.meigetsu.core.common.Resource
-import com.meigetsu.core.ui.components.MediaCard
-import com.meigetsu.core.ui.components.LoadingSkeleton
+import com.meigetsu.core.ui.components.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
@@ -41,6 +42,26 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            item {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.AutoAwesome,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        text = "Meigetsu",
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Black,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
+            }
             if (continueWatching is Resource.Success && continueWatching.data?.isNotEmpty() == true) {
                 item {
                     HomeSection(
@@ -117,11 +138,10 @@ fun HomeSection(
                 }
             }
             is Resource.Error -> {
-                Text(
-                    text = resource.message ?: "Error",
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(horizontal = 16.dp),
-                    style = MaterialTheme.typography.bodyMedium
+                ErrorView(
+                    message = resource.message ?: "Unknown Error",
+                    onRetry = { /* viewModel.refresh() */ },
+                    modifier = Modifier.height(200.dp)
                 )
             }
         }

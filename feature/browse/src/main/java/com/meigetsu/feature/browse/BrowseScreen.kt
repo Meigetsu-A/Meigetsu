@@ -18,8 +18,7 @@ import coil.compose.AsyncImage
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.extensions.ExtensionRemote
 import com.meigetsu.core.extensions.MediaSearchResult
-import com.meigetsu.core.ui.components.MediaCard
-import com.meigetsu.core.ui.components.LoadingSkeleton
+import com.meigetsu.core.ui.components.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -134,18 +133,23 @@ fun CharacterSearchResults(
             }
         }
         is Resource.Success -> {
-            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
-                items(result.data ?: emptyList()) { char ->
-                    MediaCard(
-                        title = char.name,
-                        imageUrl = char.image,
-                        onClick = { onCharacterClick(char.id) }
-                    )
+            val characters = result.data ?: emptyList()
+            if (characters.isEmpty()) {
+                EmptyView(modifier = Modifier.padding(innerPadding))
+            } else {
+                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+                    items(characters) { char ->
+                        MediaCard(
+                            title = char.name,
+                            imageUrl = char.image,
+                            onClick = { onCharacterClick(char.id) }
+                        )
+                    }
                 }
             }
         }
         is Resource.Error -> {
-            Text(text = result.message ?: "Error", modifier = Modifier.padding(innerPadding))
+            ErrorView(message = result.message ?: "Search failed", modifier = Modifier.padding(innerPadding))
         }
     }
 }
@@ -191,19 +195,24 @@ fun AniListSearchResults(
             }
         }
         is Resource.Success -> {
-            LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
-                items(result.data ?: emptyList()) { anime ->
-                    MediaCard(
-                        title = anime.title,
-                        imageUrl = anime.coverImage,
-                        type = anime.format.name,
-                        onClick = { onMediaClick(anime.id) }
-                    )
+            val animeList = result.data ?: emptyList()
+            if (animeList.isEmpty()) {
+                EmptyView(modifier = Modifier.padding(innerPadding))
+            } else {
+                LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
+                    items(animeList) { anime ->
+                        MediaCard(
+                            title = anime.title,
+                            imageUrl = anime.coverImage,
+                            type = anime.format.name,
+                            onClick = { onMediaClick(anime.id) }
+                        )
+                    }
                 }
             }
         }
         is Resource.Error -> {
-            Text(text = result.message ?: "Error", modifier = Modifier.padding(innerPadding))
+            ErrorView(message = result.message ?: "Search failed", modifier = Modifier.padding(innerPadding))
         }
     }
 }
@@ -219,6 +228,8 @@ fun GlobalSearchResults(
         LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
             items(12) { LoadingSkeleton(Modifier.padding(4.dp)) }
         }
+    } else if (results.isEmpty()) {
+        EmptyView(modifier = Modifier.padding(innerPadding))
     } else {
         LazyVerticalGrid(columns = GridCells.Fixed(3), modifier = Modifier.padding(innerPadding)) {
             items(results) { item ->
