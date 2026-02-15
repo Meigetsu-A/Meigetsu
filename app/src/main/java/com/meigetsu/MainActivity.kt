@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -60,7 +61,7 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
 
             MeigetsuTheme(themeMode = themeMode, primaryColor = primaryColor, cornerRadius = cornerRadius) {
                 if (isAuthenticated) {
-                    MainScreen()
+                    MainScreen(viewModel)
                 } else {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
                         Button(onClick = {
@@ -76,10 +77,14 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        // Simple logic to enter PIP if we are on player screen
-        // In a real app, we check if video is playing
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            enterPictureInPictureMode(android.app.PictureInPictureParams.Builder().build())
+        if (viewModel.isPlayerActive.value) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                try {
+                    enterPictureInPictureMode(android.app.PictureInPictureParams.Builder().build())
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
         }
     }
 
@@ -100,7 +105,7 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
         val promptInfo = androidx.biometric.BiometricPrompt.PromptInfo.Builder()
             .setTitle("Biometric login for Meigetsu")
             .setSubtitle("Log in using your biometric credential")
-            .setNegativeButtonText("Use account password")
+            .setNegativeButtonText("Cancel")
             .build()
 
         biometricPrompt.authenticate(promptInfo)
@@ -109,11 +114,17 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun MainScreen() {
+fun MainScreen(viewModel: MainViewModel) {
     val navController = rememberNavController()
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    LaunchedEffect(navBackStackEntry) {
+        val route = navBackStackEntry?.destination?.route
+        viewModel.setPlayerActive(route?.startsWith("player") == true)
+    }
+
     Scaffold(
         bottomBar = {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
             val showBottomBar = items.any { it.route == currentDestination?.route }
 

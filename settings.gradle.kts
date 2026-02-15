@@ -33,7 +33,3 @@ include(":feature:player")
 include(":feature:reader")
 include(":feature:settings")
 include(":feature:schedule")
-for (i in 1..50) {
-    include(":extensions:anime:scale_source_$i")
-    include(":extensions:manga:scale_source_${i+50}")
-}

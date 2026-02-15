@@ -4,11 +4,9 @@ import androidx.compose.animation.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -19,10 +17,14 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
@@ -57,14 +59,13 @@ fun ReaderScreen(
         when (mode) {
             ReaderMode.VERTICAL, ReaderMode.WEBTOON -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize().clickable { showControls = !showControls },
+                    modifier = Modifier.fillMaxSize(),
                     state = listState
                 ) {
                     itemsIndexed(pages) { index, url ->
-                        AsyncImage(
-                            model = url,
-                            contentDescription = "Page ${index + 1}",
-                            modifier = Modifier.fillParentMaxWidth(),
+                        ZoomableImage(
+                            url = url,
+                            modifier = Modifier.fillParentMaxWidth().clickable { showControls = !showControls },
                             contentScale = ContentScale.FillWidth
                         )
                         if (mode == ReaderMode.VERTICAL) {
@@ -76,13 +77,12 @@ fun ReaderScreen(
             ReaderMode.HORIZONTAL -> {
                 HorizontalPager(
                     state = pagerState,
-                    modifier = Modifier.fillMaxSize().clickable { showControls = !showControls },
+                    modifier = Modifier.fillMaxSize(),
                     pageSpacing = 8.dp
                 ) { index ->
-                    AsyncImage(
-                        model = pages[index],
-                        contentDescription = "Page ${index + 1}",
-                        modifier = Modifier.fillMaxSize(),
+                    ZoomableImage(
+                        url = pages[index],
+                        modifier = Modifier.fillMaxSize().clickable { showControls = !showControls },
                         contentScale = ContentScale.Fit
                     )
                 }
@@ -169,6 +169,46 @@ fun ReaderScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun ZoomableImage(
+    url: String,
+    modifier: Modifier = Modifier,
+    contentScale: ContentScale = ContentScale.Fit
+) {
+    var scale by remember { mutableStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val state = rememberTransformableState { zoomChange, offsetChange, _ ->
+        scale = (scale * zoomChange).coerceIn(1f, 5f)
+        offset += offsetChange
+    }
+
+    Box(
+        modifier = modifier
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onDoubleTap = {
+                        scale = if (scale > 1f) 1f else 3f
+                        offset = Offset.Zero
+                    }
+                )
+            }
+            .transformable(state = state)
+            .graphicsLayer(
+                scaleX = scale,
+                scaleY = scale,
+                translationX = offset.x,
+                translationY = offset.y
+            )
+    ) {
+        AsyncImage(
+            model = url,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = contentScale
+        )
     }
 }
 
