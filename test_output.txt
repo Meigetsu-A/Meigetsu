@@ -1,0 +1,1139 @@
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/8.8/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build
+Configuration on demand is an incubating feature.
+> Task :app:preBuild UP-TO-DATE
+> Task :core:database:preBuild UP-TO-DATE
+> Task :core:common:preBuild UP-TO-DATE
+> Task :core:data:preBuild UP-TO-DATE
+> Task :core:data:preDebugBuild UP-TO-DATE
+> Task :core:common:preDebugBuild UP-TO-DATE
+> Task :core:database:preDebugBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:checkKotlinGradlePluginConfigurationErrors
+> Task :core:domain:preBuild UP-TO-DATE
+> Task :core:domain:preDebugBuild UP-TO-DATE
+> Task :core:domain:writeDebugAarMetadata UP-TO-DATE
+> Task :core:data:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:writeDebugAarMetadata UP-TO-DATE
+> Task :core:network:preBuild UP-TO-DATE
+> Task :core:network:preDebugBuild UP-TO-DATE
+> Task :core:database:writeDebugAarMetadata UP-TO-DATE
+> Task :core:extensions:preBuild UP-TO-DATE
+> Task :core:extensions:preDebugBuild UP-TO-DATE
+> Task :core:ui:preBuild UP-TO-DATE
+> Task :core:ui:preDebugBuild UP-TO-DATE
+> Task :core:model:preBuild UP-TO-DATE
+> Task :core:network:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:browse:preBuild UP-TO-DATE
+> Task :feature:browse:preDebugBuild UP-TO-DATE
+> Task :core:model:preDebugBuild UP-TO-DATE
+> Task :core:ui:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:details:preBuild UP-TO-DATE
+> Task :feature:details:preDebugBuild UP-TO-DATE
+> Task :core:extensions:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:home:preBuild UP-TO-DATE
+> Task :feature:home:preDebugBuild UP-TO-DATE
+> Task :core:model:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:library:preBuild UP-TO-DATE
+> Task :feature:browse:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:library:preDebugBuild UP-TO-DATE
+> Task :feature:player:preBuild UP-TO-DATE
+> Task :feature:player:preDebugBuild UP-TO-DATE
+> Task :feature:details:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:home:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:reader:preBuild UP-TO-DATE
+> Task :feature:schedule:preBuild UP-TO-DATE
+> Task :feature:schedule:preDebugBuild UP-TO-DATE
+> Task :feature:reader:preDebugBuild UP-TO-DATE
+> Task :feature:player:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:settings:preBuild UP-TO-DATE
+> Task :feature:settings:preDebugBuild UP-TO-DATE
+> Task :feature:library:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:schedule:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:updates:preBuild UP-TO-DATE
+> Task :feature:updates:preDebugBuild UP-TO-DATE
+> Task :feature:reader:writeDebugAarMetadata UP-TO-DATE
+> Task :feature:settings:writeDebugAarMetadata UP-TO-DATE
+> Task :core:common:generateDebugResValues UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :core:data:generateDebugResValues UP-TO-DATE
+> Task :feature:updates:writeDebugAarMetadata UP-TO-DATE
+> Task :core:database:generateDebugResValues UP-TO-DATE
+> Task :core:common:generateDebugResources UP-TO-DATE
+> Task :core:data:generateDebugResources UP-TO-DATE
+> Task :core:database:generateDebugResources UP-TO-DATE
+> Task :core:data:packageDebugResources UP-TO-DATE
+> Task :core:database:packageDebugResources UP-TO-DATE
+> Task :core:common:packageDebugResources UP-TO-DATE
+> Task :core:model:generateDebugResValues UP-TO-DATE
+> Task :core:domain:generateDebugResValues UP-TO-DATE
+> Task :core:extensions:generateDebugResValues UP-TO-DATE
+> Task :core:model:generateDebugResources UP-TO-DATE
+> Task :core:extensions:generateDebugResources UP-TO-DATE
+> Task :core:domain:generateDebugResources UP-TO-DATE
+> Task :core:domain:packageDebugResources UP-TO-DATE
+> Task :core:model:packageDebugResources UP-TO-DATE
+> Task :core:extensions:packageDebugResources UP-TO-DATE
+> Task :feature:browse:generateDebugResValues UP-TO-DATE
+> Task :core:network:generateDebugResValues UP-TO-DATE
+> Task :core:ui:generateDebugResValues UP-TO-DATE
+> Task :feature:browse:generateDebugResources UP-TO-DATE
+> Task :core:network:generateDebugResources UP-TO-DATE
+> Task :core:ui:generateDebugResources UP-TO-DATE
+> Task :feature:browse:packageDebugResources UP-TO-DATE
+> Task :core:ui:packageDebugResources UP-TO-DATE
+> Task :feature:details:generateDebugResValues UP-TO-DATE
+> Task :feature:home:generateDebugResValues UP-TO-DATE
+> Task :feature:details:generateDebugResources UP-TO-DATE
+> Task :core:network:packageDebugResources UP-TO-DATE
+> Task :feature:home:generateDebugResources UP-TO-DATE
+> Task :feature:library:generateDebugResValues UP-TO-DATE
+> Task :feature:details:packageDebugResources UP-TO-DATE
+> Task :feature:library:generateDebugResources UP-TO-DATE
+> Task :feature:home:packageDebugResources UP-TO-DATE
+> Task :feature:player:generateDebugResValues UP-TO-DATE
+> Task :feature:reader:generateDebugResValues UP-TO-DATE
+> Task :feature:reader:generateDebugResources UP-TO-DATE
+> Task :feature:player:generateDebugResources UP-TO-DATE
+> Task :feature:reader:packageDebugResources UP-TO-DATE
+> Task :feature:schedule:generateDebugResValues UP-TO-DATE
+> Task :feature:schedule:generateDebugResources UP-TO-DATE
+> Task :feature:library:packageDebugResources UP-TO-DATE
+> Task :feature:settings:generateDebugResValues UP-TO-DATE
+> Task :feature:player:packageDebugResources UP-TO-DATE
+> Task :feature:schedule:packageDebugResources UP-TO-DATE
+> Task :feature:settings:generateDebugResources UP-TO-DATE
+> Task :feature:updates:generateDebugResValues UP-TO-DATE
+> Task :feature:updates:generateDebugResources UP-TO-DATE
+> Task :core:common:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:settings:packageDebugResources UP-TO-DATE
+> Task :core:data:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:processDebugManifest UP-TO-DATE
+> Task :feature:updates:packageDebugResources UP-TO-DATE
+> Task :core:database:extractDeepLinksDebug UP-TO-DATE
+> Task :core:domain:extractDeepLinksDebug UP-TO-DATE
+> Task :core:data:processDebugManifest UP-TO-DATE
+> Task :core:extensions:extractDeepLinksDebug UP-TO-DATE
+> Task :core:database:processDebugManifest UP-TO-DATE
+> Task :core:domain:processDebugManifest UP-TO-DATE
+> Task :core:model:extractDeepLinksDebug UP-TO-DATE
+> Task :core:model:processDebugManifest UP-TO-DATE
+> Task :core:network:extractDeepLinksDebug UP-TO-DATE
+> Task :core:extensions:processDebugManifest UP-TO-DATE
+> Task :core:ui:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:browse:extractDeepLinksDebug UP-TO-DATE
+> Task :core:network:processDebugManifest UP-TO-DATE
+> Task :core:ui:processDebugManifest UP-TO-DATE
+> Task :feature:browse:processDebugManifest UP-TO-DATE
+> Task :feature:home:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:details:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:library:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:home:processDebugManifest UP-TO-DATE
+> Task :feature:library:processDebugManifest UP-TO-DATE
+> Task :feature:details:processDebugManifest UP-TO-DATE
+> Task :feature:player:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:schedule:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:reader:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:player:processDebugManifest UP-TO-DATE
+> Task :feature:reader:processDebugManifest UP-TO-DATE
+> Task :feature:schedule:processDebugManifest UP-TO-DATE
+> Task :feature:updates:extractDeepLinksDebug UP-TO-DATE
+> Task :feature:settings:extractDeepLinksDebug UP-TO-DATE
+> Task :core:common:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:updates:processDebugManifest UP-TO-DATE
+> Task :feature:settings:processDebugManifest UP-TO-DATE
+> Task :core:database:compileDebugLibraryResources UP-TO-DATE
+> Task :core:data:compileDebugLibraryResources UP-TO-DATE
+> Task :core:common:parseDebugLocalResources UP-TO-DATE
+> Task :core:database:parseDebugLocalResources UP-TO-DATE
+> Task :core:data:parseDebugLocalResources UP-TO-DATE
+> Task :core:data:generateDebugRFile UP-TO-DATE
+> Task :core:common:generateDebugRFile UP-TO-DATE
+> Task :core:database:generateDebugRFile UP-TO-DATE
+> Task :core:domain:compileDebugLibraryResources UP-TO-DATE
+> Task :core:model:compileDebugLibraryResources UP-TO-DATE
+> Task :core:extensions:compileDebugLibraryResources UP-TO-DATE
+> Task :core:domain:parseDebugLocalResources UP-TO-DATE
+> Task :core:model:parseDebugLocalResources UP-TO-DATE
+> Task :core:extensions:parseDebugLocalResources UP-TO-DATE
+> Task :core:model:generateDebugRFile UP-TO-DATE
+> Task :core:network:compileDebugLibraryResources UP-TO-DATE
+> Task :core:domain:generateDebugRFile UP-TO-DATE
+> Task :core:extensions:generateDebugRFile UP-TO-DATE
+> Task :core:network:parseDebugLocalResources UP-TO-DATE
+> Task :feature:browse:compileDebugLibraryResources UP-TO-DATE
+> Task :core:ui:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:browse:parseDebugLocalResources UP-TO-DATE
+> Task :core:network:generateDebugRFile UP-TO-DATE
+> Task :core:ui:parseDebugLocalResources UP-TO-DATE
+> Task :feature:details:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:browse:generateDebugRFile UP-TO-DATE
+> Task :feature:home:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:details:parseDebugLocalResources UP-TO-DATE
+> Task :core:ui:generateDebugRFile UP-TO-DATE
+> Task :feature:library:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:home:parseDebugLocalResources UP-TO-DATE
+> Task :feature:details:generateDebugRFile UP-TO-DATE
+> Task :feature:player:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:home:generateDebugRFile UP-TO-DATE
+> Task :feature:library:parseDebugLocalResources UP-TO-DATE
+> Task :feature:reader:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:player:parseDebugLocalResources UP-TO-DATE
+> Task :feature:library:generateDebugRFile UP-TO-DATE
+> Task :feature:player:generateDebugRFile UP-TO-DATE
+> Task :feature:reader:parseDebugLocalResources UP-TO-DATE
+> Task :feature:schedule:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:settings:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:schedule:parseDebugLocalResources UP-TO-DATE
+> Task :feature:reader:generateDebugRFile UP-TO-DATE
+> Task :feature:updates:compileDebugLibraryResources UP-TO-DATE
+> Task :feature:settings:parseDebugLocalResources UP-TO-DATE
+> Task :feature:schedule:generateDebugRFile UP-TO-DATE
+> Task :core:common:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:settings:generateDebugRFile UP-TO-DATE
+> Task :core:data:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:updates:parseDebugLocalResources UP-TO-DATE
+> Task :core:database:checkKotlinGradlePluginConfigurationErrors
+> Task :core:model:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:updates:generateDebugRFile UP-TO-DATE
+> Task :core:database:javaPreCompileDebug UP-TO-DATE
+> Task :core:domain:checkKotlinGradlePluginConfigurationErrors
+> Task :core:extensions:checkKotlinGradlePluginConfigurationErrors
+> Task :core:network:checkKotlinGradlePluginConfigurationErrors
+> Task :core:network:checkApolloVersions UP-TO-DATE
+> Task :core:network:generateServiceApolloOptions UP-TO-DATE
+> Task :core:network:generateServiceApolloSources UP-TO-DATE
+> Task :core:network:javaPreCompileDebug UP-TO-DATE
+> Task :core:extensions:javaPreCompileDebug UP-TO-DATE
+> Task :core:domain:javaPreCompileDebug UP-TO-DATE
+> Task :core:model:compileDebugKotlin UP-TO-DATE
+> Task :core:model:javaPreCompileDebug UP-TO-DATE
+> Task :core:model:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:model:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:data:javaPreCompileDebug UP-TO-DATE
+> Task :core:model:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:ui:checkKotlinGradlePluginConfigurationErrors
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:processDebugGoogleServices UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :core:common:kspDebugKotlin UP-TO-DATE
+> Task :core:common:compileDebugKotlin UP-TO-DATE
+> Task :core:database:kspDebugKotlin UP-TO-DATE
+> Task :core:common:javaPreCompileDebug UP-TO-DATE
+> Task :core:ui:kspDebugKotlin UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :core:database:compileDebugKotlin UP-TO-DATE
+> Task :core:common:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:ui:compileDebugKotlin UP-TO-DATE
+> Task :core:ui:javaPreCompileDebug UP-TO-DATE
+> Task :core:ui:compileDebugJavaWithJavac NO-SOURCE
+> Task :core:database:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:common:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:common:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:ui:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:common:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:ui:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:ui:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:browse:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:browse:javaPreCompileDebug UP-TO-DATE
+> Task :feature:details:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:details:javaPreCompileDebug UP-TO-DATE
+> Task :feature:home:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:home:javaPreCompileDebug UP-TO-DATE
+> Task :feature:library:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:library:javaPreCompileDebug UP-TO-DATE
+> Task :feature:player:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:player:javaPreCompileDebug UP-TO-DATE
+> Task :feature:reader:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:reader:javaPreCompileDebug UP-TO-DATE
+> Task :feature:schedule:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:schedule:javaPreCompileDebug UP-TO-DATE
+> Task :feature:settings:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:settings:javaPreCompileDebug UP-TO-DATE
+> Task :feature:updates:checkKotlinGradlePluginConfigurationErrors
+> Task :feature:updates:javaPreCompileDebug UP-TO-DATE
+> Task :core:database:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:database:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:database:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:common:processDebugJavaRes UP-TO-DATE
+> Task :core:database:processDebugJavaRes UP-TO-DATE
+> Task :core:model:processDebugJavaRes UP-TO-DATE
+> Task :core:common:preReleaseBuild UP-TO-DATE
+> Task :core:ui:processDebugJavaRes UP-TO-DATE
+> Task :core:data:preReleaseBuild UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :core:common:writeReleaseAarMetadata
+> Task :core:database:preReleaseBuild UP-TO-DATE
+> Task :core:data:writeReleaseAarMetadata
+> Task :core:domain:preReleaseBuild UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :core:database:writeReleaseAarMetadata
+> Task :core:domain:writeReleaseAarMetadata
+> Task :core:model:preReleaseBuild UP-TO-DATE
+> Task :core:extensions:preReleaseBuild UP-TO-DATE
+> Task :core:extensions:writeReleaseAarMetadata
+> Task :core:ui:preReleaseBuild UP-TO-DATE
+> Task :core:model:writeReleaseAarMetadata
+> Task :feature:browse:preReleaseBuild UP-TO-DATE
+> Task :core:network:kspDebugKotlin UP-TO-DATE
+> Task :feature:browse:writeReleaseAarMetadata
+> Task :core:ui:writeReleaseAarMetadata
+> Task :feature:details:preReleaseBuild UP-TO-DATE
+> Task :feature:home:preReleaseBuild UP-TO-DATE
+> Task :core:network:compileDebugKotlin UP-TO-DATE
+> Task :core:network:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:details:writeReleaseAarMetadata
+> Task :feature:library:preReleaseBuild UP-TO-DATE
+> Task :feature:library:writeReleaseAarMetadata
+> Task :feature:player:preReleaseBuild UP-TO-DATE
+> Task :feature:player:writeReleaseAarMetadata
+> Task :feature:reader:preReleaseBuild UP-TO-DATE
+> Task :feature:home:writeReleaseAarMetadata
+> Task :feature:schedule:preReleaseBuild UP-TO-DATE
+> Task :core:network:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:network:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:reader:writeReleaseAarMetadata
+> Task :feature:schedule:writeReleaseAarMetadata
+> Task :core:network:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:network:processDebugJavaRes UP-TO-DATE
+> Task :core:network:preReleaseBuild UP-TO-DATE
+> Task :core:network:writeReleaseAarMetadata
+> Task :feature:settings:preReleaseBuild UP-TO-DATE
+> Task :core:extensions:kspDebugKotlin UP-TO-DATE
+> Task :feature:settings:writeReleaseAarMetadata
+> Task :feature:updates:preReleaseBuild UP-TO-DATE
+> Task :feature:updates:writeReleaseAarMetadata
+> Task :app:processDebugResources UP-TO-DATE
+> Task :core:extensions:compileDebugKotlin UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:extensions:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:common:generateReleaseResValues FROM-CACHE
+> Task :app:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :app:preReleaseBuild UP-TO-DATE
+> Task :core:extensions:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:extensions:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:common:generateReleaseResources
+> Task :core:extensions:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:domain:kspDebugKotlin UP-TO-DATE
+> Task :feature:schedule:kspDebugKotlin UP-TO-DATE
+> Task :core:extensions:processDebugJavaRes UP-TO-DATE
+> Task :core:domain:compileDebugKotlin UP-TO-DATE
+> Task :feature:schedule:compileDebugKotlin UP-TO-DATE
+> Task :core:domain:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:domain:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:schedule:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:domain:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:schedule:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:domain:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :app:buildKotlinToolingMetadata
+> Task :core:data:kspDebugKotlin UP-TO-DATE
+> Task :feature:browse:kspDebugKotlin UP-TO-DATE
+> Task :feature:details:kspDebugKotlin UP-TO-DATE
+> Task :core:data:compileDebugKotlin UP-TO-DATE
+> Task :feature:browse:compileDebugKotlin UP-TO-DATE
+> Task :core:data:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:details:compileDebugKotlin UP-TO-DATE
+> Task :core:common:packageReleaseResources
+> Task :feature:browse:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:details:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:details:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:details:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:browse:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:browse:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:data:transformDebugClassesWithAsm UP-TO-DATE
+> Task :core:data:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:home:kspDebugKotlin UP-TO-DATE
+> Task :feature:library:kspDebugKotlin UP-TO-DATE
+> Task :feature:home:compileDebugKotlin UP-TO-DATE
+> Task :feature:reader:kspDebugKotlin UP-TO-DATE
+> Task :feature:home:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:library:compileDebugKotlin UP-TO-DATE
+> Task :feature:home:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:player:kspDebugKotlin UP-TO-DATE
+> Task :feature:library:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:home:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:schedule:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:reader:compileDebugKotlin UP-TO-DATE
+> Task :feature:library:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:library:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:reader:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:player:compileDebugKotlin UP-TO-DATE
+> Task :feature:reader:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:player:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:reader:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:data:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:home:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:settings:kspDebugKotlin UP-TO-DATE
+> Task :feature:library:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:browse:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:details:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:player:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:player:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:reader:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:player:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:schedule:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :feature:settings:compileDebugKotlin UP-TO-DATE
+> Task :feature:updates:kspDebugKotlin UP-TO-DATE
+> Task :feature:settings:compileDebugJavaWithJavac UP-TO-DATE
+> Task :core:domain:processDebugJavaRes UP-TO-DATE
+> Task :core:data:processDebugJavaRes UP-TO-DATE
+> Task :feature:browse:processDebugJavaRes UP-TO-DATE
+> Task :feature:details:processDebugJavaRes UP-TO-DATE
+> Task :feature:home:processDebugJavaRes UP-TO-DATE
+> Task :feature:player:processDebugJavaRes UP-TO-DATE
+> Task :feature:library:processDebugJavaRes UP-TO-DATE
+> Task :feature:settings:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:updates:compileDebugKotlin UP-TO-DATE
+> Task :feature:reader:processDebugJavaRes UP-TO-DATE
+> Task :feature:settings:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :feature:schedule:processDebugJavaRes UP-TO-DATE
+> Task :feature:settings:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:data:generateReleaseResValues FROM-CACHE
+> Task :feature:updates:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:settings:processDebugJavaRes UP-TO-DATE
+> Task :core:data:generateReleaseResources FROM-CACHE
+> Task :feature:updates:transformDebugClassesWithAsm UP-TO-DATE
+> Task :feature:updates:bundleLibCompileToJarDebug UP-TO-DATE
+> Task :core:database:generateReleaseResValues FROM-CACHE
+> Task :feature:updates:bundleLibRuntimeToJarDebug UP-TO-DATE
+> Task :core:database:generateReleaseResources FROM-CACHE
+> Task :feature:updates:processDebugJavaRes UP-TO-DATE
+> Task :core:domain:generateReleaseResValues FROM-CACHE
+> Task :core:domain:generateReleaseResources FROM-CACHE
+> Task :core:data:packageReleaseResources
+> Task :core:extensions:generateReleaseResValues FROM-CACHE
+> Task :core:database:packageReleaseResources
+> Task :core:extensions:generateReleaseResources FROM-CACHE
+> Task :core:model:generateReleaseResValues FROM-CACHE
+> Task :core:domain:packageReleaseResources
+> Task :core:model:generateReleaseResources FROM-CACHE
+> Task :core:network:generateReleaseResValues FROM-CACHE
+> Task :core:network:generateReleaseResources FROM-CACHE
+> Task :core:extensions:packageReleaseResources
+> Task :core:ui:generateReleaseResValues FROM-CACHE
+> Task :core:ui:generateReleaseResources FROM-CACHE
+> Task :core:model:packageReleaseResources
+> Task :core:network:packageReleaseResources
+> Task :feature:browse:generateReleaseResValues FROM-CACHE
+> Task :feature:details:generateReleaseResValues FROM-CACHE
+> Task :feature:browse:generateReleaseResources FROM-CACHE
+> Task :feature:details:generateReleaseResources FROM-CACHE
+> Task :feature:browse:packageReleaseResources
+> Task :core:ui:packageReleaseResources
+> Task :feature:home:generateReleaseResValues FROM-CACHE
+> Task :feature:home:generateReleaseResources FROM-CACHE
+> Task :feature:details:packageReleaseResources
+> Task :feature:library:generateReleaseResValues FROM-CACHE
+> Task :feature:library:generateReleaseResources FROM-CACHE
+> Task :feature:home:packageReleaseResources
+> Task :feature:player:generateReleaseResValues FROM-CACHE
+> Task :feature:player:generateReleaseResources FROM-CACHE
+> Task :app:checkReleaseAarMetadata
+> Task :feature:reader:generateReleaseResValues FROM-CACHE
+> Task :feature:library:packageReleaseResources
+> Task :feature:schedule:generateReleaseResValues FROM-CACHE
+> Task :feature:reader:generateReleaseResources FROM-CACHE
+> Task :feature:schedule:generateReleaseResources FROM-CACHE
+> Task :feature:player:packageReleaseResources
+> Task :feature:settings:generateReleaseResValues FROM-CACHE
+> Task :feature:settings:generateReleaseResources FROM-CACHE
+> Task :feature:schedule:packageReleaseResources
+> Task :feature:reader:packageReleaseResources
+> Task :feature:updates:generateReleaseResValues FROM-CACHE
+> Task :feature:settings:packageReleaseResources
+> Task :feature:updates:generateReleaseResources FROM-CACHE
+> Task :core:common:extractDeepLinksRelease FROM-CACHE
+> Task :core:data:extractDeepLinksRelease FROM-CACHE
+> Task :core:common:processReleaseManifest FROM-CACHE
+> Task :core:data:processReleaseManifest FROM-CACHE
+> Task :feature:updates:packageReleaseResources
+> Task :core:domain:extractDeepLinksRelease FROM-CACHE
+> Task :core:database:extractDeepLinksRelease FROM-CACHE
+> Task :core:extensions:extractDeepLinksRelease FROM-CACHE
+> Task :core:database:processReleaseManifest FROM-CACHE
+> Task :core:domain:processReleaseManifest FROM-CACHE
+> Task :core:model:extractDeepLinksRelease FROM-CACHE
+> Task :core:network:extractDeepLinksRelease FROM-CACHE
+> Task :core:extensions:processReleaseManifest FROM-CACHE
+> Task :core:ui:extractDeepLinksRelease FROM-CACHE
+> Task :app:kspDebugKotlin UP-TO-DATE
+> Task :core:model:processReleaseManifest FROM-CACHE
+> Task :feature:browse:extractDeepLinksRelease FROM-CACHE
+> Task :core:network:processReleaseManifest FROM-CACHE
+> Task :core:ui:processReleaseManifest FROM-CACHE
+> Task :feature:details:extractDeepLinksRelease FROM-CACHE
+> Task :feature:home:extractDeepLinksRelease FROM-CACHE
+> Task :feature:browse:processReleaseManifest FROM-CACHE
+> Task :feature:library:extractDeepLinksRelease FROM-CACHE
+> Task :feature:home:processReleaseManifest FROM-CACHE
+> Task :feature:details:processReleaseManifest FROM-CACHE
+> Task :app:compileDebugKotlin UP-TO-DATE
+> Task :feature:player:extractDeepLinksRelease FROM-CACHE
+> Task :feature:reader:extractDeepLinksRelease FROM-CACHE
+> Task :feature:library:processReleaseManifest FROM-CACHE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :feature:schedule:extractDeepLinksRelease FROM-CACHE
+> Task :feature:player:processReleaseManifest FROM-CACHE
+> Task :feature:settings:extractDeepLinksRelease FROM-CACHE
+> Task :feature:schedule:processReleaseManifest FROM-CACHE
+> Task :feature:reader:processReleaseManifest FROM-CACHE
+> Task :feature:updates:extractDeepLinksRelease FROM-CACHE
+> Task :feature:settings:processReleaseManifest FROM-CACHE
+> Task :feature:updates:processReleaseManifest FROM-CACHE
+> Task :core:data:parseReleaseLocalResources FROM-CACHE
+> Task :core:common:parseReleaseLocalResources FROM-CACHE
+> Task :core:common:generateReleaseRFile FROM-CACHE
+> Task :core:data:generateReleaseRFile FROM-CACHE
+> Task :core:common:compileReleaseLibraryResources
+> Task :core:data:compileReleaseLibraryResources
+> Task :core:database:parseReleaseLocalResources FROM-CACHE
+> Task :core:database:compileReleaseLibraryResources
+> Task :core:domain:compileReleaseLibraryResources FROM-CACHE
+> Task :core:extensions:compileReleaseLibraryResources FROM-CACHE
+> Task :core:domain:parseReleaseLocalResources FROM-CACHE
+> Task :core:extensions:parseReleaseLocalResources FROM-CACHE
+> Task :core:database:generateReleaseRFile FROM-CACHE
+> Task :core:model:compileReleaseLibraryResources FROM-CACHE
+> Task :core:domain:generateReleaseRFile FROM-CACHE
+> Task :core:model:parseReleaseLocalResources FROM-CACHE
+> Task :core:extensions:generateReleaseRFile FROM-CACHE
+> Task :core:network:compileReleaseLibraryResources FROM-CACHE
+> Task :core:ui:compileReleaseLibraryResources FROM-CACHE
+> Task :core:model:generateReleaseRFile FROM-CACHE
+> Task :core:ui:parseReleaseLocalResources FROM-CACHE
+> Task :core:network:parseReleaseLocalResources FROM-CACHE
+> Task :feature:browse:compileReleaseLibraryResources FROM-CACHE
+> Task :core:network:generateReleaseRFile FROM-CACHE
+> Task :core:ui:generateReleaseRFile FROM-CACHE
+> Task :feature:browse:parseReleaseLocalResources FROM-CACHE
+> Task :feature:home:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:details:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:home:parseReleaseLocalResources FROM-CACHE
+> Task :feature:browse:generateReleaseRFile FROM-CACHE
+> Task :feature:details:parseReleaseLocalResources FROM-CACHE
+> Task :feature:library:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:home:generateReleaseRFile FROM-CACHE
+> Task :feature:player:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:library:parseReleaseLocalResources FROM-CACHE
+> Task :feature:details:generateReleaseRFile FROM-CACHE
+> Task :feature:player:parseReleaseLocalResources FROM-CACHE
+> Task :feature:reader:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:player:generateReleaseRFile FROM-CACHE
+> Task :feature:library:generateReleaseRFile FROM-CACHE
+> Task :feature:reader:parseReleaseLocalResources FROM-CACHE
+> Task :feature:settings:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:schedule:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:settings:parseReleaseLocalResources FROM-CACHE
+> Task :feature:schedule:parseReleaseLocalResources FROM-CACHE
+> Task :feature:reader:generateReleaseRFile FROM-CACHE
+> Task :feature:settings:generateReleaseRFile FROM-CACHE
+> Task :feature:updates:compileReleaseLibraryResources FROM-CACHE
+> Task :feature:schedule:generateReleaseRFile FROM-CACHE
+> Task :feature:updates:parseReleaseLocalResources FROM-CACHE
+> Task :feature:updates:generateReleaseRFile FROM-CACHE
+> Task :core:database:javaPreCompileRelease FROM-CACHE
+> Task :core:network:javaPreCompileRelease FROM-CACHE
+> Task :core:extensions:javaPreCompileRelease FROM-CACHE
+> Task :core:domain:javaPreCompileRelease FROM-CACHE
+> Task :core:data:javaPreCompileRelease FROM-CACHE
+> Task :core:ui:javaPreCompileRelease FROM-CACHE
+> Task :feature:browse:javaPreCompileRelease FROM-CACHE
+> Task :feature:details:javaPreCompileRelease FROM-CACHE
+> Task :feature:home:javaPreCompileRelease FROM-CACHE
+> Task :feature:library:javaPreCompileRelease FROM-CACHE
+> Task :feature:player:javaPreCompileRelease FROM-CACHE
+> Task :feature:reader:javaPreCompileRelease FROM-CACHE
+> Task :feature:schedule:javaPreCompileRelease FROM-CACHE
+> Task :feature:settings:javaPreCompileRelease FROM-CACHE
+> Task :feature:updates:javaPreCompileRelease FROM-CACHE
+> Task :core:data:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:hiltAggregateDepsDebug UP-TO-DATE
+> Task :app:hiltJavaCompileDebug UP-TO-DATE
+> Task :app:transformDebugClassesWithAsm UP-TO-DATE
+> Task :app:bundleDebugClassesToRuntimeJar
+> Task :app:processDebugJavaRes UP-TO-DATE
+> Task :app:bundleDebugClassesToCompileJar
+> Task :app:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:data:generateDebugUnitTestStubRFile
+> Task :app:compileDebugUnitTestKotlin NO-SOURCE
+> Task :app:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:generateReleaseResValues FROM-CACHE
+> Task :app:processReleaseGoogleServices
+> Task :core:model:javaPreCompileRelease FROM-CACHE
+> Task :core:data:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:data:compileDebugUnitTestKotlin NO-SOURCE
+> Task :app:mapReleaseSourceSetPaths
+> Task :core:data:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:data:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:data:hiltAggregateDepsDebugUnitTest
+> Task :app:hiltAggregateDepsDebugUnitTest
+> Task :core:data:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :app:generateReleaseResources
+> Task :core:data:processDebugUnitTestJavaRes NO-SOURCE
+> Task :app:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :app:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:data:transformDebugUnitTestClassesWithAsm
+> Task :core:data:testDebugUnitTest NO-SOURCE
+> Task :core:data:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:data:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :app:transformDebugUnitTestClassesWithAsm
+> Task :core:data:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:database:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:database:generateDebugUnitTestStubRFile
+> Task :core:common:javaPreCompileRelease FROM-CACHE
+> Task :core:common:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:common:generateDebugUnitTestStubRFile
+> Task :core:common:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:common:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:common:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:common:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:common:hiltAggregateDepsDebugUnitTest
+> Task :core:common:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :core:common:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:common:transformDebugUnitTestClassesWithAsm
+> Task :core:common:testDebugUnitTest NO-SOURCE
+> Task :core:common:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:common:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:common:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:database:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:database:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:database:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:database:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:database:hiltAggregateDepsDebugUnitTest
+> Task :core:database:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :core:database:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:database:transformDebugUnitTestClassesWithAsm
+> Task :core:database:testDebugUnitTest NO-SOURCE
+> Task :core:database:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:database:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:database:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:domain:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:domain:generateDebugUnitTestStubRFile
+> Task :core:domain:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:domain:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:domain:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:domain:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:domain:hiltAggregateDepsDebugUnitTest
+> Task :core:domain:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :core:domain:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:domain:transformDebugUnitTestClassesWithAsm
+> Task :core:domain:testDebugUnitTest NO-SOURCE
+> Task :core:domain:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:domain:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:domain:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:extensions:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:extensions:generateDebugUnitTestStubRFile
+> Task :core:extensions:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:extensions:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:extensions:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:extensions:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:extensions:hiltAggregateDepsDebugUnitTest
+> Task :core:extensions:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :core:extensions:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:extensions:transformDebugUnitTestClassesWithAsm
+> Task :core:extensions:testDebugUnitTest NO-SOURCE
+> Task :core:extensions:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:extensions:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:extensions:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:model:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:model:generateDebugUnitTestStubRFile
+> Task :core:model:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:model:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:model:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:model:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:model:testDebugUnitTest NO-SOURCE
+> Task :core:model:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:model:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:model:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:network:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:network:generateDebugUnitTestStubRFile
+> Task :core:network:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:network:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:network:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:network:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:network:hiltAggregateDepsDebugUnitTest
+> Task :core:network:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :core:network:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:network:transformDebugUnitTestClassesWithAsm
+> Task :core:network:testDebugUnitTest NO-SOURCE
+> Task :core:network:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:network:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:network:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:ui:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:ui:generateDebugUnitTestStubRFile
+> Task :core:ui:kspDebugUnitTestKotlin NO-SOURCE
+> Task :core:ui:compileDebugUnitTestKotlin NO-SOURCE
+> Task :core:ui:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :core:ui:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :core:ui:hiltAggregateDepsDebugUnitTest
+> Task :core:ui:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :core:ui:processDebugUnitTestJavaRes NO-SOURCE
+> Task :core:ui:transformDebugUnitTestClassesWithAsm
+> Task :core:ui:testDebugUnitTest NO-SOURCE
+> Task :core:ui:preReleaseUnitTestBuild UP-TO-DATE
+> Task :core:ui:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :core:ui:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:browse:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:browse:generateDebugUnitTestStubRFile
+> Task :app:testDebugUnitTest NO-SOURCE
+> Task :app:packageReleaseResources
+> Task :app:parseReleaseLocalResources FROM-CACHE
+> Task :app:createReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksRelease FROM-CACHE
+> Task :app:processReleaseMainManifest
+> Task :app:mergeReleaseResources
+> Task :feature:browse:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:browse:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:browse:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:browse:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :app:processReleaseManifest
+> Task :app:processReleaseManifestForPackage
+> Task :feature:browse:hiltAggregateDepsDebugUnitTest
+> Task :app:javaPreCompileRelease FROM-CACHE
+> Task :app:preReleaseUnitTestBuild UP-TO-DATE
+> Task :app:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:browse:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:browse:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:browse:transformDebugUnitTestClassesWithAsm
+> Task :feature:browse:testDebugUnitTest NO-SOURCE
+> Task :feature:browse:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:browse:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:browse:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:details:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:details:generateDebugUnitTestStubRFile
+> Task :feature:details:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:details:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:details:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:details:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:details:hiltAggregateDepsDebugUnitTest
+> Task :feature:details:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:details:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:details:transformDebugUnitTestClassesWithAsm
+> Task :feature:details:testDebugUnitTest NO-SOURCE
+> Task :feature:details:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:details:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:details:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:home:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:home:generateDebugUnitTestStubRFile
+> Task :feature:home:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:home:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:home:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:home:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:home:hiltAggregateDepsDebugUnitTest
+> Task :feature:home:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:home:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:home:transformDebugUnitTestClassesWithAsm
+> Task :feature:home:testDebugUnitTest NO-SOURCE
+> Task :feature:home:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:home:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:home:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:library:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:library:generateDebugUnitTestStubRFile
+> Task :feature:library:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:library:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:library:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:library:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:library:hiltAggregateDepsDebugUnitTest
+> Task :feature:library:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:library:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:library:transformDebugUnitTestClassesWithAsm
+> Task :feature:library:testDebugUnitTest NO-SOURCE
+> Task :feature:library:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:library:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:library:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:player:preDebugUnitTestBuild UP-TO-DATE
+> Task :core:common:kspReleaseKotlin
+> Task :feature:player:generateDebugUnitTestStubRFile
+> Task :feature:player:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:player:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:player:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:player:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:player:hiltAggregateDepsDebugUnitTest
+> Task :feature:player:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:player:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:player:transformDebugUnitTestClassesWithAsm
+> Task :feature:player:testDebugUnitTest NO-SOURCE
+> Task :feature:player:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:player:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:player:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:reader:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:reader:generateDebugUnitTestStubRFile
+> Task :feature:reader:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:reader:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:reader:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:reader:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:reader:hiltAggregateDepsDebugUnitTest
+> Task :feature:reader:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:reader:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:reader:transformDebugUnitTestClassesWithAsm
+> Task :feature:reader:testDebugUnitTest NO-SOURCE
+> Task :feature:reader:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:reader:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:reader:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:schedule:preDebugUnitTestBuild UP-TO-DATE
+> Task :app:processReleaseResources
+> Task :feature:schedule:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:schedule:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:schedule:generateDebugUnitTestStubRFile
+> Task :feature:settings:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:schedule:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:schedule:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:schedule:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:schedule:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:settings:generateDebugUnitTestStubRFile
+> Task :feature:schedule:hiltAggregateDepsDebugUnitTest
+> Task :feature:schedule:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:schedule:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:schedule:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:settings:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:settings:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:settings:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:settings:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:schedule:transformDebugUnitTestClassesWithAsm
+> Task :feature:schedule:testDebugUnitTest NO-SOURCE
+> Task :feature:updates:preDebugUnitTestBuild UP-TO-DATE
+> Task :feature:settings:hiltAggregateDepsDebugUnitTest
+> Task :feature:updates:generateDebugUnitTestStubRFile
+> Task :feature:updates:kspDebugUnitTestKotlin NO-SOURCE
+> Task :feature:settings:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:settings:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:updates:compileDebugUnitTestKotlin NO-SOURCE
+> Task :feature:updates:javaPreCompileDebugUnitTest FROM-CACHE
+> Task :feature:updates:compileDebugUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:settings:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:settings:transformDebugUnitTestClassesWithAsm
+> Task :feature:settings:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:settings:testDebugUnitTest NO-SOURCE
+> Task :feature:updates:hiltAggregateDepsDebugUnitTest
+> Task :feature:settings:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :feature:updates:hiltJavaCompileDebugUnitTest NO-SOURCE
+> Task :feature:updates:processDebugUnitTestJavaRes NO-SOURCE
+> Task :feature:updates:preReleaseUnitTestBuild UP-TO-DATE
+> Task :feature:updates:transformDebugUnitTestClassesWithAsm
+> Task :feature:updates:generateReleaseUnitTestStubRFile FROM-CACHE
+> Task :feature:updates:testDebugUnitTest NO-SOURCE
+> Task :feature:updates:javaPreCompileReleaseUnitTest FROM-CACHE
+> Task :core:common:compileReleaseKotlin
+> Task :core:model:compileReleaseKotlin
+> Task :core:model:compileReleaseJavaWithJavac NO-SOURCE
+> Task :core:model:processReleaseJavaRes
+> Task :core:model:bundleLibRuntimeToJarRelease
+> Task :core:model:bundleLibCompileToJarRelease
+> Task :core:model:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:model:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:model:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:model:testReleaseUnitTest NO-SOURCE
+> Task :core:model:test UP-TO-DATE
+> Task :core:common:compileReleaseJavaWithJavac
+> Task :core:common:processReleaseJavaRes
+> Task :core:common:transformReleaseClassesWithAsm
+> Task :core:common:bundleLibCompileToJarRelease
+> Task :core:common:bundleLibRuntimeToJarRelease
+> Task :core:common:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:common:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:common:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:common:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:common:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:common:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:common:transformReleaseUnitTestClassesWithAsm
+> Task :core:common:testReleaseUnitTest NO-SOURCE
+> Task :core:common:test UP-TO-DATE
+> Task :core:ui:kspReleaseKotlin
+> Task :core:network:kspReleaseKotlin
+
+> Task :core:database:kspReleaseKotlin
+w: [ksp] /app/core/database/src/main/java/com/meigetsu/core/database/MeigetsuDatabase.kt:30: Schema export directory was not provided to the annotation processor so Room cannot export the schema. You can either provide `room.schemaLocation` annotation processor argument by applying the Room Gradle plugin (id 'androidx.room') OR set exportSchema to false.
+
+> Task :core:database:compileReleaseKotlin
+> Task :core:ui:compileReleaseKotlin
+> Task :core:ui:compileReleaseJavaWithJavac NO-SOURCE
+> Task :core:ui:processReleaseJavaRes
+> Task :core:ui:transformReleaseClassesWithAsm
+> Task :core:ui:bundleLibCompileToJarRelease
+> Task :core:ui:bundleLibRuntimeToJarRelease
+> Task :core:ui:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:ui:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:ui:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:ui:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:ui:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:ui:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:ui:transformReleaseUnitTestClassesWithAsm
+> Task :core:ui:testReleaseUnitTest NO-SOURCE
+> Task :core:ui:test UP-TO-DATE
+> Task :core:database:compileReleaseJavaWithJavac
+> Task :core:database:processReleaseJavaRes
+> Task :core:database:transformReleaseClassesWithAsm
+> Task :core:database:bundleLibRuntimeToJarRelease
+> Task :core:database:bundleLibCompileToJarRelease
+> Task :core:database:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:database:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:database:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:database:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:database:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:database:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:database:transformReleaseUnitTestClassesWithAsm
+> Task :core:database:testReleaseUnitTest NO-SOURCE
+> Task :core:database:test UP-TO-DATE
+> Task :core:network:compileReleaseKotlin
+> Task :core:network:compileReleaseJavaWithJavac
+> Task :core:network:processReleaseJavaRes
+> Task :core:network:transformReleaseClassesWithAsm
+> Task :core:network:bundleLibCompileToJarRelease
+> Task :core:network:bundleLibRuntimeToJarRelease
+> Task :core:network:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:network:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:network:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:network:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:network:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:network:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:network:transformReleaseUnitTestClassesWithAsm
+> Task :core:network:testReleaseUnitTest NO-SOURCE
+> Task :core:network:test UP-TO-DATE
+> Task :feature:schedule:kspReleaseKotlin
+> Task :feature:schedule:compileReleaseKotlin
+> Task :feature:schedule:compileReleaseJavaWithJavac
+> Task :feature:schedule:processReleaseJavaRes
+> Task :feature:schedule:transformReleaseClassesWithAsm
+> Task :feature:schedule:bundleLibCompileToJarRelease
+> Task :feature:schedule:bundleLibRuntimeToJarRelease
+> Task :feature:schedule:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:schedule:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:schedule:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:schedule:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:schedule:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:schedule:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:schedule:transformReleaseUnitTestClassesWithAsm
+> Task :feature:schedule:testReleaseUnitTest NO-SOURCE
+> Task :feature:schedule:test UP-TO-DATE
+> Task :core:extensions:kspReleaseKotlin
+> Task :core:extensions:compileReleaseKotlin
+> Task :core:extensions:compileReleaseJavaWithJavac
+> Task :core:extensions:processReleaseJavaRes
+> Task :core:extensions:transformReleaseClassesWithAsm
+> Task :core:extensions:bundleLibCompileToJarRelease
+> Task :core:extensions:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:extensions:bundleLibRuntimeToJarRelease
+> Task :core:extensions:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:extensions:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:extensions:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:extensions:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:extensions:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:extensions:transformReleaseUnitTestClassesWithAsm
+> Task :core:extensions:testReleaseUnitTest NO-SOURCE
+> Task :core:extensions:test UP-TO-DATE
+> Task :core:domain:kspReleaseKotlin
+> Task :core:domain:compileReleaseKotlin
+> Task :core:domain:compileReleaseJavaWithJavac
+> Task :core:domain:transformReleaseClassesWithAsm
+> Task :core:domain:processReleaseJavaRes
+> Task :core:domain:bundleLibCompileToJarRelease
+> Task :core:domain:bundleLibRuntimeToJarRelease
+> Task :feature:home:kspReleaseKotlin
+> Task :feature:details:kspReleaseKotlin
+> Task :feature:browse:kspReleaseKotlin
+> Task :core:data:kspReleaseKotlin
+> Task :feature:home:compileReleaseKotlin
+> Task :feature:home:compileReleaseJavaWithJavac
+> Task :feature:home:transformReleaseClassesWithAsm
+> Task :feature:home:bundleLibCompileToJarRelease
+> Task :feature:browse:compileReleaseKotlin
+> Task :feature:browse:compileReleaseJavaWithJavac
+> Task :feature:browse:transformReleaseClassesWithAsm
+> Task :feature:browse:bundleLibCompileToJarRelease
+
+> Task :feature:details:compileReleaseKotlin
+w: file:///app/feature/details/src/main/java/com/meigetsu/feature/details/MediaDetailsScreen.kt:78:48 'ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.ArrowBack
+w: file:///app/feature/details/src/main/java/com/meigetsu/feature/details/MediaDetailsScreen.kt:101:9 Parameter 'innerPadding' is never used, could be renamed to _
+w: file:///app/feature/details/src/main/java/com/meigetsu/feature/details/MediaDetailsScreen.kt:158:90 'MenuBook: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.MenuBook
+
+> Task :feature:details:compileReleaseJavaWithJavac
+> Task :feature:details:transformReleaseClassesWithAsm
+> Task :feature:details:bundleLibCompileToJarRelease
+> Task :feature:library:kspReleaseKotlin
+
+> Task :core:data:compileReleaseKotlin
+w: file:///app/core/data/src/main/java/com/meigetsu/core/data/repository/DownloadRepositoryImpl.kt:160:17 Variable 'response' is never used
+
+> Task :core:data:compileReleaseJavaWithJavac
+> Task :feature:player:kspReleaseKotlin
+> Task :core:data:transformReleaseClassesWithAsm
+> Task :core:data:bundleLibCompileToJarRelease
+> Task :feature:reader:kspReleaseKotlin
+
+> Task :feature:library:compileReleaseKotlin
+w: file:///app/feature/library/src/main/java/com/meigetsu/feature/library/LibraryScreen.kt:181:29 'LinearProgressIndicator(Float, Modifier = ..., Color = ..., Color = ..., StrokeCap = ...): Unit' is deprecated. Use the overload that takes `progress` as a lambda
+
+> Task :feature:library:compileReleaseJavaWithJavac
+> Task :feature:library:transformReleaseClassesWithAsm
+> Task :feature:library:bundleLibCompileToJarRelease
+> Task :feature:settings:kspReleaseKotlin
+
+> Task :feature:reader:compileReleaseKotlin
+w: file:///app/feature/reader/src/main/java/com/meigetsu/feature/reader/ReaderScreen.kt:65:43 Parameter 'index' is never used, could be renamed to _
+w: file:///app/feature/reader/src/main/java/com/meigetsu/feature/reader/ReaderScreen.kt:103:44 'ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.ArrowBack
+
+> Task :feature:reader:compileReleaseJavaWithJavac
+> Task :feature:reader:transformReleaseClassesWithAsm
+> Task :feature:reader:bundleLibCompileToJarRelease
+> Task :core:data:bundleLibRuntimeToJarRelease
+> Task :feature:home:bundleLibRuntimeToJarRelease
+> Task :feature:library:bundleLibRuntimeToJarRelease
+> Task :feature:browse:bundleLibRuntimeToJarRelease
+> Task :feature:details:bundleLibRuntimeToJarRelease
+> Task :feature:reader:bundleLibRuntimeToJarRelease
+> Task :core:data:processReleaseJavaRes
+> Task :feature:browse:processReleaseJavaRes
+> Task :feature:details:processReleaseJavaRes
+> Task :feature:home:processReleaseJavaRes
+> Task :feature:library:processReleaseJavaRes
+> Task :feature:reader:processReleaseJavaRes
+> Task :core:data:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:data:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:data:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:data:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:data:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:data:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:data:transformReleaseUnitTestClassesWithAsm
+> Task :core:data:testReleaseUnitTest NO-SOURCE
+> Task :core:data:test UP-TO-DATE
+> Task :core:domain:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :core:domain:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :core:domain:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :core:domain:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :core:domain:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :core:domain:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :core:domain:transformReleaseUnitTestClassesWithAsm
+> Task :core:domain:testReleaseUnitTest NO-SOURCE
+> Task :core:domain:test UP-TO-DATE
+> Task :feature:browse:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:browse:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:browse:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:browse:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:browse:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:browse:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:browse:transformReleaseUnitTestClassesWithAsm
+> Task :feature:browse:testReleaseUnitTest NO-SOURCE
+> Task :feature:browse:test UP-TO-DATE
+> Task :feature:details:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:details:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:details:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:details:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:details:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:details:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:details:transformReleaseUnitTestClassesWithAsm
+> Task :feature:details:testReleaseUnitTest NO-SOURCE
+> Task :feature:details:test UP-TO-DATE
+> Task :feature:home:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:home:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:home:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:home:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:home:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:home:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:home:transformReleaseUnitTestClassesWithAsm
+> Task :feature:home:testReleaseUnitTest NO-SOURCE
+> Task :feature:home:test UP-TO-DATE
+> Task :feature:library:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:library:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:library:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:library:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:library:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:library:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:library:transformReleaseUnitTestClassesWithAsm
+> Task :feature:library:testReleaseUnitTest NO-SOURCE
+> Task :feature:library:test UP-TO-DATE
+> Task :feature:reader:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:reader:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:reader:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:reader:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:reader:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:reader:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:reader:transformReleaseUnitTestClassesWithAsm
+> Task :feature:reader:testReleaseUnitTest NO-SOURCE
+> Task :feature:reader:test UP-TO-DATE
+> Task :feature:updates:kspReleaseKotlin
+
+> Task :feature:player:compileReleaseKotlin
+w: file:///app/feature/player/src/main/java/com/meigetsu/feature/player/EpisodeBottomSheet.kt:16:5 Parameter 'onEpisodeClick' is never used
+w: file:///app/feature/player/src/main/java/com/meigetsu/feature/player/PlayerOverlay.kt:110:40 'ArrowBack: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.ArrowBack
+w: file:///app/feature/player/src/main/java/com/meigetsu/feature/player/PlayerOverlay.kt:118:40 'PlaylistPlay: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.PlaylistPlay
+w: file:///app/feature/player/src/main/java/com/meigetsu/feature/player/PlayerScreen.kt:26:9 Variable 'currentUrl' is never used
+
+> Task :feature:player:compileReleaseJavaWithJavac
+> Task :feature:player:processReleaseJavaRes
+> Task :feature:player:transformReleaseClassesWithAsm
+> Task :feature:player:bundleLibCompileToJarRelease
+> Task :feature:player:bundleLibRuntimeToJarRelease
+> Task :feature:player:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:player:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:player:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:player:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:player:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:player:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:player:transformReleaseUnitTestClassesWithAsm
+> Task :feature:player:testReleaseUnitTest NO-SOURCE
+> Task :feature:player:test UP-TO-DATE
+> Task :feature:updates:compileReleaseKotlin
+> Task :feature:updates:compileReleaseJavaWithJavac
+> Task :feature:updates:processReleaseJavaRes
+> Task :feature:updates:transformReleaseClassesWithAsm
+> Task :feature:updates:bundleLibCompileToJarRelease
+> Task :feature:updates:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:updates:bundleLibRuntimeToJarRelease
+> Task :feature:updates:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:updates:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:updates:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:updates:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:updates:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:updates:transformReleaseUnitTestClassesWithAsm
+> Task :feature:updates:testReleaseUnitTest NO-SOURCE
+> Task :feature:updates:test UP-TO-DATE
+
+> Task :feature:settings:compileReleaseKotlin
+w: file:///app/feature/settings/src/main/java/com/meigetsu/feature/settings/SettingsScreen.kt:71:70 'LibraryBooks: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.LibraryBooks
+w: file:///app/feature/settings/src/main/java/com/meigetsu/feature/settings/SettingsScreen.kt:78:117 'List: ImageVector' is deprecated. Use the AutoMirrored version at Icons.AutoMirrored.Rounded.List
+
+> Task :feature:settings:compileReleaseJavaWithJavac
+> Task :feature:settings:processReleaseJavaRes
+> Task :feature:settings:transformReleaseClassesWithAsm
+> Task :feature:settings:bundleLibCompileToJarRelease
+> Task :feature:settings:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:settings:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :feature:settings:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :feature:settings:bundleLibRuntimeToJarRelease
+> Task :feature:settings:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :feature:settings:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :feature:settings:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :feature:settings:transformReleaseUnitTestClassesWithAsm
+> Task :feature:settings:testReleaseUnitTest NO-SOURCE
+> Task :feature:settings:test UP-TO-DATE
+> Task :app:kspReleaseKotlin
+
+> Task :app:compileReleaseKotlin
+w: file:///app/app/src/main/java/com/meigetsu/MainActivity.kt:223:21 Variable 'malId' is never used
+
+> Task :app:compileReleaseJavaWithJavac
+> Task :app:hiltAggregateDepsRelease FROM-CACHE
+> Task :app:hiltJavaCompileRelease
+> Task :app:processReleaseJavaRes
+> Task :app:bundleReleaseClassesToCompileJar
+> Task :app:kspReleaseUnitTestKotlin NO-SOURCE
+> Task :app:compileReleaseUnitTestKotlin NO-SOURCE
+> Task :app:compileReleaseUnitTestJavaWithJavac NO-SOURCE
+> Task :app:transformReleaseClassesWithAsm
+> Task :app:bundleReleaseClassesToRuntimeJar
+> Task :app:hiltAggregateDepsReleaseUnitTest FROM-CACHE
+> Task :app:hiltJavaCompileReleaseUnitTest NO-SOURCE
+> Task :app:processReleaseUnitTestJavaRes NO-SOURCE
+> Task :app:transformReleaseUnitTestClassesWithAsm
+> Task :app:testReleaseUnitTest NO-SOURCE
+> Task :app:test UP-TO-DATE
+
+BUILD SUCCESSFUL in 3m 15s
+778 actionable tasks: 261 executed, 207 from cache, 310 up-to-date

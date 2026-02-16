@@ -189,7 +189,6 @@ fun MainScreen(viewModel: MainViewModel) {
             composable(Screen.Browse.route) {
                 BrowseScreen(
                     hiltViewModel(),
-                    hiltViewModel(),
                     onMediaClick = { id -> navController.navigate("details/$id") },
                     onCharacterClick = { id -> navController.navigate("character/$id") }
                 )

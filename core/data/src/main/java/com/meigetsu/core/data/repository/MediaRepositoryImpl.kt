@@ -38,7 +38,7 @@ class MediaRepositoryImpl @Inject constructor(
         }
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(SearchMediaQuery(
+            val response = apolloClient.query(SearchCharactersQuery(
                 search = com.apollographql.apollo.api.Optional.present(query)
             )).execute()
             val charList = response.data?.Page?.characters?.filterNotNull()?.map {
@@ -46,7 +46,7 @@ class MediaRepositoryImpl @Inject constructor(
                     id = it.id.toString(),
                     name = it.name?.full ?: "Unknown",
                     image = it.image?.large,
-                    description = it.description
+                    description = null
                 )
             } ?: emptyList()
             emit(Resource.Success(charList))
@@ -258,8 +258,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.TV,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.TV,
         episodes = episodes,
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -280,8 +280,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.MANGA,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.MANGA,
         chapters = chapters,
         volumes = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -296,8 +296,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.TV,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.TV,
         episodes = episodes,
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -318,8 +318,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.MANGA,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.MANGA,
         chapters = chapters,
         volumes = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -335,8 +335,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.TV,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.TV,
         episodes = episodes,
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -356,8 +356,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.MANGA,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.MANGA,
         chapters = chapters,
         volumes = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -372,8 +372,8 @@ class MediaRepositoryImpl @Inject constructor(
         coverImage = coverImage?.extraLarge,
         bannerImage = bannerImage,
         rating = averageScore?.toDouble()?.div(10.0),
-        status = MediaStatus.RELEASING,
-        format = MediaFormat.TV,
+        status = status?.toMediaStatus() ?: MediaStatus.RELEASING,
+        format = format?.toMediaFormat() ?: MediaFormat.TV,
         episodes = episodes,
         nextEpisode = null,
         genres = genres?.filterNotNull() ?: emptyList(),
@@ -383,4 +383,31 @@ class MediaRepositoryImpl @Inject constructor(
         year = seasonYear,
         studio = null
     )
+
+    private fun com.meigetsu.core.network.type.MediaStatus.toMediaStatus(): MediaStatus {
+        return when (this) {
+            com.meigetsu.core.network.type.MediaStatus.FINISHED -> MediaStatus.FINISHED
+            com.meigetsu.core.network.type.MediaStatus.RELEASING -> MediaStatus.RELEASING
+            com.meigetsu.core.network.type.MediaStatus.NOT_YET_RELEASED -> MediaStatus.NOT_YET_RELEASED
+            com.meigetsu.core.network.type.MediaStatus.CANCELLED -> MediaStatus.CANCELLED
+            com.meigetsu.core.network.type.MediaStatus.HIATUS -> MediaStatus.HIATUS
+            else -> MediaStatus.RELEASING
+        }
+    }
+
+    private fun com.meigetsu.core.network.type.MediaFormat.toMediaFormat(): MediaFormat {
+        return when (this) {
+            com.meigetsu.core.network.type.MediaFormat.TV -> MediaFormat.TV
+            com.meigetsu.core.network.type.MediaFormat.TV_SHORT -> MediaFormat.TV_SHORT
+            com.meigetsu.core.network.type.MediaFormat.MOVIE -> MediaFormat.MOVIE
+            com.meigetsu.core.network.type.MediaFormat.SPECIAL -> MediaFormat.SPECIAL
+            com.meigetsu.core.network.type.MediaFormat.OVA -> MediaFormat.OVA
+            com.meigetsu.core.network.type.MediaFormat.ONA -> MediaFormat.ONA
+            com.meigetsu.core.network.type.MediaFormat.MUSIC -> MediaFormat.MUSIC
+            com.meigetsu.core.network.type.MediaFormat.MANGA -> MediaFormat.MANGA
+            com.meigetsu.core.network.type.MediaFormat.NOVEL -> MediaFormat.NOVEL
+            com.meigetsu.core.network.type.MediaFormat.ONE_SHOT -> MediaFormat.ONE_SHOT
+            else -> MediaFormat.TV
+        }
+    }
 }

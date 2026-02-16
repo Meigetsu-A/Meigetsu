@@ -39,4 +39,8 @@ class ExtensionViewModel @Inject constructor(
             repoDao.updateTrust(repo.url, !repo.isTrusted)
         }
     }
+
+    fun scanExtensions() {
+        extensionManager.scanInstalledExtensions()
+    }
 }

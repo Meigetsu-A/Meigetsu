@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -27,6 +28,7 @@ fun ExtensionManagementScreen(
 ) {
     val animeProviders by viewModel.extensionManager.animeProviders.collectAsState()
     val availableExtensions by viewModel.extensionManager.availableExtensions.collectAsState()
+    val isScanning by viewModel.extensionManager.isScanning.collectAsState()
     val repos by viewModel.repos.collectAsState()
     var repoUrl by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
@@ -38,6 +40,15 @@ fun ExtensionManagementScreen(
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.scanExtensions() }) {
+                        if (isScanning) {
+                            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        } else {
+                            Icon(Icons.Rounded.Refresh, contentDescription = "Scan for extensions")
+                        }
                     }
                 }
             )

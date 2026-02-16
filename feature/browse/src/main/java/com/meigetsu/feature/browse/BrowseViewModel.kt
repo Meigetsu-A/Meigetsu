@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
-import com.meigetsu.core.network.JikanService
+import com.meigetsu.core.domain.usecase.GlobalSearchUseCase
 import com.meigetsu.core.extensions.ExtensionManager
 import com.meigetsu.core.extensions.ExtensionRemote
+import com.meigetsu.core.extensions.MediaSearchResult
 import com.meigetsu.core.model.Anime
+import com.meigetsu.core.model.Manga
 import com.meigetsu.core.model.Character
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -22,44 +24,50 @@ sealed class BrowseUiEvent {
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
-    private val jikanService: JikanService,
+    private val globalSearchUseCase: GlobalSearchUseCase,
     val extensionManager: ExtensionManager
 ) : ViewModel() {
 
-    private val _searchResult = MutableStateFlow<Resource<List<Anime>>>(Resource.Success(emptyList()))
-    val searchResult: StateFlow<Resource<List<Anime>>> = _searchResult.asStateFlow()
+    private val _animeResults = MutableStateFlow<Resource<List<Anime>>>(Resource.Success(emptyList()))
+    val animeResults = _animeResults.asStateFlow()
 
-    private val _characterSearchResult = MutableStateFlow<Resource<List<Character>>>(Resource.Success(emptyList()))
-    val characterSearchResult: StateFlow<Resource<List<Character>>> = _characterSearchResult.asStateFlow()
+    private val _mangaResults = MutableStateFlow<Resource<List<Manga>>>(Resource.Success(emptyList()))
+    val mangaResults = _mangaResults.asStateFlow()
+
+    private val _characterResults = MutableStateFlow<Resource<List<Character>>>(Resource.Success(emptyList()))
+    val characterResults = _characterResults.asStateFlow()
+
+    private val _extensionResults = MutableStateFlow<List<MediaSearchResult>>(emptyList())
+    val extensionResults = _extensionResults.asStateFlow()
+
+    private val _isSearching = MutableStateFlow(false)
+    val isSearching = _isSearching.asStateFlow()
 
     val availableExtensions: StateFlow<List<ExtensionRemote>> = extensionManager.availableExtensions
 
     private val _eventChannel = Channel<BrowseUiEvent>()
     val events = _eventChannel.receiveAsFlow()
 
-    fun search(query: String, type: String = "ANIME") {
-        if (type == "CHARACTER") {
-            viewModelScope.launch {
-                _characterSearchResult.value = Resource.Loading()
-                try {
-                    val response = jikanService.searchCharacters(query)
-                    val characters = response.data.map {
-                        Character(
-                            id = it.mal_id.toString(),
-                            name = it.name,
-                            image = it.images.jpg.image_url,
-                            description = it.about
-                        )
-                    }
-                    _characterSearchResult.value = Resource.Success(characters)
-                } catch (e: Exception) {
-                    _characterSearchResult.value = Resource.Error(e.message ?: "Search failed")
-                }
+    fun search(query: String) {
+        if (query.isBlank()) return
+        viewModelScope.launch {
+            _isSearching.value = true
+
+            // Launch searches concurrently
+            launch {
+                mediaRepository.searchAnime(query, 1).collect { _animeResults.value = it }
             }
-        } else {
-            mediaRepository.searchAnime(query, 1).onEach {
-                _searchResult.value = it
-            }.launchIn(viewModelScope)
+            launch {
+                mediaRepository.searchManga(query, 1).collect { _mangaResults.value = it }
+            }
+            launch {
+                mediaRepository.searchCharacters(query).collect { _characterResults.value = it }
+            }
+            launch {
+                _extensionResults.value = globalSearchUseCase.execute(query)
+            }
+
+            _isSearching.value = false
         }
     }
 

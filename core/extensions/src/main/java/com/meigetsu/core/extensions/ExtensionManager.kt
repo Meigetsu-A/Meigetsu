@@ -1,6 +1,8 @@
 package com.meigetsu.core.extensions
 
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import com.meigetsu.core.database.dao.RepoDao
 import com.meigetsu.core.database.entity.ExtensionRepoEntity
 import com.meigetsu.core.extensions.model.AniListProvider
@@ -47,11 +49,19 @@ class ExtensionManager @Inject constructor(
     private val _availableExtensions = MutableStateFlow<List<ExtensionRemote>>(emptyList())
     val availableExtensions = _availableExtensions.asStateFlow()
 
+    private val _isScanning = MutableStateFlow(false)
+    val isScanning = _isScanning.asStateFlow()
+
     init {
         registerExtension(aniListProvider)
         registerExtension(mangaDexProvider)
         registerExtension(consumetProvider)
-        enterpriseExtensions.forEach { registerExtension(it) }
+
+        scope.launch {
+            enterpriseExtensions.forEach { registerExtension(it) }
+        }
+
+        scanInstalledExtensions()
 
         scope.launch {
             repoDao.getAllRepos().collect { repos ->
@@ -68,6 +78,33 @@ class ExtensionManager @Inject constructor(
         }
     }
 
+    fun scanInstalledExtensions() {
+        scope.launch {
+            _isScanning.value = true
+            val pkgManager = context.packageManager
+            val intent = Intent("com.meigetsu.EXTENSION")
+            val flags = PackageManager.GET_META_DATA
+            val resolvedInfos = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                pkgManager.queryIntentActivities(intent, PackageManager.ResolveInfoFlags.of(flags.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                pkgManager.queryIntentActivities(intent, flags)
+            }
+
+            resolvedInfos.forEach { resolveInfo ->
+                val pkgName = resolveInfo.activityInfo.packageName
+                try {
+                    val appInfo = pkgManager.getApplicationInfo(pkgName, 0)
+                    val apkFile = File(appInfo.sourceDir)
+                    loadExtensionFromApk(apkFile, pkgName)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+            _isScanning.value = false
+        }
+    }
+
     suspend fun fetchExtensions(repoUrl: String) {
         try {
             val url = if (repoUrl.endsWith("index.json")) repoUrl else "$repoUrl/index.json"
@@ -79,12 +116,15 @@ class ExtensionManager @Inject constructor(
     }
 
     fun registerExtension(extension: Extension) {
-        _installedExtensions.value += extension
-        if (extension is AnimeProvider) {
-            _animeProviders.value += (extension.metadata.id to extension)
-        }
-        if (extension is MangaProvider) {
-            _mangaProviders.value += (extension.metadata.id to extension)
+        val current = _installedExtensions.value
+        if (current.none { it.metadata.id == extension.metadata.id }) {
+            _installedExtensions.value = current + extension
+            if (extension is AnimeProvider) {
+                _animeProviders.value += (extension.metadata.id to extension)
+            }
+            if (extension is MangaProvider) {
+                _mangaProviders.value += (extension.metadata.id to extension)
+            }
         }
     }
 
@@ -108,7 +148,6 @@ class ExtensionManager @Inject constructor(
             context.classLoader
         )
 
-        // Discovery logic: Try package name + .ExtensionEntry, then fallback to common names
         val possibleClasses = mutableListOf<String>()
         if (pkgName != null) {
             possibleClasses.add("$pkgName.ExtensionEntry")
@@ -142,7 +181,6 @@ class ExtensionManager @Inject constructor(
     fun removeRepository(url: String) {
         scope.launch {
             repoDao.deleteRepo(ExtensionRepoEntity(url = url, name = "", lastUpdated = 0))
-            // Optionally clear available extensions from this repo
         }
     }
 
