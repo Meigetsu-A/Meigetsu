@@ -221,7 +221,27 @@ class MediaRepositoryImpl @Inject constructor(
                     id = char.id.toString(),
                     name = char.name?.full ?: "Unknown",
                     image = char.image?.large,
-                    description = char.description
+                    description = char.description,
+                    associatedMedia = char.media?.nodes?.filterNotNull()?.map {
+                        Anime(
+                            id = it.id.toString(),
+                            title = it.title?.english ?: it.title?.romaji ?: "Unknown",
+                            description = null,
+                            coverImage = it.coverImage?.large,
+                            bannerImage = null,
+                            rating = null,
+                            status = MediaStatus.RELEASING,
+                            format = MediaFormat.TV,
+                            episodes = null,
+                            nextEpisode = null,
+                            genres = emptyList(),
+                            averageScore = null,
+                            popularity = null,
+                            season = null,
+                            year = null,
+                            studio = null
+                        )
+                    } ?: emptyList()
                 )))
             } else {
                 emit(Resource.Error("Character not found"))
@@ -345,7 +365,15 @@ class MediaRepositoryImpl @Inject constructor(
         season = season?.name,
         year = seasonYear,
         studio = null,
-        trailerUrl = null
+        trailerUrl = null,
+        characters = characters?.nodes?.filterNotNull()?.map {
+            Character(
+                id = it.id.toString(),
+                name = it.name?.full ?: "Unknown",
+                image = it.image?.large,
+                description = null
+            )
+        } ?: emptyList()
     )
 
     private fun GetMediaDetailsQuery.Media.toMangaDetails() = Manga(

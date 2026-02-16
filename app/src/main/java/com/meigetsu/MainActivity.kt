@@ -49,6 +49,7 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
             val themeMode by viewModel.themeMode.collectAsState()
             val cornerRadius by viewModel.cornerRadius.collectAsState()
             val biometricEnabled by viewModel.biometricEnabled.collectAsState()
+            val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState()
             var isAuthenticated by remember { mutableStateOf(!biometricEnabled) }
 
             if (biometricEnabled && !isAuthenticated) {
@@ -60,7 +61,9 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
             }
 
             MeigetsuTheme(themeMode = themeMode, primaryColor = primaryColor, cornerRadius = cornerRadius) {
-                if (isAuthenticated) {
+                if (!isOnboardingCompleted) {
+                    OnboardingScreen(onComplete = { viewModel.completeOnboarding() })
+                } else if (isAuthenticated) {
                     MainScreen(viewModel)
                 } else {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
@@ -229,14 +232,19 @@ fun MainScreen(viewModel: MainViewModel) {
                         val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
                         navController.navigate("player/$encodedUrl?mediaId=$id")
                     },
-                    onReadClick = { mangaId, chapterId -> navController.navigate("reader/$mangaId/$chapterId") }
+                    onReadClick = { mangaId, chapterId -> navController.navigate("reader/$mangaId/$chapterId") },
+                    onCharacterClick = { charId -> navController.navigate("character/$charId") }
                 )
             }
             composable(
                 "character/{charId}",
                 arguments = listOf(navArgument("charId") { type = NavType.StringType })
             ) {
-                CharacterDetailsScreen(hiltViewModel())
+                CharacterDetailsScreen(
+                    hiltViewModel(),
+                    onBackClick = { navController.popBackStack() },
+                    onMediaClick = { id -> navController.navigate("details/$id") }
+                )
             }
             composable(
                 "player/{url}?mediaId={mediaId}",

@@ -18,7 +18,8 @@ data class Anime(
     val year: Int?,
     val studio: String?,
     val trailerUrl: String? = null,
-    val idMal: Int? = null
+    val idMal: Int? = null,
+    val characters: List<Character> = emptyList()
 )
 
 enum class MediaStatus {

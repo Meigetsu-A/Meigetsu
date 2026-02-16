@@ -29,6 +29,7 @@ class PreferenceRepositoryImpl @Inject constructor(
     private val adultContentKey = booleanPreferencesKey("adult_content")
     private val biometricEnabledKey = booleanPreferencesKey("biometric_enabled")
     private val autoRefreshIntervalKey = intPreferencesKey("auto_refresh_interval")
+    private val onboardingCompletedKey = booleanPreferencesKey("onboarding_completed")
 
     override fun getPrimaryColor(): Flow<Int> = context.dataStore.data.map { it[primaryColorKey] ?: 0xFFE50914.toInt() }
     override suspend fun setPrimaryColor(color: Int) {
@@ -73,6 +74,11 @@ class PreferenceRepositoryImpl @Inject constructor(
     override fun getAutoRefreshInterval(): Flow<Int> = context.dataStore.data.map { it[autoRefreshIntervalKey] ?: 0 }
     override suspend fun setAutoRefreshInterval(minutes: Int) {
         context.dataStore.edit { it[autoRefreshIntervalKey] = minutes }
+    }
+
+    override fun isOnboardingCompleted(): Flow<Boolean> = context.dataStore.data.map { it[onboardingCompletedKey] ?: false }
+    override suspend fun setOnboardingCompleted(completed: Boolean) {
+        context.dataStore.edit { it[onboardingCompletedKey] = completed }
     }
 
     override suspend fun exportBackup(): String {

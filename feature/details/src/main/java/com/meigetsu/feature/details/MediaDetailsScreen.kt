@@ -1,9 +1,11 @@
 package com.meigetsu.feature.details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
@@ -28,7 +30,8 @@ fun MediaDetailsScreen(
     viewModel: DetailsViewModel,
     onBackClick: () -> Unit,
     onWatchClick: (String, String) -> Unit,
-    onReadClick: (String, String) -> Unit
+    onReadClick: (String, String) -> Unit,
+    onCharacterClick: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val streamUrls by viewModel.streamUrls.collectAsState()
@@ -136,6 +139,18 @@ fun MediaDetailsScreen(
                                 Spacer(modifier = Modifier.height(8.dp))
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(text = "${anime.year ?: ""} • ${anime.format.name} • ★ ${anime.rating ?: ""}", color = Color.LightGray)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Surface(
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = MaterialTheme.shapes.extraSmall
+                                    ) {
+                                        Text(
+                                            text = anime.status.name,
+                                            modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -193,12 +208,50 @@ fun MediaDetailsScreen(
                         }
                     }
 
+                    if (anime.characters.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "Characters",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                            )
+                            LazyRow(contentPadding = PaddingValues(horizontal = 24.dp)) {
+                                items(anime.characters) { char ->
+                                    Column(
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(end = 12.dp)
+                                            .clickable { onCharacterClick(char.id) },
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        AsyncImage(
+                                            model = char.image,
+                                            contentDescription = char.name,
+                                            modifier = Modifier
+                                                .size(100.dp)
+                                                .background(MaterialTheme.colorScheme.surfaceVariant, MaterialTheme.shapes.medium),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                        Text(
+                                            text = char.name,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            maxLines = 2,
+                                            modifier = Modifier.padding(top = 4.dp),
+                                            fontWeight = FontWeight.Medium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     item {
                         Text(
                             text = if (anime.format.name == "MANGA") "Chapters" else "Episodes",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp)
+                            modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
                         )
                     }
 

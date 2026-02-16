@@ -30,6 +30,9 @@ interface PreferenceRepository {
     fun getAutoRefreshInterval(): Flow<Int> // in minutes, 0 means disabled
     suspend fun setAutoRefreshInterval(minutes: Int)
 
+    fun isOnboardingCompleted(): Flow<Boolean>
+    suspend fun setOnboardingCompleted(completed: Boolean)
+
     suspend fun exportBackup(): String
     suspend fun importBackup(json: String)
 }
