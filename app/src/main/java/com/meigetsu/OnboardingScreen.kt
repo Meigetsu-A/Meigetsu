@@ -1,16 +1,17 @@
 package com.meigetsu
 
 import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -20,12 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -35,8 +34,7 @@ fun OnboardingScreen(
 ) {
     val pages = listOf(
         OnboardingPage.Welcome,
-        OnboardingPage.Aggregator,
-        OnboardingPage.Permissions,
+        OnboardingPage.Unified,
         OnboardingPage.Legal
     )
     val pagerState = rememberPagerState { pages.size }
@@ -45,7 +43,7 @@ fun OnboardingScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(Color.Black)
     ) {
         HorizontalPager(
             state = pagerState,
@@ -61,22 +59,21 @@ fun OnboardingScreen(
             }
         }
 
-        // Indicator
+        // Elegant Indicator
         Row(
             Modifier
-                .height(50.dp)
-                .fillMaxWidth()
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.Center
+                .padding(bottom = 120.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             repeat(pages.size) { iteration ->
-                val color = if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else Color.Gray.copy(alpha = 0.5f)
+                val width by animateDpAsState(if (pagerState.currentPage == iteration) 24.dp else 8.dp)
+                val color = if (pagerState.currentPage == iteration) MaterialTheme.colorScheme.primary else Color.DarkGray
                 Box(
                     modifier = Modifier
-                        .padding(4.dp)
-                        .background(color, MaterialTheme.shapes.extraLarge)
-                        .size(12.dp)
+                        .height(8.dp)
+                        .width(width)
+                        .background(color, androidx.compose.foundation.shape.CircleShape)
                 )
             }
         }
@@ -88,71 +85,70 @@ fun OnboardingContent(
     page: OnboardingPage,
     onNext: () -> Unit
 ) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { results ->
-        // We proceed anyway for now, or we could check if all are granted
-        onNext()
-    }
+    ) { onNext() }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(40.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = page.icon,
-            contentDescription = null,
-            modifier = Modifier.size(120.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-        Spacer(modifier = Modifier.height(32.dp))
+        Surface(
+            modifier = Modifier.size(160.dp),
+            color = MaterialTheme.colorScheme.primary.copy(0.1f),
+            shape = androidx.compose.foundation.shape.CircleShape
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = page.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(80.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(48.dp))
+
         Text(
             text = page.title,
-            style = MaterialTheme.typography.headlineLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.displaySmall.copy(fontWeight = FontWeight.Black),
+            textAlign = TextAlign.Center,
+            color = Color.White
         )
+
         Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = page.description,
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = Color.Gray,
+            lineHeight = 24.sp
         )
-        Spacer(modifier = Modifier.height(48.dp))
+
+        Spacer(modifier = Modifier.height(64.dp))
 
         Button(
             onClick = {
-                if (page is OnboardingPage.Permissions) {
+                if (page == OnboardingPage.Welcome) {
                     val permissions = mutableListOf<String>()
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         permissions.add(Manifest.permission.POST_NOTIFICATIONS)
                     }
-                    // For files, usually we don't need broad storage permission on modern Android unless scanning whole storage
-                    // But for "access downloaded extensions", if they are in public folders:
-                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-                        permissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
-                    }
-
-                    if (permissions.isNotEmpty()) {
-                        permissionLauncher.launch(permissions.toTypedArray())
-                    } else {
-                        onNext()
-                    }
+                    if (permissions.isNotEmpty()) permissionLauncher.launch(permissions.toTypedArray())
+                    else onNext()
                 } else {
                     onNext()
                 }
             },
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = RoundedCornerShape(16.dp)
         ) {
-            Text(page.buttonText)
+            Text(page.buttonText, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleMedium)
         }
     }
 }
@@ -164,27 +160,21 @@ sealed class OnboardingPage(
     val buttonText: String
 ) {
     object Welcome : OnboardingPage(
-        "Welcome to Meigetsu",
-        "Your new home for Anime and Manga content aggregation. Elegant, fast, and powerful.",
+        "MEIGETSU",
+        "Experience Anime and Manga like never before. Minimalist, fast, and unified.",
         Icons.Rounded.AutoAwesome,
         "Get Started"
     )
-    object Aggregator : OnboardingPage(
-        "Content Aggregator",
-        "Meigetsu does not host any content. It provides a browser-like interface to access third-party extensions.",
-        Icons.Rounded.TravelExplore,
-        "I Understand"
-    )
-    object Permissions : OnboardingPage(
-        "Permissions",
-        "To provide the best experience, we need permissions to show notifications and access local extension files.",
-        Icons.Rounded.Security,
-        "Grant Permissions"
+    object Unified : OnboardingPage(
+        "Anime & Manga",
+        "Switch between watching your favorite series and reading the latest chapters seamlessly in one place.",
+        Icons.Rounded.AutoStories,
+        "Next"
     )
     object Legal : OnboardingPage(
-        "Legal Disclaimer",
-        "By using this app, you agree to our Terms of Service and acknowledge that you are responsible for the extensions you install.",
+        "Safe & Secure",
+        "We prioritize your privacy and respect content creators. Meigetsu is a tool for accessing public content.",
         Icons.Rounded.Gavel,
-        "Agree & Finish"
+        "Agree & Enter"
     )
 }

@@ -37,7 +37,7 @@ fun ReaderScreen(
     val currentPage by viewModel.currentPage.collectAsState()
 
     var mode by remember { mutableStateOf(ReaderMode.WEBTOON) }
-    var showControls by remember { mutableStateOf(true) }
+    var showControls by remember { mutableStateOf(false) } // Default hidden for immersion
     var showSettings by remember { mutableStateOf(false) }
 
     val pagerState = rememberPagerState { pages.size }
@@ -59,13 +59,15 @@ fun ReaderScreen(
         when (mode) {
             ReaderMode.VERTICAL, ReaderMode.WEBTOON -> {
                 LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+                        detectTapGestures(onTap = { showControls = !showControls })
+                    },
                     state = listState
                 ) {
                     itemsIndexed(pages) { index, url ->
                         ZoomableImage(
                             url = url,
-                            modifier = Modifier.fillParentMaxWidth().clickable { showControls = !showControls },
+                            modifier = Modifier.fillParentMaxWidth(),
                             contentScale = ContentScale.FillWidth
                         )
                         if (mode == ReaderMode.VERTICAL) {
@@ -77,19 +79,21 @@ fun ReaderScreen(
             ReaderMode.HORIZONTAL -> {
                 HorizontalPager(
                     state = pagerState,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+                        detectTapGestures(onTap = { showControls = !showControls })
+                    },
                     pageSpacing = 8.dp
                 ) { index ->
                     ZoomableImage(
                         url = pages[index],
-                        modifier = Modifier.fillMaxSize().clickable { showControls = !showControls },
+                        modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Fit
                     )
                 }
             }
         }
 
-        // Controls
+        // Minimalist Overlay
         AnimatedVisibility(
             visible = showControls,
             enter = fadeIn() + slideInVertically { -it },
@@ -97,14 +101,14 @@ fun ReaderScreen(
             modifier = Modifier.align(Alignment.TopCenter)
         ) {
             TopAppBar(
-                title = { Text("Chapter Reading", fontWeight = FontWeight.Bold) },
+                title = { Text("Chapter ${currentPage + 1}", style = MaterialTheme.typography.titleMedium) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Rounded.ArrowBack, contentDescription = null)
+                        Icon(Icons.Rounded.ArrowBack, null)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Black.copy(alpha = 0.6f),
+                    containerColor = Color.Black.copy(0.6f),
                     titleContentColor = Color.White,
                     navigationIconContentColor = Color.White
                 )
@@ -118,54 +122,52 @@ fun ReaderScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             Surface(
-                color = Color.Black.copy(alpha = 0.6f),
+                color = Color.Black.copy(alpha = 0.8f),
                 contentColor = Color.White
             ) {
-                Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+                Column(modifier = Modifier.fillMaxWidth().padding(24.dp).navigationBarsPadding()) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(text = "${currentPage + 1} / ${pages.size}", style = MaterialTheme.typography.labelLarge)
-                        Row {
+                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
                             IconButton(onClick = { showSettings = true }) {
-                                Icon(Icons.Rounded.Settings, contentDescription = "Settings")
+                                Icon(Icons.Rounded.Settings, null)
                             }
                             IconButton(onClick = { /* Bookmark */ }) {
-                                Icon(Icons.Rounded.BookmarkBorder, contentDescription = "Bookmark")
+                                Icon(Icons.Rounded.BookmarkBorder, null)
                             }
                         }
                     }
                     Slider(
-                        value = if (pages.isNotEmpty()) currentPage.toFloat() / (pages.size - 1) else 0f,
-                        onValueChange = { /* Seek */ },
-                        colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White)
+                        value = if (pages.isNotEmpty()) (currentPage.toFloat() / (pages.size - 1).coerceAtLeast(1)) else 0f,
+                        onValueChange = { /* Seek logic */ },
+                        colors = SliderDefaults.colors(
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTrackColor = MaterialTheme.colorScheme.primary
+                        )
                     )
                 }
             }
         }
 
+        // Settings Sheet
         if (showSettings) {
             ModalBottomSheet(
                 onDismissRequest = { showSettings = false },
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
+                containerColor = Color(0xFF141414),
+                contentColor = Color.White
             ) {
                 Column(modifier = Modifier.padding(24.dp).navigationBarsPadding()) {
-                    Text(text = "Reading Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Reading Mode", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height(16.dp))
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         ReaderModeItem("Vertical", Icons.Rounded.Expand, mode == ReaderMode.VERTICAL) { mode = ReaderMode.VERTICAL }
                         ReaderModeItem("Horizontal", Icons.Rounded.SwapHoriz, mode == ReaderMode.HORIZONTAL) { mode = ReaderMode.HORIZONTAL }
                         ReaderModeItem("Webtoon", Icons.Rounded.ViewStream, mode == ReaderMode.WEBTOON) { mode = ReaderMode.WEBTOON }
                     }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text(text = "Display", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    ListItem(
-                        headlineContent = { Text("Immersive Mode") },
-                        trailingContent = { Switch(checked = true, onCheckedChange = {}) }
-                    )
                 }
             }
         }
@@ -214,19 +216,12 @@ fun ZoomableImage(
 
 @Composable
 fun ReaderModeItem(label: String, icon: androidx.compose.ui.graphics.vector.ImageVector, selected: Boolean, onClick: () -> Unit) {
+    val color = if (selected) MaterialTheme.colorScheme.primary else Color.Gray
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.clickable { onClick() }.padding(8.dp)
     ) {
-        Icon(
-            icon,
-            contentDescription = null,
-            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.labelSmall,
-            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        Icon(icon, null, tint = color)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = color)
     }
 }

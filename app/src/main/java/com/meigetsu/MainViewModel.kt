@@ -16,19 +16,20 @@ class MainViewModel @Inject constructor(
 
     val primaryColor: StateFlow<Color> = preferenceRepository.getPrimaryColor()
         .map { Color(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Color(0xFFE50914))
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Color(0xFF00BFFF))
 
     val themeMode: StateFlow<String> = preferenceRepository.getThemeMode()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM")
 
     val cornerRadius: StateFlow<Int> = preferenceRepository.getCornerRadius()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 8)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 16)
 
     val biometricEnabled: StateFlow<Boolean> = preferenceRepository.getBiometricEnabled()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
+    // Default to false for fresh installs, DataStore will emit true quickly if already completed
     val isOnboardingCompleted: StateFlow<Boolean> = preferenceRepository.isOnboardingCompleted()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true) // Default to true to avoid flicker
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _isPlayerActive = MutableStateFlow(false)
     val isPlayerActive: StateFlow<Boolean> = _isPlayerActive.asStateFlow()

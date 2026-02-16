@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.MediaItem
 import androidx.media3.common.PlaybackParameters
+import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,6 +30,15 @@ class PlayerViewModel @Inject constructor(
 
     val player = ExoPlayer.Builder(context).build()
 
+    private val _isPlaying = MutableStateFlow(false)
+    val isPlaying = _isPlaying.asStateFlow()
+
+    private val _progress = MutableStateFlow(0L)
+    val progress = _progress.asStateFlow()
+
+    private val _duration = MutableStateFlow(0L)
+    val duration = _duration.asStateFlow()
+
     private val _currentPosition = MutableStateFlow(0L)
     val currentPosition = _currentPosition.asStateFlow()
 
@@ -51,6 +61,17 @@ class PlayerViewModel @Inject constructor(
     val selectedQuality = _selectedQuality.asStateFlow()
 
     init {
+        player.addListener(object : Player.Listener {
+            override fun onIsPlayingChanged(isPlaying: Boolean) {
+                _isPlaying.value = isPlaying
+            }
+            override fun onPlaybackStateChanged(state: Int) {
+                if (state == Player.STATE_READY) {
+                    _duration.value = player.duration
+                }
+            }
+        })
+
         val encodedUrl: String? = savedStateHandle["url"]
         val mediaId: String? = savedStateHandle["mediaId"]
 
@@ -78,6 +99,7 @@ class PlayerViewModel @Inject constructor(
             while (true) {
                 val pos = player.currentPosition
                 val dur = player.duration
+                _progress.value = pos
                 _currentPosition.value = pos
 
                 val mediaId: String? = savedStateHandle["mediaId"]
@@ -85,7 +107,7 @@ class PlayerViewModel @Inject constructor(
                     libraryRepository.updateWatchHistory(mediaId, 1, pos, dur)
                 }
 
-                kotlinx.coroutines.delay(5000) // Save every 5s to save battery/DB hits
+                kotlinx.coroutines.delay(1000)
             }
         }
     }
@@ -98,6 +120,11 @@ class PlayerViewModel @Inject constructor(
         player.prepare()
         player.play()
     }
+
+    fun play() = player.play()
+    fun pause() = player.pause()
+    fun seekTo(pos: Long) = player.seekTo(pos)
+    fun seekRelative(ms: Long) = player.seekTo(player.currentPosition + ms)
 
     fun switchQuality(streamUrl: StreamUrl) {
         val currentPos = player.currentPosition

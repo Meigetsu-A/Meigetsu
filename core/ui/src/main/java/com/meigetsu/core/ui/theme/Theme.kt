@@ -10,44 +10,30 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun MeigetsuTheme(
     themeMode: String = "SYSTEM",
-    primaryColor: Color = Color(0xFFE50914),
-    cornerRadius: Int = 12,
+    primaryColor: Color = Color(0xFF00BFFF), // Vibrant Deep Sky Blue
+    cornerRadius: Int = 16,
     content: @Composable () -> Unit
 ) {
-    val darkTheme = when (themeMode) {
-        "DARK", "OLED" -> true
-        "LIGHT" -> false
-        else -> isSystemInDarkTheme()
-    }
+    // Force Dark Mode for the premium "AniLab" feel
+    val darkTheme = true
 
-    val isOled = themeMode == "OLED"
-
-    val colorScheme = if (darkTheme) {
-        darkColorScheme(
-            primary = primaryColor,
-            onPrimary = Color.White,
-            surface = if (isOled) Color.Black else Color(0xFF141414),
-            onSurface = Color.White,
-            background = if (isOled) Color.Black else Color.Black,
-            onBackground = Color.White,
-            surfaceVariant = if (isOled) Color(0xFF1A1A1A) else Color(0xFF2F2F2F)
-        )
-    } else {
-        lightColorScheme(
-            primary = primaryColor,
-            onPrimary = Color.White,
-            surface = Color.White,
-            onSurface = Color.Black,
-            background = Color(0xFFF5F5F1),
-            onBackground = Color.Black,
-            surfaceVariant = Color(0xFFE5E5E5)
-        )
-    }
+    val colorScheme = darkColorScheme(
+        primary = primaryColor,
+        onPrimary = Color.Black,
+        surface = Color(0xFF0A0A0A),
+        onSurface = Color(0xFFE1E1E1),
+        background = Color(0xFF000000),
+        onBackground = Color.White,
+        surfaceVariant = Color(0xFF1E1E1E),
+        onSurfaceVariant = Color(0xFFB0B0B0),
+        secondary = Color(0xFF1DB954), // Subtle green secondary
+        tertiary = Color(0xFFFFD700) // Gold for ratings
+    )
 
     val shapes = Shapes(
-        small = RoundedCornerShape(cornerRadius.dp / 2),
+        small = RoundedCornerShape(4.dp),
         medium = RoundedCornerShape(cornerRadius.dp),
-        large = RoundedCornerShape(cornerRadius.dp * 2)
+        large = RoundedCornerShape(24.dp)
     )
 
     MaterialTheme(

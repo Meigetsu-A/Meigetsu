@@ -5,8 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
 import com.meigetsu.core.domain.usecase.GlobalSearchUseCase
+import com.meigetsu.core.network.JikanService
 import com.meigetsu.core.extensions.ExtensionManager
-import com.meigetsu.core.extensions.ExtensionRemote
 import com.meigetsu.core.extensions.MediaSearchResult
 import com.meigetsu.core.model.Anime
 import com.meigetsu.core.model.Manga
@@ -24,6 +24,7 @@ sealed class BrowseUiEvent {
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
+    private val jikanService: JikanService,
     private val globalSearchUseCase: GlobalSearchUseCase,
     val extensionManager: ExtensionManager
 ) : ViewModel() {
@@ -42,8 +43,6 @@ class BrowseViewModel @Inject constructor(
 
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
-
-    val availableExtensions: StateFlow<List<ExtensionRemote>> = extensionManager.availableExtensions
 
     private val _eventChannel = Channel<BrowseUiEvent>()
     val events = _eventChannel.receiveAsFlow()
@@ -68,14 +67,6 @@ class BrowseViewModel @Inject constructor(
             }
 
             _isSearching.value = false
-        }
-    }
-
-    fun installExtension(remote: ExtensionRemote) {
-        viewModelScope.launch {
-            _eventChannel.send(BrowseUiEvent.ShowSnackbar("Installing ${remote.name}..."))
-            extensionManager.installExtension(remote)
-            _eventChannel.send(BrowseUiEvent.ShowSnackbar("Installed ${remote.name}"))
         }
     }
 }

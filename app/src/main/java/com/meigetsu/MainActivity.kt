@@ -5,14 +5,17 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,7 +31,6 @@ import com.meigetsu.feature.details.CharacterDetailsScreen
 import com.meigetsu.feature.home.HomeScreen
 import com.meigetsu.feature.library.LibraryScreen
 import com.meigetsu.feature.settings.SettingsScreen
-import com.meigetsu.feature.settings.ExtensionManagementScreen
 import com.meigetsu.feature.settings.StatsScreen
 import com.meigetsu.feature.updates.UpdatesScreen
 import com.meigetsu.feature.schedule.ScheduleScreen
@@ -115,7 +117,6 @@ class MainActivity : androidx.fragment.app.FragmentActivity() {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(viewModel: MainViewModel) {
     val navController = rememberNavController()
@@ -132,50 +133,73 @@ fun MainScreen(viewModel: MainViewModel) {
             val showBottomBar = items.any { it.route == currentDestination?.route }
 
             if (showBottomBar) {
-                NavigationBar(tonalElevation = 8.dp) {
-                    items.forEach { screen ->
-                        val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                        NavigationBarItem(
-                            icon = {
-                                Icon(
-                                    imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                    contentDescription = null
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = screen.label,
-                                    fontSize = 10.sp,
-                                    maxLines = 1,
-                                    softWrap = false,
-                                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                                )
-                            },
-                            selected = selected,
-                            alwaysShowLabel = false,
-                            onClick = {
-                                navController.navigate(screen.route) {
-                                    popUpTo(navController.graph.findStartDestination().id) {
-                                        saveState = true
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 16.dp)
+                        .navigationBarsPadding()
+                ) {
+                    Surface(
+                        color = Color(0xFF141414),
+                        shape = RoundedCornerShape(24.dp),
+                        tonalElevation = 8.dp,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp, horizontal = 12.dp)
+                                .fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceAround,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            items.forEach { screen ->
+                                val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
+                                val contentColor = if (selected) MaterialTheme.colorScheme.primary else Color.Gray
+
+                                Column(
+                                    horizontalAlignment = Alignment.CenterHorizontally,
+                                    modifier = Modifier
+                                        .clickable {
+                                            navController.navigate(screen.route) {
+                                                popUpTo(navController.graph.findStartDestination().id) {
+                                                    saveState = true
+                                                }
+                                                launchSingleTop = true
+                                                restoreState = true
+                                            }
+                                        }
+                                        .padding(8.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
+                                        contentDescription = null,
+                                        tint = contentColor,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    if (selected) {
+                                        Text(
+                                            text = screen.label,
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = contentColor,
+                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                                            fontSize = 10.sp
+                                        )
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
-                        )
+                        }
                     }
                 }
             }
-        }
+        },
+        containerColor = Color.Black
     ) { innerPadding ->
         NavHost(
             navController,
             startDestination = Screen.Home.route,
-            Modifier.padding(innerPadding),
-            enterTransition = { fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
-            exitTransition = { fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
-            popEnterTransition = { fadeIn() + slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End) },
-            popExitTransition = { fadeOut() + slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) }
+            Modifier.padding(bottom = 0.dp),
+            enterTransition = { fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
+            exitTransition = { fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
             composable(Screen.Home.route) {
                 HomeScreen(hiltViewModel(), onMediaClick = { id -> navController.navigate("details/$id") })
@@ -199,12 +223,8 @@ fun MainScreen(viewModel: MainViewModel) {
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     hiltViewModel(),
-                    onManageExtensionsClick = { navController.navigate("extensions") },
                     onStatsClick = { navController.navigate("stats") }
                 )
-            }
-            composable("extensions") {
-                ExtensionManagementScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
             composable("stats") {
                 StatsScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })

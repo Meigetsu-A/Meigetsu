@@ -1,12 +1,10 @@
 package com.meigetsu.feature.browse
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
@@ -15,10 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.meigetsu.core.common.Resource
-import com.meigetsu.core.extensions.ExtensionRemote
 import com.meigetsu.core.extensions.MediaSearchResult
 import com.meigetsu.core.ui.components.*
 
@@ -34,10 +30,8 @@ fun BrowseScreen(
     val characterResults by viewModel.characterResults.collectAsState()
     val extensionResults by viewModel.extensionResults.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
-    val availableExtensions by viewModel.availableExtensions.collectAsState()
 
     var query by remember { mutableStateOf("") }
-    var activeTab by remember { mutableStateOf(0) }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
@@ -51,21 +45,11 @@ fun BrowseScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            Column {
-                TabRow(selectedTabIndex = activeTab) {
-                    Tab(
-                        selected = activeTab == 0,
-                        onClick = { activeTab = 0 },
-                        icon = { Icon(Icons.Rounded.Search, null) },
-                        text = { Text("Search") }
-                    )
-                    Tab(
-                        selected = activeTab == 1,
-                        onClick = { activeTab = 1 },
-                        icon = { Icon(Icons.Rounded.Extension, null) },
-                        text = { Text("Extensions") }
-                    )
-                }
+            Column(modifier = Modifier.background(Color.Black)) {
+                CenterAlignedTopAppBar(
+                    title = { Text("SEARCH", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Black)) },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
+                )
 
                 SearchBar(
                     query = query,
@@ -73,27 +57,26 @@ fun BrowseScreen(
                     onSearch = { viewModel.search(it) },
                     active = false,
                     onActiveChange = {},
-                    placeholder = { Text("Search Anime, Manga, Characters...") },
+                    placeholder = { Text("Anime, Manga, Characters...") },
                     leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    shape = MaterialTheme.shapes.medium
+                    shape = MaterialTheme.shapes.medium,
+                    colors = SearchBarDefaults.colors(containerColor = Color(0xFF141414))
                 ) { }
             }
-        }
+        },
+        containerColor = Color.Black
     ) { innerPadding ->
-        when (activeTab) {
-            0 -> UnifiedSearchResults(
-                animeResults,
-                mangaResults,
-                characterResults,
-                extensionResults,
-                isSearching,
-                innerPadding,
-                onMediaClick,
-                onCharacterClick
-            )
-            1 -> ExtensionsList(availableExtensions, innerPadding) { viewModel.installExtension(it) }
-        }
+        UnifiedSearchResults(
+            animeResults,
+            mangaResults,
+            characterResults,
+            extensionResults,
+            isSearching,
+            innerPadding,
+            onMediaClick,
+            onCharacterClick
+        )
     }
 }
 
@@ -169,7 +152,7 @@ fun UnifiedSearchResults(
 
         // Extension Results
         if (extensions.isNotEmpty()) {
-            item { SearchSectionHeader("Extension Sources") }
+            item { SearchSectionHeader("Other Sources") }
             items(extensions.chunked(3)) { chunk ->
                 Row(modifier = Modifier.padding(horizontal = 16.dp)) {
                     chunk.forEach { item ->
@@ -194,7 +177,7 @@ fun UnifiedSearchResults(
             }
         }
 
-        item { Spacer(Modifier.height(32.dp)) }
+        item { Spacer(Modifier.height(100.dp)) }
     }
 }
 
@@ -203,35 +186,8 @@ fun SearchSectionHeader(title: String) {
     Text(
         text = title,
         style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(16.dp)
+        fontWeight = FontWeight.Black,
+        modifier = Modifier.padding(16.dp),
+        color = Color.White
     )
-}
-
-@Composable
-fun ExtensionsList(
-    extensions: List<ExtensionRemote>,
-    innerPadding: PaddingValues,
-    onInstall: (ExtensionRemote) -> Unit
-) {
-    LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
-        items(extensions) { extension ->
-            ListItem(
-                headlineContent = { Text(extension.name) },
-                supportingContent = { Text("${extension.pkg} • v${extension.version}") },
-                leadingContent = {
-                    AsyncImage(
-                        model = extension.icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(40.dp)
-                    )
-                },
-                trailingContent = {
-                    Button(onClick = { onInstall(extension) }) {
-                        Text("Install")
-                    }
-                }
-            )
-        }
-    }
 }

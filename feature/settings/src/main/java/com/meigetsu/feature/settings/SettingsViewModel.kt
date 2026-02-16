@@ -5,7 +5,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.database.dao.ReadingStatsDao
-import com.meigetsu.core.database.entity.ExtensionRepoEntity
 import com.meigetsu.core.database.entity.ReadingStatsEntity
 import com.meigetsu.core.domain.repository.PreferenceRepository
 import com.meigetsu.core.domain.repository.LibraryRepository
@@ -78,17 +77,6 @@ class SettingsViewModel @Inject constructor(
 
     fun setLibraryLayout(layout: String) {
         viewModelScope.launch { preferenceRepository.setLibraryLayout(layout) }
-    }
-
-    val repositories: StateFlow<List<ExtensionRepoEntity>> = extensionManager.getRepositories()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    fun addRepository(url: String, name: String) {
-        extensionManager.addRepository(url, name)
-    }
-
-    fun removeRepository(url: String) {
-        extensionManager.removeRepository(url)
     }
 
     val stats: StateFlow<List<ReadingStatsEntity>> = statsDao.getAllStats()
