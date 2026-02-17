@@ -118,16 +118,28 @@ class DetailsViewModel @Inject constructor(
 
     fun downloadSelected() {
         viewModelScope.launch {
-            val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
-            val itemsToDownload = episodes.value.filter { selectedEpisodeIds.value.contains(it.id) }
+            val media = (uiState.value as? Resource.Success)?.data ?: return@launch
 
-            val providers = extensionManager.animeProviders.value
-            val providerId = providers.keys.find { it == "consumet" }
-                ?: providers.keys.find { it != "anilist" }
-                ?: providers.keys.firstOrNull() ?: return@launch
+            if (media is Anime) {
+                val itemsToDownload = episodes.value.filter { selectedEpisodeIds.value.contains(it.id) }
+                val providers = extensionManager.animeProviders.value
+                val providerId = providers.keys.find { it == "consumet" }
+                    ?: providers.keys.find { it != "anilist" }
+                    ?: providers.keys.firstOrNull() ?: return@launch
 
-            downloadItemsUseCase.execute(anime, itemsToDownload, providerId)
-            _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added ${itemsToDownload.size} items to downloads"))
+                downloadItemsUseCase.execute(media, itemsToDownload, providerId)
+                _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added ${itemsToDownload.size} episodes to downloads"))
+            } else if (media is Manga) {
+                val itemsToDownload = chapters.value.filter { selectedEpisodeIds.value.contains(it.id) }
+                val providers = extensionManager.mangaProviders.value
+                val providerId = providers.keys.find { it == "mangadex" }
+                    ?: providers.keys.find { it != "anilist" }
+                    ?: providers.keys.firstOrNull() ?: return@launch
+
+                downloadItemsUseCase.executeChapters(media, itemsToDownload, providerId)
+                _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added ${itemsToDownload.size} chapters to downloads"))
+            }
+
             clearSelection()
         }
     }

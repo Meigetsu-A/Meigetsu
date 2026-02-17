@@ -45,7 +45,7 @@ class ScraperEngine @Inject constructor(
         val target = if (definition.selector.isEmpty()) element else element.selectFirst(definition.selector)
         var result = when {
             target == null -> ""
-            definition.attribute != null -> target.attr(definition.attribute)
+            definition.attribute != null -> target.attr(definition.attribute!!)
             else -> target.text()
         }
 
