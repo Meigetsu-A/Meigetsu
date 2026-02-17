@@ -268,7 +268,7 @@ fun MainScreen(viewModel: MainViewModel) {
                 CharacterDetailsScreen(
                     hiltViewModel(),
                     onBackClick = { navController.popBackStack() },
-                    onMediaClick = { id -> navController.navigate("details/$id") }
+                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") }
                 )
             }
             composable(
