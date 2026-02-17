@@ -1,17 +1,16 @@
 # Meigetsu
 
-Meigetsu is an advanced, production-ready content aggregator for Android, built with Kotlin, Jetpack Compose, and Clean Architecture. Inspired by Mihon and Cloudstream, it offers a sophisticated plugin-based extension system and a premium media consumption experience.
+Meigetsu is a high-performance, automated media scraping and consumption application for Android. Built with a focus on speed, efficiency, and a premium "AniLab" aesthetic, Meigetsu utilizes advanced automation to provide seamless access to anime and manga from hundreds of sources.
 
-## ⚖️ LEGAL / DMCA SAFETY REQUIREMENTS
+## ⚖️ LEGAL DISCLAIMER
 
-**IMPORTANT: READ CAREFULLY**
+**IMPORTANT: FOR EDUCATIONAL PURPOSES ONLY**
 
-*   **Meigetsu does NOT host or store any copyrighted content.**
-*   **Meigetsu does NOT provide copyrighted media.**
-*   All content is aggregated from publicly available third-party APIs and extensions.
-*   Users are solely responsible for the extensions they install and the content they access.
-*   The developer of Meigetsu is not liable for any third-party content accessed through the app.
-*   Meigetsu functions as a browser-like tool for media metadata and stream extraction from external sources.
+*   **Meigetsu is a tool for automated web scraping.**
+*   **The developer does NOT host, store, or provide any copyrighted media content.**
+*   The application functions as a specialized web browser that automates the process of finding and viewing publicly available content on the internet.
+*   Users are solely responsible for how they use the tool and the content they choose to access.
+*   The developer is not liable for any misuse of the application or for any third-party content.
 
 ### 🛡️ DMCA Takedown
 If you believe that your copyrighted work is being linked to or accessed through Meigetsu in a way that constitutes copyright infringement, please contact the third-party source directly. Since Meigetsu does not host content, we cannot remove it from the internet. However, for any concerns regarding the application itself, you may contact:
@@ -35,7 +34,7 @@ This project is licensed under the **MIT License**.
 *   **Browse & Global Search:** Unified search across all installed providers and powerful AniList-powered metadata browsing.
 *   **Video Player (Netflix-Style):** Custom ExoPlayer implementation with volume/brightness gestures, double-tap seek, PIP, and advanced playback controls.
 *   **Manga Reader:** Multi-mode reader (Webtoon, Vertical, Paged Horizontal) with smooth animations and pinch-to-zoom.
-*   **Plugin System (Mihon/Cloudstream Style):** Dynamic extension loading with sophisticated metadata, lang support, and auto-update capabilities.
+*   **Scraping Automation Engine:** Built-in support for 500+ sources with dynamic JSON-based definitions.
 *   **Advanced Settings:**
     *   **Theme Builder:** Real-time primary/secondary color customization and corner radius adjustments.
     *   **Incognito Mode:** Browse without history or progress saving.

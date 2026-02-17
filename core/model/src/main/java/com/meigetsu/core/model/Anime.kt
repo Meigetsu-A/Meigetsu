@@ -1,26 +1,26 @@
 package com.meigetsu.core.model
 
 data class Anime(
-    val id: String,
-    val title: String,
-    val description: String?,
-    val coverImage: String?,
-    val bannerImage: String?,
-    val rating: Double?,
-    val status: MediaStatus,
-    val format: MediaFormat,
+    override val id: String,
+    override val title: String,
+    override val description: String?,
+    override val coverImage: String?,
+    override val bannerImage: String?,
+    override val rating: Double?,
+    override val status: MediaStatus,
+    override val format: MediaFormat,
     val episodes: Int?,
     val nextEpisode: Int?,
-    val genres: List<String>,
-    val averageScore: Int?,
-    val popularity: Int?,
+    override val genres: List<String>,
+    override val averageScore: Int?,
+    override val popularity: Int?,
     val season: String?,
-    val year: Int?,
+    override val year: Int?,
     val studio: String?,
-    val trailerUrl: String? = null,
-    val idMal: Int? = null,
+    override val trailerUrl: String? = null,
+    override val idMal: Int? = null,
     val characters: List<Character> = emptyList()
-)
+) : Media
 
 enum class MediaStatus {
     FINISHED, RELEASING, NOT_YET_RELEASED, CANCELLED, HIATUS

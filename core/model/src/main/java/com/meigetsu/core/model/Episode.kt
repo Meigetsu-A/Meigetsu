@@ -6,7 +6,8 @@ data class Episode(
     val number: Int,
     val title: String?,
     val thumbnail: String?,
-    val airDate: String?
+    val airDate: String?,
+    val url: String = ""
 )
 
 data class Chapter(
@@ -14,5 +15,6 @@ data class Chapter(
     val mangaId: String,
     val number: Double,
     val title: String?,
-    val scanlator: String?
+    val scanlator: String?,
+    val url: String = ""
 )

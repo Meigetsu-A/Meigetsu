@@ -31,15 +31,19 @@ class DetailsViewModel @Inject constructor(
 
     private val mediaId: String? = savedStateHandle["mediaId"]
     private val malId: Int? = savedStateHandle["malId"]
+    private val mediaType: String? = savedStateHandle["mediaType"]
 
-    private val _uiState = MutableStateFlow<Resource<Anime>>(Resource.Loading())
-    val uiState: StateFlow<Resource<Anime>> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow<Resource<Media>>(Resource.Loading())
+    val uiState: StateFlow<Resource<Media>> = _uiState.asStateFlow()
 
     private val _streamUrls = MutableStateFlow<List<StreamUrl>>(emptyList())
     val streamUrls = _streamUrls.asStateFlow()
 
     private val _episodes = MutableStateFlow<List<Episode>>(emptyList())
     val episodes = _episodes.asStateFlow()
+
+    private val _chapters = MutableStateFlow<List<Chapter>>(emptyList())
+    val chapters = _chapters.asStateFlow()
 
     private val _selectedEpisodeIds = MutableStateFlow<Set<String>>(emptySet())
     val selectedEpisodeIds = _selectedEpisodeIds.asStateFlow()
@@ -55,17 +59,25 @@ class DetailsViewModel @Inject constructor(
     }
 
     private fun loadDetails() {
-        mediaRepository.getAnimeDetails(id = mediaId, idMal = malId).onEach { resource ->
-            _uiState.value = resource
-            if (resource is Resource.Success) {
-                fetchEpisodes(resource.data!!)
-            }
-        }.launchIn(viewModelScope)
+        if (mediaType == "MANGA") {
+            mediaRepository.getMangaDetails(id = mediaId, idMal = malId).onEach { resource ->
+                _uiState.value = resource
+                if (resource is Resource.Success) {
+                    fetchChapters(resource.data!!)
+                }
+            }.launchIn(viewModelScope)
+        } else {
+            mediaRepository.getAnimeDetails(id = mediaId, idMal = malId).onEach { resource ->
+                _uiState.value = resource
+                if (resource is Resource.Success) {
+                    fetchEpisodes(resource.data!!)
+                }
+            }.launchIn(viewModelScope)
+        }
     }
 
     private fun fetchEpisodes(anime: Anime) {
         viewModelScope.launch {
-            // Prefer content providers over metadata providers
             val providers = extensionManager.animeProviders.value.values
             val provider = providers.find { it.metadata.id == "consumet" }
                 ?: providers.find { it.metadata.id != "anilist" }
@@ -73,6 +85,19 @@ class DetailsViewModel @Inject constructor(
 
             if (provider != null) {
                 _episodes.value = provider.getEpisodes(anime.id)
+            }
+        }
+    }
+
+    private fun fetchChapters(manga: Manga) {
+        viewModelScope.launch {
+            val providers = extensionManager.mangaProviders.value.values
+            val provider = providers.find { it.metadata.id == "mangadex" }
+                ?: providers.find { it.metadata.id != "anilist" }
+                ?: providers.firstOrNull()
+
+            if (provider != null) {
+                _chapters.value = provider.getChapters(manga.id)
             }
         }
     }
@@ -124,8 +149,12 @@ class DetailsViewModel @Inject constructor(
 
     fun addToLibrary() {
         viewModelScope.launch {
-            val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
-            libraryRepository.addToLibrary(anime)
+            val media = (uiState.value as? Resource.Success)?.data ?: return@launch
+            if (media is Anime) {
+                libraryRepository.addToLibrary(media)
+            } else if (media is Manga) {
+                libraryRepository.addToLibrary(media)
+            }
             _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added to Library"))
         }
     }

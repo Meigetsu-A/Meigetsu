@@ -34,7 +34,7 @@ import com.meigetsu.core.model.Anime
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     val trendingAnime by viewModel.trendingAnime.collectAsState()
     val popularAnime by viewModel.popularAnime.collectAsState()
@@ -106,7 +106,7 @@ fun HomeScreen(
 @Composable
 fun SpotlightSection(
     resource: Resource<List<Anime>>,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     val items = (resource as? Resource.Success)?.data?.take(5) ?: emptyList()
     val pagerState = rememberPagerState { items.size }
@@ -115,7 +115,7 @@ fun SpotlightSection(
         if (items.isNotEmpty()) {
             HorizontalPager(state = pagerState) { index ->
                 val anime = items[index]
-                Box(modifier = Modifier.fillMaxSize().clickable { onMediaClick(anime.id) }) {
+                Box(modifier = Modifier.fillMaxSize().clickable { onMediaClick(anime.id, "ANIME") }) {
                     AsyncImage(
                         model = anime.bannerImage ?: anime.coverImage,
                         contentDescription = null,
@@ -199,7 +199,7 @@ fun SpotlightSection(
 fun ModernHomeSection(
     title: String,
     resource: Resource<List<Anime>>,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     Column(modifier = Modifier.padding(vertical = 16.dp)) {
         Row(
@@ -239,7 +239,7 @@ fun ModernHomeSection(
                             imageUrl = anime.coverImage,
                             rating = anime.rating,
                             status = if (anime.status == com.meigetsu.core.model.MediaStatus.RELEASING) "LIVE" else null,
-                            onClick = { onMediaClick(anime.id) }
+                            onClick = { onMediaClick(anime.id, "ANIME") }
                         )
                     }
                 }

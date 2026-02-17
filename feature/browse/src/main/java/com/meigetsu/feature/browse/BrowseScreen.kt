@@ -22,7 +22,7 @@ import com.meigetsu.core.ui.components.*
 @Composable
 fun BrowseScreen(
     viewModel: BrowseViewModel,
-    onMediaClick: (String) -> Unit,
+    onMediaClick: (String, String) -> Unit,
     onCharacterClick: (String) -> Unit
 ) {
     val animeResults by viewModel.animeResults.collectAsState()
@@ -88,7 +88,7 @@ fun UnifiedSearchResults(
     extensions: List<MediaSearchResult>,
     isSearching: Boolean,
     innerPadding: PaddingValues,
-    onMediaClick: (String) -> Unit,
+    onMediaClick: (String, String) -> Unit,
     onCharacterClick: (String) -> Unit
 ) {
     if (isSearching) {
@@ -109,7 +109,7 @@ fun UnifiedSearchResults(
                             title = item.title,
                             imageUrl = item.coverImage,
                             modifier = Modifier.width(140.dp),
-                            onClick = { onMediaClick(item.id) }
+                            onClick = { onMediaClick(item.id, "ANIME") }
                         )
                     }
                 }
@@ -126,7 +126,7 @@ fun UnifiedSearchResults(
                             title = item.title,
                             imageUrl = item.coverImage,
                             modifier = Modifier.width(140.dp),
-                            onClick = { onMediaClick(item.id) }
+                            onClick = { onMediaClick(item.id, "MANGA") }
                         )
                     }
                 }
@@ -165,7 +165,7 @@ fun UnifiedSearchResults(
                                 if (item.type.uppercase() == "CHARACTER") {
                                     onCharacterClick(item.id)
                                 } else {
-                                    onMediaClick(item.id)
+                                    onMediaClick(item.id, item.type.uppercase())
                                 }
                             }
                         )

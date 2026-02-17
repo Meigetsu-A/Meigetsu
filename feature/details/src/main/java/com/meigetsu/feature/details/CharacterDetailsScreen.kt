@@ -25,7 +25,7 @@ import coil.compose.AsyncImage
 fun CharacterDetailsScreen(
     viewModel: CharacterDetailsViewModel,
     onBackClick: () -> Unit,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -77,7 +77,7 @@ fun CharacterDetailsScreen(
                                         title = anime.title,
                                         imageUrl = anime.coverImage,
                                         modifier = Modifier.width(140.dp).padding(end = 12.dp),
-                                        onClick = { onMediaClick(anime.id) }
+                                        onClick = { onMediaClick(anime.id, "ANIME") }
                                     )
                                 }
                             }

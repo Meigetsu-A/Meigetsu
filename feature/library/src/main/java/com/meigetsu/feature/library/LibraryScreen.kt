@@ -21,7 +21,7 @@ import com.meigetsu.core.ui.components.MediaCard
 @Composable
 fun LibraryScreen(
     viewModel: LibraryViewModel,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     val libraryAnime by viewModel.libraryAnime.collectAsState()
     val libraryManga by viewModel.libraryManga.collectAsState()
@@ -64,7 +64,7 @@ fun LibraryScreen(
 fun LibraryMangaGrid(
     libraryManga: List<com.meigetsu.core.model.Manga>,
     innerPadding: PaddingValues,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     if (libraryManga.isEmpty()) {
         EmptyLibraryView(innerPadding)
@@ -80,7 +80,7 @@ fun LibraryMangaGrid(
                 MediaCard(
                     title = manga.title,
                     imageUrl = manga.coverImage,
-                    onClick = { onMediaClick(manga.id) }
+                    onClick = { onMediaClick(manga.id, "MANGA") }
                 )
             }
         }
@@ -128,7 +128,7 @@ fun EmptyLibraryView(innerPadding: PaddingValues) {
 fun LibraryGrid(
     libraryAnime: List<com.meigetsu.core.model.Anime>,
     innerPadding: PaddingValues,
-    onMediaClick: (String) -> Unit
+    onMediaClick: (String, String) -> Unit
 ) {
     if (libraryAnime.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
@@ -150,7 +150,7 @@ fun LibraryGrid(
                 MediaCard(
                     title = anime.title,
                     imageUrl = anime.coverImage,
-                    onClick = { onMediaClick(anime.id) }
+                    onClick = { onMediaClick(anime.id, "ANIME") }
                 )
             }
         }

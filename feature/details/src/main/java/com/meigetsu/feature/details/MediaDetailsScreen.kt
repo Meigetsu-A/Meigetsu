@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.ui.components.LoadingSkeleton
-import com.meigetsu.core.model.Anime
+import com.meigetsu.core.model.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,6 +41,7 @@ fun MediaDetailsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val streamUrls by viewModel.streamUrls.collectAsState()
     val episodes by viewModel.episodes.collectAsState()
+    val chapters by viewModel.chapters.collectAsState()
     val uriHandler = LocalUriHandler.current
 
     LaunchedEffect(streamUrls) {
@@ -54,11 +55,11 @@ fun MediaDetailsScreen(
         when (val state = uiState) {
             is Resource.Loading -> LoadingSkeleton(Modifier.fillMaxSize())
             is Resource.Success -> {
-                val anime = state.data!!
+                val media = state.data!!
 
                 // Immersive Background
                 AsyncImage(
-                    model = anime.coverImage,
+                    model = media.coverImage,
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize().blur(50.dp),
                     contentScale = ContentScale.Crop,
@@ -67,34 +68,46 @@ fun MediaDetailsScreen(
 
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     item {
-                        MediaHeader(anime, onBackClick)
+                        MediaHeader(media, onBackClick)
                     }
 
                     item {
-                        MediaActions(anime, viewModel, uriHandler, onReadClick, episodes.firstOrNull()?.id)
+                        MediaActions(
+                            media,
+                            viewModel,
+                            uriHandler,
+                            onReadClick,
+                            if (media is Anime) episodes.firstOrNull()?.id else chapters.firstOrNull()?.id
+                        )
                     }
 
                     item {
-                        MediaInfo(anime)
+                        MediaInfo(media)
                     }
 
-                    if (anime.characters.isNotEmpty()) {
+                    if (media is Anime && media.characters.isNotEmpty()) {
                         item {
-                            CharacterList(anime.characters, onCharacterClick)
+                            CharacterList(media.characters, onCharacterClick)
                         }
                     }
 
                     item {
                         Text(
-                            text = if (anime.format.name == "MANGA") "Chapters" else "Episodes",
+                            text = if (media is Manga) "Chapters" else "Episodes",
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.Black,
                             modifier = Modifier.padding(24.dp)
                         )
                     }
 
-                    items(episodes) { episode ->
-                        EpisodeItem(episode, anime, onReadClick, viewModel)
+                    if (media is Anime) {
+                        items(episodes) { episode ->
+                            EpisodeItem(episode, media, onReadClick, viewModel)
+                        }
+                    } else if (media is Manga) {
+                        items(chapters) { chapter ->
+                            ChapterItem(chapter, media, onReadClick)
+                        }
                     }
 
                     item { Spacer(Modifier.height(50.dp)) }
@@ -110,10 +123,10 @@ fun MediaDetailsScreen(
 }
 
 @Composable
-fun MediaHeader(anime: Anime, onBackClick: () -> Unit) {
+fun MediaHeader(media: Media, onBackClick: () -> Unit) {
     Box(modifier = Modifier.fillMaxWidth().height(400.dp)) {
         AsyncImage(
-            model = anime.bannerImage ?: anime.coverImage,
+            model = media.bannerImage ?: media.coverImage,
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop
@@ -135,17 +148,17 @@ fun MediaHeader(anime: Anime, onBackClick: () -> Unit) {
             modifier = Modifier.align(Alignment.BottomStart).padding(24.dp)
         ) {
             Text(
-                text = anime.title,
+                text = media.title,
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Black,
                 color = Color.White
             )
             Spacer(Modifier.height(8.dp))
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("${anime.year ?: ""} • ${anime.format.name}", color = Color.Gray)
+                Text("${media.year ?: ""} • ${media.format.name}", color = Color.Gray)
                 Spacer(Modifier.width(12.dp))
                 Icon(Icons.Rounded.Star, null, tint = Color(0xFFFFD700), modifier = Modifier.size(16.dp))
-                Text(" ${anime.rating ?: "N/A"}", color = Color.White, fontWeight = FontWeight.Bold)
+                Text(" ${media.rating ?: "N/A"}", color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
     }
@@ -153,11 +166,11 @@ fun MediaHeader(anime: Anime, onBackClick: () -> Unit) {
 
 @Composable
 fun MediaActions(
-    anime: Anime,
+    media: Media,
     viewModel: DetailsViewModel,
     uriHandler: androidx.compose.ui.platform.UriHandler,
     onReadClick: (String, String) -> Unit,
-    firstEpisodeId: String?
+    firstItemId: String?
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
@@ -165,16 +178,16 @@ fun MediaActions(
     ) {
         Button(
             onClick = {
-                if (anime.format.name == "MANGA") onReadClick(anime.id, firstEpisodeId ?: anime.id)
+                if (media is Manga) onReadClick(media.id, firstItemId ?: media.id)
                 else viewModel.fetchStreams()
             },
             modifier = Modifier.weight(1f).height(54.dp),
             shape = RoundedCornerShape(12.dp),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
-            Icon(if (anime.format.name == "MANGA") Icons.Rounded.MenuBook else Icons.Rounded.PlayArrow, null)
+            Icon(if (media is Manga) Icons.Rounded.MenuBook else Icons.Rounded.PlayArrow, null)
             Spacer(Modifier.width(8.dp))
-            Text(if (anime.format.name == "MANGA") "Read Now" else "Watch Now", fontWeight = FontWeight.Bold)
+            Text(if (media is Manga) "Read Now" else "Watch Now", fontWeight = FontWeight.Bold)
         }
 
         FilledTonalIconButton(
@@ -185,9 +198,9 @@ fun MediaActions(
             Icon(Icons.Rounded.Add, null)
         }
 
-        if (anime.trailerUrl != null) {
+        if (media.trailerUrl != null) {
             FilledTonalIconButton(
-                onClick = { uriHandler.openUri(anime.trailerUrl!!) },
+                onClick = { uriHandler.openUri(media.trailerUrl!!) },
                 modifier = Modifier.size(54.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
@@ -198,10 +211,10 @@ fun MediaActions(
 }
 
 @Composable
-fun MediaInfo(anime: Anime) {
+fun MediaInfo(media: Media) {
     Column(modifier = Modifier.padding(horizontal = 24.dp)) {
         Text(
-            text = anime.description?.replace(Regex("<.*?>"), "") ?: "No description",
+            text = media.description?.replace(Regex("<.*?>"), "") ?: "No description",
             style = MaterialTheme.typography.bodyMedium,
             color = Color.LightGray,
             maxLines = 4,
@@ -209,7 +222,7 @@ fun MediaInfo(anime: Anime) {
         )
         Spacer(Modifier.height(16.dp))
         LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            items(anime.genres) { genre ->
+            items(media.genres) { genre ->
                 Surface(
                     color = Color.White.copy(0.1f),
                     shape = RoundedCornerShape(8.dp)
@@ -265,7 +278,7 @@ fun EpisodeItem(
 ) {
     ListItem(
         headlineContent = { Text(episode.title ?: "Episode ${episode.number}", fontWeight = FontWeight.Bold) },
-        supportingContent = { Text("${if (anime.format.name == "MANGA") "Chapter" else "Episode"} ${episode.number}", color = Color.Gray) },
+        supportingContent = { Text("Episode ${episode.number}", color = Color.Gray) },
         leadingContent = {
             Surface(
                 modifier = Modifier.size(40.dp),
@@ -284,8 +297,39 @@ fun EpisodeItem(
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable {
-            if (anime.format.name == "MANGA") onReadClick(anime.id, episode.id)
-            else viewModel.fetchStreams()
+            viewModel.fetchStreams()
+        }
+    )
+}
+
+@Composable
+fun ChapterItem(
+    chapter: com.meigetsu.core.model.Chapter,
+    manga: Manga,
+    onReadClick: (String, String) -> Unit
+) {
+    ListItem(
+        headlineContent = { Text(chapter.title ?: "Chapter ${chapter.number}", fontWeight = FontWeight.Bold) },
+        supportingContent = { Text("Chapter ${chapter.number} • ${chapter.scanlator ?: "Unknown"}", color = Color.Gray) },
+        leadingContent = {
+            Surface(
+                modifier = Modifier.size(40.dp),
+                color = MaterialTheme.colorScheme.primary.copy(0.1f),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Icon(Icons.Rounded.MenuBook, null, tint = MaterialTheme.colorScheme.primary)
+                }
+            }
+        },
+        trailingContent = {
+            IconButton(onClick = { /* Download */ }) {
+                Icon(Icons.Rounded.Download, null, tint = Color.Gray)
+            }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.clickable {
+            onReadClick(manga.id, chapter.id)
         }
     )
 }

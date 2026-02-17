@@ -1,18 +1,20 @@
 package com.meigetsu.core.model
 
 data class Manga(
-    val id: String,
-    val title: String,
-    val description: String?,
-    val coverImage: String?,
-    val bannerImage: String?,
-    val rating: Double?,
-    val status: MediaStatus,
-    val format: MediaFormat,
+    override val id: String,
+    override val title: String,
+    override val description: String?,
+    override val coverImage: String?,
+    override val bannerImage: String?,
+    override val rating: Double?,
+    override val status: MediaStatus,
+    override val format: MediaFormat,
     val chapters: Int?,
     val volumes: Int?,
-    val genres: List<String>,
-    val averageScore: Int?,
-    val popularity: Int?,
-    val idMal: Int? = null
-)
+    override val genres: List<String>,
+    override val averageScore: Int?,
+    override val popularity: Int?,
+    override val idMal: Int? = null,
+    override val year: Int? = null,
+    override val trailerUrl: String? = null
+) : Media

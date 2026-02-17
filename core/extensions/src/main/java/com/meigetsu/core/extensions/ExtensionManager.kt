@@ -4,8 +4,11 @@ import android.content.Context
 import com.meigetsu.core.extensions.model.AniListProvider
 import com.meigetsu.core.extensions.model.MangaDexProvider
 import com.meigetsu.core.extensions.model.ConsumetProvider
+import com.meigetsu.core.model.SourceDefinition
+import com.meigetsu.core.network.ScraperEngine
 import dagger.hilt.android.qualifiers.ApplicationContext
 import io.ktor.client.*
+import kotlinx.serialization.json.Json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,8 +21,10 @@ class ExtensionManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val aniListProvider: AniListProvider,
     private val mangaDexProvider: MangaDexProvider,
-    private val consumetProvider: ConsumetProvider
+    private val consumetProvider: ConsumetProvider,
+    private val scraperEngine: ScraperEngine
 ) {
+    private val json = Json { ignoreUnknownKeys = true }
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     private val _installedExtensions = MutableStateFlow<List<Extension>>(emptyList())
@@ -36,9 +41,39 @@ class ExtensionManager @Inject constructor(
         registerExtension(aniListProvider)
         registerExtension(mangaDexProvider)
         registerExtension(consumetProvider)
+        loadDynamicExtensions()
+        loadAssetExtensions()
     }
 
-    private fun registerExtension(extension: Extension) {
+    private fun loadDynamicExtensions() {
+        val extensionsDir = context.getExternalFilesDir("extensions") ?: return
+        extensionsDir.listFiles()?.filter { it.extension == "json" }?.forEach { file ->
+            try {
+                val definition = json.decodeFromString<SourceDefinition>(file.readText())
+                val provider = UniversalProvider(definition, scraperEngine)
+                registerExtension(provider)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    private fun loadAssetExtensions() {
+        try {
+            context.assets.list("sources")?.forEach { fileName ->
+                if (fileName.endsWith(".json")) {
+                    val jsonString = context.assets.open("sources/$fileName").bufferedReader().use { it.readText() }
+                    val definition = json.decodeFromString<SourceDefinition>(jsonString)
+                    val provider = UniversalProvider(definition, scraperEngine)
+                    registerExtension(provider)
+                }
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun registerExtension(extension: Extension) {
         val current = _installedExtensions.value
         if (current.none { it.metadata.id == extension.metadata.id }) {
             _installedExtensions.value = current + extension

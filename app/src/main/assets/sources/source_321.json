@@ -1,0 +1,86 @@
+{
+  "id": "source_321",
+  "name": "Pirate Source 321",
+  "type": "MANGA",
+  "baseUrl": "https://source321.com",
+  "version": "1.0.0",
+  "search": {
+    "endpoint": "/search.html?keyword={query}&page={page}",
+    "selector": ".last_episodes ul.items li",
+    "fields": {
+      "id": {
+        "selector": "p.name a",
+        "attribute": "href",
+        "regex": "/category/(.*)"
+      },
+      "title": {
+        "selector": "p.name a",
+        "attribute": "title"
+      },
+      "image": {
+        "selector": ".img a img",
+        "attribute": "src"
+      }
+    }
+  },
+  "popular": {
+    "endpoint": "/popular.html?page={page}",
+    "selector": ".last_episodes ul.items li",
+    "fields": {
+      "id": {
+        "selector": "p.name a",
+        "attribute": "href",
+        "regex": "/category/(.*)"
+      },
+      "title": {
+        "selector": "p.name a",
+        "attribute": "title"
+      },
+      "image": {
+        "selector": ".img a img",
+        "attribute": "src"
+      }
+    }
+  },
+  "latest": {
+    "endpoint": "/recent-release.html?page={page}",
+    "selector": ".last_episodes ul.items li",
+    "fields": {
+      "id": {
+        "selector": "p.name a",
+        "attribute": "href",
+        "regex": "(.*)-episode"
+      },
+      "title": {
+        "selector": "p.name a"
+      },
+      "image": {
+        "selector": ".img a img",
+        "attribute": "src"
+      }
+    }
+  },
+  "episodes": null,
+  "chapters": {
+    "endpoint": "/manga/{id}",
+    "selector": ".chapter-list .row",
+    "fields": {
+      "id": {
+        "selector": "a",
+        "attribute": "href",
+        "regex": "/manga/.*/(.*)"
+      },
+      "number": {
+        "selector": "a",
+        "attribute": "href",
+        "regex": "chapter-(.*)"
+      },
+      "title": {
+        "selector": "a"
+      }
+    }
+  },
+  "headers": {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+  }
+}

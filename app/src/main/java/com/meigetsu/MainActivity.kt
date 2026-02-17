@@ -202,21 +202,21 @@ fun MainScreen(viewModel: MainViewModel) {
             exitTransition = { fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(hiltViewModel(), onMediaClick = { id -> navController.navigate("details/$id") })
+                HomeScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") })
             }
             composable(Screen.Library.route) {
-                LibraryScreen(hiltViewModel(), onMediaClick = { id -> navController.navigate("details/$id") })
+                LibraryScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") })
             }
             composable(Screen.Updates.route) {
                 UpdatesScreen(hiltViewModel())
             }
             composable(Screen.Schedule.route) {
-                ScheduleScreen(hiltViewModel(), onMediaClick = { malId -> navController.navigate("details/null?malId=$malId") })
+                ScheduleScreen(hiltViewModel(), onMediaClick = { malId -> navController.navigate("details/null?malId=$malId&mediaType=ANIME") })
             }
             composable(Screen.Browse.route) {
                 BrowseScreen(
                     hiltViewModel(),
-                    onMediaClick = { id -> navController.navigate("details/$id") },
+                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") },
                     onCharacterClick = { id -> navController.navigate("character/$id") }
                 )
             }
@@ -230,7 +230,7 @@ fun MainScreen(viewModel: MainViewModel) {
                 StatsScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
             composable(
-                "details/{mediaId}?malId={malId}",
+                "details/{mediaId}?malId={malId}&mediaType={mediaType}",
                 arguments = listOf(
                     navArgument("mediaId") {
                         type = NavType.StringType
@@ -240,6 +240,11 @@ fun MainScreen(viewModel: MainViewModel) {
                     navArgument("malId") {
                         type = NavType.IntType
                         defaultValue = -1
+                    },
+                    navArgument("mediaType") {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = "ANIME"
                     }
                 )
             ) { backStackEntry ->
