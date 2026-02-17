@@ -25,7 +25,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.meigetsu.core.ui.theme.MeigetsuTheme
-import com.meigetsu.feature.browse.BrowseScreen
 import com.meigetsu.feature.details.MediaDetailsScreen
 import com.meigetsu.feature.details.CharacterDetailsScreen
 import com.meigetsu.feature.home.HomeScreen
@@ -213,13 +212,6 @@ fun MainScreen(viewModel: MainViewModel) {
             composable(Screen.Schedule.route) {
                 ScheduleScreen(hiltViewModel(), onMediaClick = { malId -> navController.navigate("details/null?malId=$malId&mediaType=ANIME") })
             }
-            composable(Screen.Browse.route) {
-                BrowseScreen(
-                    hiltViewModel(),
-                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") },
-                    onCharacterClick = { id -> navController.navigate("character/$id") }
-                )
-            }
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     hiltViewModel(),
@@ -303,7 +295,6 @@ sealed class Screen(
     object Library : Screen("library", "Library", Icons.Rounded.AutoStories, Icons.Rounded.AutoStories)
     object Updates : Screen("updates", "Updates", Icons.Rounded.Update, Icons.Rounded.Update)
     object Schedule : Screen("schedule", "Schedule", Icons.Rounded.CalendarMonth, Icons.Rounded.CalendarMonth)
-    object Browse : Screen("browse", "Browse", Icons.Rounded.Explore, Icons.Rounded.Explore)
     object Settings : Screen("settings", "Settings", Icons.Rounded.Settings, Icons.Rounded.Settings)
 }
 
@@ -312,6 +303,5 @@ val items = listOf(
     Screen.Library,
     Screen.Updates,
     Screen.Schedule,
-    Screen.Browse,
     Screen.Settings
 )

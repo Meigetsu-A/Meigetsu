@@ -38,67 +38,242 @@ fun HomeScreen(
 ) {
     val trendingAnime by viewModel.trendingAnime.collectAsState()
     val popularAnime by viewModel.popularAnime.collectAsState()
+    val trendingManga by viewModel.trendingManga.collectAsState()
+    val popularManga by viewModel.popularManga.collectAsState()
     val recommendedAnime by viewModel.recommendedAnime.collectAsState()
     val continueWatching by viewModel.continueWatching.collectAsState()
 
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val selectedGenre by viewModel.selectedGenre.collectAsState()
+    val isSearching by viewModel.isSearching.collectAsState()
+    val searchResultsAnime by viewModel.searchResultsAnime.collectAsState()
+    val searchResultsManga by viewModel.searchResultsManga.collectAsState()
+
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        "MEIGETSU",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Black,
-                            letterSpacing = 4.sp
-                        ),
-                        color = MaterialTheme.colorScheme.primary
+            Column(modifier = Modifier.background(Color.Black)) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            "MEIGETSU",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Black,
+                                letterSpacing = 4.sp
+                            ),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    },
+                    actions = {
+                        IconButton(onClick = { /* Notifications */ }) {
+                            Icon(Icons.Rounded.NotificationsNone, null)
+                        }
+                    },
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Transparent,
+                        scrolledContainerColor = Color.Black.copy(alpha = 0.8f)
                     )
-                },
-                actions = {
-                    IconButton(onClick = { /* Search */ }) {
-                        Icon(Icons.Rounded.Search, null)
-                    }
-                    IconButton(onClick = { /* Notifications */ }) {
-                        Icon(Icons.Rounded.NotificationsNone, null)
-                    }
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Black.copy(alpha = 0.8f)
                 )
-            )
+
+                SearchBar(
+                    query = searchQuery,
+                    onQueryChange = { viewModel.updateSearchQuery(it) },
+                    onSearch = { viewModel.updateSearchQuery(it) },
+                    active = false,
+                    onActiveChange = {},
+                    placeholder = { Text("Search Anime & Manga...") },
+                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    colors = SearchBarDefaults.colors(containerColor = Color(0xFF141414))
+                ) { }
+
+                LazyRow(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                    contentPadding = PaddingValues(horizontal = 16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(viewModel.genres) { genre ->
+                        FilterChip(
+                            selected = selectedGenre == genre,
+                            onClick = { viewModel.updateGenre(genre) },
+                            label = { Text(genre) },
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                selectedLabelColor = Color.Black
+                            )
+                        )
+                    }
+                }
+            }
         },
         containerColor = Color.Black
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Spotlight Section
+        if (isSearching || searchQuery.isNotBlank() || selectedGenre != null) {
+            SearchResultsContent(
+                searchResultsAnime,
+                searchResultsManga,
+                innerPadding,
+                onMediaClick
+            )
+        } else {
+            HomeContent(
+                trendingAnime,
+                popularAnime,
+                trendingManga,
+                popularManga,
+                recommendedAnime,
+                continueWatching,
+                innerPadding,
+                onMediaClick
+            )
+        }
+    }
+}
+
+@Composable
+fun SearchResultsContent(
+    animeResults: Resource<List<Anime>>,
+    mangaResults: Resource<List<com.meigetsu.core.model.Manga>>,
+    innerPadding: PaddingValues,
+    onMediaClick: (String, String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(innerPadding)
+    ) {
+        item { SectionHeader("Anime Results") }
+        item {
+            MediaHorizontalRow(animeResults, "ANIME", onMediaClick)
+        }
+        item { SectionHeader("Manga Results") }
+        item {
+            MediaHorizontalRowManga(mangaResults, "MANGA", onMediaClick)
+        }
+        item { Spacer(Modifier.height(100.dp)) }
+    }
+}
+
+@Composable
+fun HomeContent(
+    trendingAnime: Resource<List<Anime>>,
+    popularAnime: Resource<List<Anime>>,
+    trendingManga: Resource<List<com.meigetsu.core.model.Manga>>,
+    popularManga: Resource<List<com.meigetsu.core.model.Manga>>,
+    recommendedAnime: Resource<List<Anime>>,
+    continueWatching: Resource<List<Anime>>,
+    innerPadding: PaddingValues,
+    onMediaClick: (String, String) -> Unit
+) {
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(top = innerPadding.calculateTopPadding())
+    ) {
+        // Spotlight Section
+        item {
+            SpotlightSection(trendingAnime, onMediaClick)
+        }
+
+        item { Spacer(Modifier.height(24.dp)) }
+
+        // Continue Watching
+        if (continueWatching is Resource.Success && continueWatching.data?.isNotEmpty() == true) {
             item {
-                SpotlightSection(trendingAnime, onMediaClick)
+                ModernHomeSection("Continue Playing", continueWatching, onMediaClick)
             }
+        }
 
-            item { Spacer(Modifier.height(24.dp)) }
+        // Popular Section
+        item {
+            ModernHomeSection("Must Watch Anime", popularAnime, onMediaClick)
+        }
 
-            // Continue Watching
-            if (continueWatching is Resource.Success && continueWatching.data?.isNotEmpty() == true) {
-                item {
-                    ModernHomeSection("Continue Playing", continueWatching, onMediaClick)
+        // Trending Manga
+        item {
+            ModernHomeSectionManga("Trending Manga", trendingManga, onMediaClick)
+        }
+
+        // Popular Manga
+        item {
+            ModernHomeSectionManga("Popular Manga", popularManga, onMediaClick)
+        }
+
+        // Recommended Section
+        item {
+            ModernHomeSection("For You", recommendedAnime, onMediaClick)
+        }
+
+        item { Spacer(modifier = Modifier.height(100.dp)) }
+    }
+}
+
+@Composable
+fun SectionHeader(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Black,
+        modifier = Modifier.padding(16.dp),
+        color = Color.White
+    )
+}
+
+@Composable
+fun MediaHorizontalRow(
+    resource: Resource<List<Anime>>,
+    type: String,
+    onMediaClick: (String, String) -> Unit
+) {
+    when (resource) {
+        is Resource.Loading -> {
+            LazyRow(contentPadding = PaddingValues(horizontal = 16.dp)) {
+                items(5) { LoadingSkeleton(Modifier.width(140.dp).height(200.dp).padding(end = 12.dp)) }
+            }
+        }
+        is Resource.Success -> {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(resource.data ?: emptyList()) { item ->
+                    MediaCard(
+                        title = item.title,
+                        imageUrl = item.coverImage,
+                        rating = item.rating,
+                        onClick = { onMediaClick(item.id, type) }
+                    )
                 }
             }
-
-            // Popular Section
-            item {
-                ModernHomeSection("Must Watch Anime", popularAnime, onMediaClick)
-            }
-
-            // Recommended Section
-            item {
-                ModernHomeSection("For You", recommendedAnime, onMediaClick)
-            }
-
-            item { Spacer(modifier = Modifier.height(80.dp)) }
         }
+        else -> {}
+    }
+}
+
+@Composable
+fun MediaHorizontalRowManga(
+    resource: Resource<List<com.meigetsu.core.model.Manga>>,
+    type: String,
+    onMediaClick: (String, String) -> Unit
+) {
+    when (resource) {
+        is Resource.Loading -> {
+            LazyRow(contentPadding = PaddingValues(horizontal = 16.dp)) {
+                items(5) { LoadingSkeleton(Modifier.width(140.dp).height(200.dp).padding(end = 12.dp)) }
+            }
+        }
+        is Resource.Success -> {
+            LazyRow(
+                contentPadding = PaddingValues(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                items(resource.data ?: emptyList()) { item ->
+                    MediaCard(
+                        title = item.title,
+                        imageUrl = item.coverImage,
+                        rating = item.rating,
+                        onClick = { onMediaClick(item.id, type) }
+                    )
+                }
+            }
+        }
+        else -> {}
     }
 }
 
@@ -191,6 +366,60 @@ fun SpotlightSection(
             }
         } else {
             LoadingSkeleton(Modifier.fillMaxSize())
+        }
+    }
+}
+
+@Composable
+fun ModernHomeSectionManga(
+    title: String,
+    resource: Resource<List<com.meigetsu.core.model.Manga>>,
+    onMediaClick: (String, String) -> Unit
+) {
+    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = Color.White
+            )
+            Text(
+                "See all",
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        when (resource) {
+            is Resource.Loading -> {
+                LazyRow(contentPadding = PaddingValues(horizontal = 24.dp)) {
+                    items(5) { LoadingSkeleton(Modifier.width(140.dp).height(200.dp).padding(end = 12.dp)) }
+                }
+            }
+            is Resource.Success -> {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(resource.data ?: emptyList()) { manga ->
+                        MediaCard(
+                            title = manga.title,
+                            imageUrl = manga.coverImage,
+                            rating = manga.rating,
+                            onClick = { onMediaClick(manga.id, "MANGA") }
+                        )
+                    }
+                }
+            }
+            is Resource.Error -> {
+            }
         }
     }
 }

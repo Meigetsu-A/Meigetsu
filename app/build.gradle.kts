@@ -61,7 +61,6 @@ dependencies {
     implementation(project(":feature:home"))
     implementation(project(":feature:library"))
     implementation(project(":feature:updates"))
-    implementation(project(":feature:browse"))
     implementation(project(":feature:details"))
     implementation(project(":feature:player"))
     implementation(project(":feature:reader"))

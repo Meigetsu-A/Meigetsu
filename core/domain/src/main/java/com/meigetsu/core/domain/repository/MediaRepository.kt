@@ -12,8 +12,8 @@ interface MediaRepository {
     fun getPopularAnime(): Flow<Resource<List<Anime>>>
     fun getPopularManga(): Flow<Resource<List<Manga>>>
     fun getRecommendedAnime(): Flow<Resource<List<Anime>>>
-    fun searchAnime(query: String, page: Int): Flow<Resource<List<Anime>>>
-    fun searchManga(query: String, page: Int): Flow<Resource<List<Manga>>>
+    fun searchAnime(query: String?, page: Int, genre: String? = null): Flow<Resource<List<Anime>>>
+    fun searchManga(query: String?, page: Int, genre: String? = null): Flow<Resource<List<Manga>>>
     fun searchCharacters(query: String): Flow<Resource<List<Character>>>
     fun getAnimeDetails(id: String? = null, idMal: Int? = null): Flow<Resource<Anime>>
     fun getMangaDetails(id: String? = null, idMal: Int? = null): Flow<Resource<Manga>>

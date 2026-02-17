@@ -119,17 +119,18 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun searchAnime(query: String, page: Int): Flow<Resource<List<Anime>>> = flow {
-        if (query.isBlank()) {
+    override fun searchAnime(query: String?, page: Int, genre: String?): Flow<Resource<List<Anime>>> = flow {
+        if (query.isNullOrBlank() && genre == null) {
             emit(Resource.Success(emptyList()))
             return@flow
         }
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(SearchMediaQuery(
-                search = com.apollographql.apollo.api.Optional.present(query),
+                search = com.apollographql.apollo.api.Optional.presentIfNotNull(query),
                 type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME),
-                page = com.apollographql.apollo.api.Optional.present(page)
+                page = com.apollographql.apollo.api.Optional.present(page),
+                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genre)
             )).execute()
             val animeList = response.data?.Page?.media?.filterNotNull()?.map {
                 it.toAnimeSearch()
@@ -140,17 +141,18 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun searchManga(query: String, page: Int): Flow<Resource<List<Manga>>> = flow {
-        if (query.isBlank()) {
+    override fun searchManga(query: String?, page: Int, genre: String?): Flow<Resource<List<Manga>>> = flow {
+        if (query.isNullOrBlank() && genre == null) {
             emit(Resource.Success(emptyList()))
             return@flow
         }
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(SearchMediaQuery(
-                search = com.apollographql.apollo.api.Optional.present(query),
+                search = com.apollographql.apollo.api.Optional.presentIfNotNull(query),
                 type = com.apollographql.apollo.api.Optional.present(MediaType.MANGA),
-                page = com.apollographql.apollo.api.Optional.present(page)
+                page = com.apollographql.apollo.api.Optional.present(page),
+                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genre)
             )).execute()
             val mangaList = response.data?.Page?.media?.filterNotNull()?.map {
                 it.toMangaSearch()
@@ -164,7 +166,8 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getAnimeDetails(id: String?, idMal: Int?): Flow<Resource<Anime>> = flow {
         emit(Resource.Loading())
         try {
-            val intId = id?.toIntOrNull()
+            val actualId = if (id == "null") null else id
+            val intId = actualId?.toIntOrNull()
             if (intId == null && idMal == null) {
                 emit(Resource.Error("Missing ID"))
                 return@flow
@@ -187,7 +190,8 @@ class MediaRepositoryImpl @Inject constructor(
     override fun getMangaDetails(id: String?, idMal: Int?): Flow<Resource<Manga>> = flow {
         emit(Resource.Loading())
         try {
-            val intId = id?.toIntOrNull()
+            val actualId = if (id == "null") null else id
+            val intId = actualId?.toIntOrNull()
             if (intId == null && idMal == null) {
                 emit(Resource.Error("Missing ID"))
                 return@flow

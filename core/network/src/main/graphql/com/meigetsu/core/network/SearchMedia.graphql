@@ -1,6 +1,6 @@
-query SearchMedia($search: String, $type: MediaType, $page: Int) {
+query SearchMedia($search: String, $type: MediaType, $page: Int, $genre: String) {
   Page(page: $page, perPage: 20) {
-    media(search: $search, type: $type) {
+    media(search: $search, type: $type, genre: $genre) {
       id
       title {
         romaji
