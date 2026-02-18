@@ -35,9 +35,11 @@ fun BrowseScreen(
     val extensionResults by viewModel.extensionResults.collectAsState()
     val isSearching by viewModel.isSearching.collectAsState()
     val filters by viewModel.filters.collectAsState()
+    val externalSources by viewModel.externalSources.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var showFilterSheet by remember { mutableStateOf(false) }
+    var selectedBrowseTab by remember { mutableStateOf(0) } // 0: Media, 1: Directories
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -69,53 +71,130 @@ fun BrowseScreen(
                     colors = TopAppBarDefaults.centerAlignedTopAppBarColors(containerColor = Color.Transparent)
                 )
 
-                SearchBar(
-                    query = filters.query,
-                    onQueryChange = { viewModel.updateQuery(it) },
-                    onSearch = { viewModel.search() },
-                    active = false,
-                    onActiveChange = {},
-                    placeholder = { Text("Anime, Manga, Characters...") },
-                    leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                    shape = MaterialTheme.shapes.medium,
-                    colors = SearchBarDefaults.colors(containerColor = Color(0xFF141414))
-                ) { }
-
-                // Quick Genre Row
-                val genres = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Romance", "Sci-Fi", "Slice of Life")
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                TabRow(
+                    selectedTabIndex = selectedBrowseTab,
+                    containerColor = Color.Transparent,
+                    contentColor = MaterialTheme.colorScheme.primary,
+                    divider = {}
                 ) {
-                    items(genres) { genre ->
-                        FilterChip(
-                            selected = filters.genre == genre,
-                            onClick = { viewModel.updateGenre(if (filters.genre == genre) null else genre) },
-                            label = { Text(genre) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = Color.Black
+                    Tab(selected = selectedBrowseTab == 0, onClick = { selectedBrowseTab = 0 }, text = { Text("Universal") })
+                    Tab(selected = selectedBrowseTab == 1, onClick = { selectedBrowseTab = 1 }, text = { Text("Directories") })
+                }
+
+                if (selectedBrowseTab == 0) {
+                    SearchBar(
+                        query = filters.query,
+                        onQueryChange = { viewModel.updateQuery(it) },
+                        onSearch = { viewModel.search() },
+                        active = false,
+                        onActiveChange = {},
+                        placeholder = { Text("Anime, Manga, Characters...") },
+                        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        colors = SearchBarDefaults.colors(containerColor = Color(0xFF141414))
+                    ) { }
+
+                    // Quick Genre Row
+                    val genres = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Romance", "Sci-Fi", "Slice of Life")
+                    LazyRow(
+                        modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(genres) { genre ->
+                            FilterChip(
+                                selected = filters.genre == genre,
+                                onClick = { viewModel.updateGenre(if (filters.genre == genre) null else genre) },
+                                label = { Text(genre) },
+                                colors = FilterChipDefaults.filterChipColors(
+                                    selectedContainerColor = MaterialTheme.colorScheme.primary,
+                                    selectedLabelColor = Color.Black
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
         },
         containerColor = Color.Black
     ) { innerPadding ->
-        UnifiedSearchResults(
-            animeResults,
-            mangaResults,
-            characterResults,
-            extensionResults,
-            isSearching,
-            innerPadding,
-            onMediaClick,
-            onCharacterClick,
-            onLoadMore = { viewModel.loadNextPage() }
-        )
+        if (selectedBrowseTab == 0) {
+            UnifiedSearchResults(
+                animeResults,
+                mangaResults,
+                characterResults,
+                extensionResults,
+                isSearching,
+                innerPadding,
+                onMediaClick,
+                onCharacterClick,
+                onLoadMore = { viewModel.loadNextPage() }
+            )
+        } else {
+            ExternalSourcesContent(externalSources, innerPadding)
+        }
+    }
+}
+
+@Composable
+fun ExternalSourcesContent(
+    resource: Resource<List<com.meigetsu.core.model.ExternalSource>>,
+    innerPadding: PaddingValues
+) {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+
+    when (resource) {
+        is Resource.Loading -> {
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+        is Resource.Success -> {
+            val sources = resource.data ?: emptyList()
+            val categories = sources.groupBy { it.category }
+
+            LazyColumn(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                categories.forEach { (category, sites) ->
+                    item {
+                        SearchSectionHeader(category)
+                    }
+                    items(sites.chunked(2)) { chunk ->
+                        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            chunk.forEach { site ->
+                                Card(
+                                    onClick = { uriHandler.openUri(site.url) },
+                                    modifier = Modifier.weight(1f).height(60.dp),
+                                    colors = CardDefaults.cardColors(containerColor = Color(0xFF141414))
+                                ) {
+                                    Row(
+                                        modifier = Modifier.fillMaxSize().padding(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        if (site.iconUrl != null) {
+                                            AsyncImage(
+                                                model = site.iconUrl,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(32.dp).clip(RoundedCornerShape(4.dp))
+                                            )
+                                            Spacer(Modifier.width(12.dp))
+                                        }
+                                        Text(site.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                                    }
+                                }
+                            }
+                            if (chunk.size < 2) Spacer(Modifier.weight(1f))
+                        }
+                    }
+                }
+                item { Spacer(Modifier.height(100.dp)) }
+            }
+        }
+        is Resource.Error -> {
+            Box(modifier = Modifier.fillMaxSize().padding(innerPadding), contentAlignment = Alignment.Center) {
+                Text("Failed to load directories: ${resource.message}", color = Color.White)
+            }
+        }
     }
 }
 

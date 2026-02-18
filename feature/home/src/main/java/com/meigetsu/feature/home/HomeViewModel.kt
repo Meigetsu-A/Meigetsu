@@ -5,8 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
 import com.meigetsu.core.domain.repository.LibraryRepository
+import com.meigetsu.core.domain.repository.EverythingMoeRepository
 import com.meigetsu.core.model.Anime
 import com.meigetsu.core.model.Manga
+import com.meigetsu.core.model.ExternalSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -15,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
-    private val libraryRepository: LibraryRepository
+    private val libraryRepository: LibraryRepository,
+    private val everythingMoeRepository: EverythingMoeRepository
 ) : ViewModel() {
 
     private val _trendingAnime = MutableStateFlow<Resource<List<Anime>>>(Resource.Loading())
@@ -35,6 +38,9 @@ class HomeViewModel @Inject constructor(
 
     private val _continueWatching = MutableStateFlow<Resource<List<Anime>>>(Resource.Success(emptyList()))
     val continueWatching: StateFlow<Resource<List<Anime>>> = _continueWatching.asStateFlow()
+
+    private val _topSources = MutableStateFlow<Resource<List<ExternalSource>>>(Resource.Loading())
+    val topSources: StateFlow<Resource<List<ExternalSource>>> = _topSources.asStateFlow()
 
     // Search and Filters
     private val _searchQuery = MutableStateFlow("")
@@ -122,6 +128,7 @@ class HomeViewModel @Inject constructor(
         loadPopular()
         loadRecommended()
         loadContinueWatching()
+        loadSources()
     }
 
     private fun loadTrending() {
@@ -160,5 +167,11 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun loadSources() {
+        everythingMoeRepository.getSources().onEach {
+            _topSources.value = it
+        }.launchIn(viewModelScope)
     }
 }

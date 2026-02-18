@@ -42,6 +42,7 @@ fun HomeScreen(
     val popularManga by viewModel.popularManga.collectAsState()
     val recommendedAnime by viewModel.recommendedAnime.collectAsState()
     val continueWatching by viewModel.continueWatching.collectAsState()
+    val topSources by viewModel.topSources.collectAsState()
 
     val searchQuery by viewModel.searchQuery.collectAsState()
     val selectedGenre by viewModel.selectedGenre.collectAsState()
@@ -123,6 +124,7 @@ fun HomeScreen(
                 popularManga,
                 recommendedAnime,
                 continueWatching,
+                topSources,
                 innerPadding,
                 onMediaClick
             )
@@ -160,6 +162,7 @@ fun HomeContent(
     popularManga: Resource<List<com.meigetsu.core.model.Manga>>,
     recommendedAnime: Resource<List<Anime>>,
     continueWatching: Resource<List<Anime>>,
+    topSources: Resource<List<com.meigetsu.core.model.ExternalSource>>,
     innerPadding: PaddingValues,
     onMediaClick: (String, String) -> Unit
 ) {
@@ -178,6 +181,11 @@ fun HomeContent(
             item {
                 ModernHomeSection("Continue Playing", continueWatching, onMediaClick)
             }
+        }
+
+        // Top Sources (Everything Moe)
+        item {
+            SourcesSection(topSources)
         }
 
         // Popular Section
@@ -420,6 +428,63 @@ fun ModernHomeSectionManga(
             }
             is Resource.Error -> {
             }
+        }
+    }
+}
+
+@Composable
+fun SourcesSection(resource: Resource<List<com.meigetsu.core.model.ExternalSource>>) {
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
+    Column(modifier = Modifier.padding(vertical = 16.dp)) {
+        SectionHeader("Discovery Directories")
+        when (resource) {
+            is Resource.Loading -> {
+                LazyRow(contentPadding = PaddingValues(horizontal = 24.dp)) {
+                    items(5) { LoadingSkeleton(Modifier.width(120.dp).height(80.dp).padding(end = 12.dp)) }
+                }
+            }
+            is Resource.Success -> {
+                LazyRow(
+                    contentPadding = PaddingValues(horizontal = 24.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(resource.data?.take(15) ?: emptyList()) { source ->
+                        Card(
+                            onClick = { uriHandler.openUri(source.url) },
+                            modifier = Modifier.width(120.dp).height(80.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFF1A1A1A))
+                        ) {
+                            Box(modifier = Modifier.fillMaxSize().padding(8.dp), contentAlignment = Alignment.Center) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    if (source.iconUrl != null) {
+                                        AsyncImage(
+                                            model = source.iconUrl,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(24.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
+                                    Text(
+                                        text = source.name,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                    Text(
+                                        text = source.category,
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = Color.Gray,
+                                        fontSize = 8.sp
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else -> {}
         }
     }
 }

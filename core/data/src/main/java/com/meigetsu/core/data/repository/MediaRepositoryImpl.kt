@@ -184,13 +184,27 @@ class MediaRepositoryImpl @Inject constructor(
         try {
             val actualId = if (id == "null") null else id
             val intId = actualId?.toIntOrNull()
-            if (intId == null && idMal == null) {
+
+            // If ID is not numeric and no valid idMal, try searching by title (the slug)
+            if (intId == null && (idMal == null || idMal <= 0)) {
+                if (!actualId.isNullOrBlank()) {
+                    searchAnime(actualId, 1).collect { resource ->
+                        if (resource is Resource.Success && resource.data?.isNotEmpty() == true) {
+                            val first = resource.data!!.first()
+                            getAnimeDetails(first.id, null).collect { emit(it) }
+                        } else if (resource is Resource.Error) {
+                            emit(Resource.Error(resource.message ?: "Anime not found"))
+                        }
+                    }
+                    return@flow
+                }
                 emit(Resource.Error("Missing ID"))
                 return@flow
             }
+
             val response = apolloClient.query(GetMediaDetailsQuery(
                 id = com.apollographql.apollo.api.Optional.presentIfNotNull(intId),
-                idMal = com.apollographql.apollo.api.Optional.presentIfNotNull(idMal)
+                idMal = com.apollographql.apollo.api.Optional.presentIfNotNull(idMal?.takeIf { it > 0 })
             )).execute()
             val anime = response.data?.Media?.toAnimeDetails()
             if (anime != null) {
@@ -208,13 +222,26 @@ class MediaRepositoryImpl @Inject constructor(
         try {
             val actualId = if (id == "null") null else id
             val intId = actualId?.toIntOrNull()
-            if (intId == null && idMal == null) {
+
+            if (intId == null && (idMal == null || idMal <= 0)) {
+                if (!actualId.isNullOrBlank()) {
+                    searchManga(actualId, 1).collect { resource ->
+                        if (resource is Resource.Success && resource.data?.isNotEmpty() == true) {
+                            val first = resource.data!!.first()
+                            getMangaDetails(first.id, null).collect { emit(it) }
+                        } else if (resource is Resource.Error) {
+                            emit(Resource.Error(resource.message ?: "Manga not found"))
+                        }
+                    }
+                    return@flow
+                }
                 emit(Resource.Error("Missing ID"))
                 return@flow
             }
+
             val response = apolloClient.query(GetMediaDetailsQuery(
                 id = com.apollographql.apollo.api.Optional.presentIfNotNull(intId),
-                idMal = com.apollographql.apollo.api.Optional.presentIfNotNull(idMal)
+                idMal = com.apollographql.apollo.api.Optional.presentIfNotNull(idMal?.takeIf { it > 0 })
             )).execute()
             val manga = response.data?.Media?.toMangaDetails()
             if (manga != null) {

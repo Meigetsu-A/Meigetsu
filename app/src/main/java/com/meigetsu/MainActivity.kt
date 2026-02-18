@@ -314,6 +314,6 @@ val items = listOf(
     Screen.Home,
     Screen.Library,
     Screen.Updates,
-    Screen.Schedule,
+    Screen.Browse,
     Screen.Settings
 )

@@ -4,13 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
+import com.meigetsu.core.domain.repository.EverythingMoeRepository
 import com.meigetsu.core.domain.usecase.GlobalSearchUseCase
 import com.meigetsu.core.network.JikanService
 import com.meigetsu.core.extensions.ExtensionManager
 import com.meigetsu.core.extensions.MediaSearchResult
-import com.meigetsu.core.model.Anime
-import com.meigetsu.core.model.Manga
-import com.meigetsu.core.model.Character
+import com.meigetsu.core.model.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -34,6 +33,7 @@ data class BrowseFilters(
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
+    private val everythingMoeRepository: EverythingMoeRepository,
     private val jikanService: JikanService,
     private val globalSearchUseCase: GlobalSearchUseCase,
     val extensionManager: ExtensionManager
@@ -53,6 +53,9 @@ class BrowseViewModel @Inject constructor(
 
     private val _extensionResults = MutableStateFlow<List<MediaSearchResult>>(emptyList())
     val extensionResults = _extensionResults.asStateFlow()
+
+    private val _externalSources = MutableStateFlow<Resource<List<ExternalSource>>>(Resource.Loading())
+    val externalSources = _externalSources.asStateFlow()
 
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()

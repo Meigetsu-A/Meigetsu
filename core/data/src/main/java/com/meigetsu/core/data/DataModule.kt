@@ -40,4 +40,10 @@ abstract class DataModule {
     abstract fun bindNewsRepository(
         newsRepositoryImpl: NewsRepositoryImpl
     ): NewsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEverythingMoeRepository(
+        everythingMoeRepositoryImpl: EverythingMoeRepositoryImpl
+    ): EverythingMoeRepository
 }
