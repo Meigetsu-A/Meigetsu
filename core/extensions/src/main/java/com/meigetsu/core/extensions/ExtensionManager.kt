@@ -1,9 +1,6 @@
 package com.meigetsu.core.extensions
 
 import android.content.Context
-import com.meigetsu.core.extensions.model.AniListProvider
-import com.meigetsu.core.extensions.model.MangaDexProvider
-import com.meigetsu.core.extensions.model.ConsumetProvider
 import com.meigetsu.core.model.SourceDefinition
 import com.meigetsu.core.network.ScraperEngine
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -19,9 +16,6 @@ import javax.inject.Singleton
 @Singleton
 class ExtensionManager @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val aniListProvider: AniListProvider,
-    private val mangaDexProvider: MangaDexProvider,
-    private val consumetProvider: ConsumetProvider,
     private val scraperEngine: ScraperEngine
 ) {
     private val json = Json { ignoreUnknownKeys = true }
@@ -37,10 +31,6 @@ class ExtensionManager @Inject constructor(
     val mangaProviders = _mangaProviders.asStateFlow()
 
     init {
-        // Automatically register built-in high-quality sources
-        registerExtension(aniListProvider)
-        registerExtension(mangaDexProvider)
-        registerExtension(consumetProvider)
         loadDynamicExtensions()
         loadAssetExtensions()
     }

@@ -26,26 +26,46 @@ class SettingsViewModel @Inject constructor(
         .map { Color(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Color(0xFFE50914))
 
+    val secondaryColor: StateFlow<Color> = preferenceRepository.getSecondaryColor()
+        .map { Color(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Color(0xFF141414))
+
+    val accentColor: StateFlow<Color> = preferenceRepository.getAccentColor()
+        .map { Color(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), Color(0xFFB9090B))
+
     val themeMode: StateFlow<String> = preferenceRepository.getThemeMode()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "SYSTEM")
 
     val cornerRadius: StateFlow<Int> = preferenceRepository.getCornerRadius()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 8)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 12)
 
     val incognitoMode: StateFlow<Boolean> = preferenceRepository.getIncognitoMode()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
-
-    val adultContent: StateFlow<Boolean> = preferenceRepository.getAdultContent()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     val biometricEnabled: StateFlow<Boolean> = preferenceRepository.getBiometricEnabled()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val autoRefreshInterval: StateFlow<Int> = preferenceRepository.getAutoRefreshInterval()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val dataSaverEnabled: StateFlow<Boolean> = preferenceRepository.isDataSaverEnabled()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    val libraryLayout: StateFlow<String> = preferenceRepository.getLibraryLayout()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "GRID")
+    val playbackSpeed: StateFlow<Float> = preferenceRepository.getDefaultPlaybackSpeed()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 1.0f)
+
+    val defaultQuality: StateFlow<String> = preferenceRepository.getDefaultQuality()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "1080p")
+
+    val autoNextEnabled: StateFlow<Boolean> = preferenceRepository.isAutoNextEnabled()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), true)
+
+    val skipIntroAutoEnabled: StateFlow<Boolean> = preferenceRepository.isSkipIntroAutoEnabled()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
+    val readingMode: StateFlow<String> = preferenceRepository.getReadingMode()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "VERTICAL")
+
+    val preloadPageCount: StateFlow<Int> = preferenceRepository.getPreloadPageCount()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 5)
 
     fun updatePrimaryColor(color: Color) {
         viewModelScope.launch { preferenceRepository.setPrimaryColor(color.toArgb()) }
@@ -63,20 +83,36 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { preferenceRepository.setIncognitoMode(enabled) }
     }
 
-    fun setAdultContent(enabled: Boolean) {
-        viewModelScope.launch { preferenceRepository.setAdultContent(enabled) }
-    }
-
     fun setBiometricEnabled(enabled: Boolean) {
         viewModelScope.launch { preferenceRepository.setBiometricEnabled(enabled) }
     }
 
-    fun setAutoRefreshInterval(minutes: Int) {
-        viewModelScope.launch { preferenceRepository.setAutoRefreshInterval(minutes) }
+    fun setDataSaverEnabled(enabled: Boolean) {
+        viewModelScope.launch { preferenceRepository.setDataSaverEnabled(enabled) }
     }
 
-    fun setLibraryLayout(layout: String) {
-        viewModelScope.launch { preferenceRepository.setLibraryLayout(layout) }
+    fun setPlaybackSpeed(speed: Float) {
+        viewModelScope.launch { preferenceRepository.setDefaultPlaybackSpeed(speed) }
+    }
+
+    fun setDefaultQuality(quality: String) {
+        viewModelScope.launch { preferenceRepository.setDefaultQuality(quality) }
+    }
+
+    fun setAutoNext(enabled: Boolean) {
+        viewModelScope.launch { preferenceRepository.setAutoNextEnabled(enabled) }
+    }
+
+    fun setSkipIntroAuto(enabled: Boolean) {
+        viewModelScope.launch { preferenceRepository.setSkipIntroAutoEnabled(enabled) }
+    }
+
+    fun setReadingMode(mode: String) {
+        viewModelScope.launch { preferenceRepository.setReadingMode(mode) }
+    }
+
+    fun setPreloadPageCount(count: Int) {
+        viewModelScope.launch { preferenceRepository.setPreloadPageCount(count) }
     }
 
     val stats: StateFlow<List<ReadingStatsEntity>> = statsDao.getAllStats()

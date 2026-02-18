@@ -119,18 +119,28 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun searchAnime(query: String?, page: Int, genre: String?): Flow<Resource<List<Anime>>> = flow {
-        if (query.isNullOrBlank() && genre == null) {
-            emit(Resource.Success(emptyList()))
-            return@flow
-        }
+    override fun searchAnime(
+        query: String?,
+        page: Int,
+        genre: String?,
+        season: String?,
+        year: Int?,
+        format: String?,
+        status: String?,
+        sort: String?
+    ): Flow<Resource<List<Anime>>> = flow {
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(SearchMediaQuery(
-                search = com.apollographql.apollo.api.Optional.presentIfNotNull(query),
+                search = com.apollographql.apollo.api.Optional.presentIfNotNull(if (query.isNullOrBlank()) null else query),
                 type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME),
                 page = com.apollographql.apollo.api.Optional.present(page),
-                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genre)
+                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genre),
+                season = com.apollographql.apollo.api.Optional.presentIfNotNull(season?.let { com.meigetsu.core.network.type.MediaSeason.valueOf(it) }),
+                seasonYear = com.apollographql.apollo.api.Optional.presentIfNotNull(year),
+                format = com.apollographql.apollo.api.Optional.presentIfNotNull(format?.let { com.meigetsu.core.network.type.MediaFormat.valueOf(it) }),
+                status = com.apollographql.apollo.api.Optional.presentIfNotNull(status?.let { com.meigetsu.core.network.type.MediaStatus.valueOf(it) }),
+                sort = com.apollographql.apollo.api.Optional.presentIfNotNull(sort?.let { listOf(com.meigetsu.core.network.type.MediaSort.valueOf(it)) })
             )).execute()
             val animeList = response.data?.Page?.media?.filterNotNull()?.map {
                 it.toAnimeSearch()
@@ -141,18 +151,24 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun searchManga(query: String?, page: Int, genre: String?): Flow<Resource<List<Manga>>> = flow {
-        if (query.isNullOrBlank() && genre == null) {
-            emit(Resource.Success(emptyList()))
-            return@flow
-        }
+    override fun searchManga(
+        query: String?,
+        page: Int,
+        genre: String?,
+        format: String?,
+        status: String?,
+        sort: String?
+    ): Flow<Resource<List<Manga>>> = flow {
         emit(Resource.Loading())
         try {
             val response = apolloClient.query(SearchMediaQuery(
-                search = com.apollographql.apollo.api.Optional.presentIfNotNull(query),
+                search = com.apollographql.apollo.api.Optional.presentIfNotNull(if (query.isNullOrBlank()) null else query),
                 type = com.apollographql.apollo.api.Optional.present(MediaType.MANGA),
                 page = com.apollographql.apollo.api.Optional.present(page),
-                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genre)
+                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genre),
+                format = com.apollographql.apollo.api.Optional.presentIfNotNull(format?.let { com.meigetsu.core.network.type.MediaFormat.valueOf(it) }),
+                status = com.apollographql.apollo.api.Optional.presentIfNotNull(status?.let { com.meigetsu.core.network.type.MediaStatus.valueOf(it) }),
+                sort = com.apollographql.apollo.api.Optional.presentIfNotNull(sort?.let { listOf(com.meigetsu.core.network.type.MediaSort.valueOf(it)) })
             )).execute()
             val mangaList = response.data?.Page?.media?.filterNotNull()?.map {
                 it.toMangaSearch()

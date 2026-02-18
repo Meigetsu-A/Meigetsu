@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -16,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,6 +34,7 @@ import com.meigetsu.feature.library.LibraryScreen
 import com.meigetsu.feature.settings.SettingsScreen
 import com.meigetsu.feature.settings.StatsScreen
 import com.meigetsu.feature.updates.UpdatesScreen
+import com.meigetsu.feature.browse.BrowseScreen
 import com.meigetsu.feature.schedule.ScheduleScreen
 import com.meigetsu.feature.player.PlayerScreen
 import com.meigetsu.feature.reader.ReaderScreen
@@ -154,6 +157,7 @@ fun MainScreen(viewModel: MainViewModel) {
                             items.forEach { screen ->
                                 val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                                 val contentColor = if (selected) MaterialTheme.colorScheme.primary else Color.Gray
+                                val scale by animateFloatAsState(if (selected) 1.2f else 1.0f)
 
                                 Column(
                                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -173,9 +177,9 @@ fun MainScreen(viewModel: MainViewModel) {
                                         imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
                                         contentDescription = null,
                                         tint = contentColor,
-                                        modifier = Modifier.size(24.dp)
+                                        modifier = Modifier.size(24.dp).graphicsLayer(scaleX = scale, scaleY = scale)
                                     )
-                                    if (selected) {
+                                    AnimatedVisibility(visible = selected) {
                                         Text(
                                             text = screen.label,
                                             style = MaterialTheme.typography.labelSmall,
@@ -192,7 +196,7 @@ fun MainScreen(viewModel: MainViewModel) {
             }
         },
         containerColor = Color.Black
-    ) { innerPadding ->
+    ) { _ ->
         NavHost(
             navController,
             startDestination = Screen.Home.route,
@@ -211,6 +215,13 @@ fun MainScreen(viewModel: MainViewModel) {
             }
             composable(Screen.Schedule.route) {
                 ScheduleScreen(hiltViewModel(), onMediaClick = { malId -> navController.navigate("details/null?malId=$malId&mediaType=ANIME") })
+            }
+            composable(Screen.Browse.route) {
+                BrowseScreen(
+                    hiltViewModel(),
+                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") },
+                    onCharacterClick = { charId -> navController.navigate("character/$charId") }
+                )
             }
             composable(Screen.Settings.route) {
                 SettingsScreen(
@@ -295,6 +306,7 @@ sealed class Screen(
     object Library : Screen("library", "Library", Icons.Rounded.AutoStories, Icons.Rounded.AutoStories)
     object Updates : Screen("updates", "Updates", Icons.Rounded.Update, Icons.Rounded.Update)
     object Schedule : Screen("schedule", "Schedule", Icons.Rounded.CalendarMonth, Icons.Rounded.CalendarMonth)
+    object Browse : Screen("browse", "Browse", Icons.Rounded.Search, Icons.Rounded.Search)
     object Settings : Screen("settings", "Settings", Icons.Rounded.Settings, Icons.Rounded.Settings)
 }
 

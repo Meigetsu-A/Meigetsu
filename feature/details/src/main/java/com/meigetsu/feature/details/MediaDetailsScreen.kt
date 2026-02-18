@@ -39,6 +39,7 @@ fun MediaDetailsScreen(
     onCharacterClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val isInLibrary by viewModel.isInLibrary.collectAsState()
     val streamUrls by viewModel.streamUrls.collectAsState()
     val episodes by viewModel.episodes.collectAsState()
     val chapters by viewModel.chapters.collectAsState()
@@ -77,7 +78,8 @@ fun MediaDetailsScreen(
                             viewModel,
                             uriHandler,
                             onReadClick,
-                            if (media is Anime) episodes.firstOrNull()?.id else chapters.firstOrNull()?.id
+                            if (media is Anime) episodes.firstOrNull()?.id else chapters.firstOrNull()?.id,
+                            isInLibrary
                         )
                     }
 
@@ -170,7 +172,8 @@ fun MediaActions(
     viewModel: DetailsViewModel,
     uriHandler: androidx.compose.ui.platform.UriHandler,
     onReadClick: (String, String) -> Unit,
-    firstItemId: String?
+    firstItemId: String?,
+    isInLibrary: Boolean
 ) {
     Row(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp),
@@ -191,11 +194,15 @@ fun MediaActions(
         }
 
         FilledTonalIconButton(
-            onClick = { viewModel.addToLibrary() },
+            onClick = { viewModel.toggleLibrary() },
             modifier = Modifier.size(54.dp),
             shape = RoundedCornerShape(12.dp)
         ) {
-            Icon(Icons.Rounded.Add, null)
+            Icon(
+                imageVector = if (isInLibrary) Icons.Rounded.Favorite else Icons.Rounded.Add,
+                contentDescription = "Toggle Library",
+                tint = if (isInLibrary) MaterialTheme.colorScheme.primary else Color.White
+            )
         }
 
         if (media.trailerUrl != null) {

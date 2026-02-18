@@ -36,6 +36,9 @@ class DetailsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<Resource<Media>>(Resource.Loading())
     val uiState: StateFlow<Resource<Media>> = _uiState.asStateFlow()
 
+    private val _isInLibrary = MutableStateFlow(false)
+    val isInLibrary = _isInLibrary.asStateFlow()
+
     private val _streamUrls = MutableStateFlow<List<StreamUrl>>(emptyList())
     val streamUrls = _streamUrls.asStateFlow()
 
@@ -56,6 +59,7 @@ class DetailsViewModel @Inject constructor(
 
     init {
         loadDetails()
+        checkIfInLibrary()
     }
 
     private fun loadDetails() {
@@ -76,11 +80,20 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
+    private fun checkIfInLibrary() {
+        combine(
+            libraryRepository.getLibraryAnime(),
+            libraryRepository.getLibraryManga()
+        ) { anime, manga ->
+            val id = (_uiState.value as? Resource.Success)?.data?.id
+            anime.any { it.id == id } || manga.any { it.id == id }
+        }.onEach { _isInLibrary.value = it }.launchIn(viewModelScope)
+    }
+
     private fun fetchEpisodes(anime: Anime) {
         viewModelScope.launch {
             val providers = extensionManager.animeProviders.value.values
-            val provider = providers.find { it.metadata.id == "consumet" }
-                ?: providers.find { it.metadata.id != "anilist" }
+            val provider = providers.firstOrNull { it.metadata.id != "anilist" }
                 ?: providers.firstOrNull()
 
             if (provider != null) {
@@ -92,12 +105,25 @@ class DetailsViewModel @Inject constructor(
     private fun fetchChapters(manga: Manga) {
         viewModelScope.launch {
             val providers = extensionManager.mangaProviders.value.values
-            val provider = providers.find { it.metadata.id == "mangadex" }
-                ?: providers.find { it.metadata.id != "anilist" }
+            val provider = providers.firstOrNull { it.metadata.id != "anilist" }
                 ?: providers.firstOrNull()
 
             if (provider != null) {
                 _chapters.value = provider.getChapters(manga.id)
+            }
+        }
+    }
+
+    fun toggleLibrary() {
+        viewModelScope.launch {
+            val media = (uiState.value as? Resource.Success)?.data ?: return@launch
+            if (_isInLibrary.value) {
+                libraryRepository.removeFromLibrary(media.id)
+                _eventChannel.send(DetailsUiEvent.ShowSnackbar("Removed from Library"))
+            } else {
+                if (media is Anime) libraryRepository.addToLibrary(media)
+                else if (media is Manga) libraryRepository.addToLibrary(media)
+                _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added to Library"))
             }
         }
     }
@@ -123,8 +149,7 @@ class DetailsViewModel @Inject constructor(
             if (media is Anime) {
                 val itemsToDownload = episodes.value.filter { selectedEpisodeIds.value.contains(it.id) }
                 val providers = extensionManager.animeProviders.value
-                val providerId = providers.keys.find { it == "consumet" }
-                    ?: providers.keys.find { it != "anilist" }
+                val providerId = providers.keys.find { it != "anilist" }
                     ?: providers.keys.firstOrNull() ?: return@launch
 
                 downloadItemsUseCase.execute(media, itemsToDownload, providerId)
@@ -132,8 +157,7 @@ class DetailsViewModel @Inject constructor(
             } else if (media is Manga) {
                 val itemsToDownload = chapters.value.filter { selectedEpisodeIds.value.contains(it.id) }
                 val providers = extensionManager.mangaProviders.value
-                val providerId = providers.keys.find { it == "mangadex" }
-                    ?: providers.keys.find { it != "anilist" }
+                val providerId = providers.keys.find { it != "anilist" }
                     ?: providers.keys.firstOrNull() ?: return@launch
 
                 downloadItemsUseCase.executeChapters(media, itemsToDownload, providerId)
@@ -149,8 +173,7 @@ class DetailsViewModel @Inject constructor(
             val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
             // Try to find a provider that can handle this anime
             val providers = extensionManager.animeProviders.value.values
-            val provider = providers.find { it.metadata.id == "consumet" }
-                ?: providers.find { it.metadata.id != "anilist" }
+            val provider = providers.find { it.metadata.id != "anilist" }
                 ?: providers.firstOrNull()
 
             provider?.let {
@@ -160,14 +183,6 @@ class DetailsViewModel @Inject constructor(
     }
 
     fun addToLibrary() {
-        viewModelScope.launch {
-            val media = (uiState.value as? Resource.Success)?.data ?: return@launch
-            if (media is Anime) {
-                libraryRepository.addToLibrary(media)
-            } else if (media is Manga) {
-                libraryRepository.addToLibrary(media)
-            }
-            _eventChannel.send(DetailsUiEvent.ShowSnackbar("Added to Library"))
-        }
+        toggleLibrary()
     }
 }

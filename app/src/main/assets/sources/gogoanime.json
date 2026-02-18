@@ -1,0 +1,50 @@
+{
+  "id": "gogoanime",
+  "name": "GogoAnime",
+  "type": "ANIME",
+  "baseUrl": "https://gogoanime3.co",
+  "version": 1,
+  "search": {
+    "endpoint": "/search.html?keyword={query}",
+    "selector": ".last_episodes ul.items li",
+    "fields": {
+      "id": { "selector": "a", "attribute": "href", "replace": { "/category/": "" } },
+      "title": { "selector": ".name a", "attribute": "title" },
+      "image": { "selector": "img", "attribute": "src" }
+    }
+  },
+  "popular": {
+    "endpoint": "/popular.html?page={page}",
+    "selector": ".last_episodes ul.items li",
+    "fields": {
+      "id": { "selector": "a", "attribute": "href", "replace": { "/category/": "" } },
+      "title": { "selector": ".name a", "attribute": "title" },
+      "image": { "selector": "img", "attribute": "src" }
+    }
+  },
+  "latest": {
+    "endpoint": "/?page={page}",
+    "selector": ".last_episodes ul.items li",
+    "fields": {
+      "id": { "selector": "a", "attribute": "href", "replace": { "/category/": "" } },
+      "title": { "selector": ".name a", "attribute": "title" },
+      "image": { "selector": "img", "attribute": "src" }
+    }
+  },
+  "episodes": {
+    "endpoint": "/category/{id}",
+    "selector": "#episode_related li",
+    "fields": {
+      "id": { "selector": "a", "attribute": "href" },
+      "number": { "selector": ".name", "regex": "Episode (\\d+)" },
+      "url": { "selector": "a", "attribute": "href" }
+    }
+  },
+  "streamUrls": {
+    "endpoint": "{url}",
+    "selector": ".play-video iframe",
+    "fields": {
+      "url": { "selector": "", "attribute": "src" }
+    }
+  }
+}

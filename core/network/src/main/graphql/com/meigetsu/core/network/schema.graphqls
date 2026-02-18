@@ -6,7 +6,19 @@ type Query {
 
 type Page {
   pageInfo: PageInfo
-  media(type: MediaType, sort: [MediaSort], search: String, id: Int, idMal: Int, id_in: [Int], genre: String): [Media]
+  media(
+    type: MediaType,
+    sort: [MediaSort],
+    search: String,
+    id: Int,
+    idMal: Int,
+    id_in: [Int],
+    genre: String,
+    season: MediaSeason,
+    seasonYear: Int,
+    format: MediaFormat,
+    status: MediaStatus
+  ): [Media]
   characters(search: String): [Character]
 }
 

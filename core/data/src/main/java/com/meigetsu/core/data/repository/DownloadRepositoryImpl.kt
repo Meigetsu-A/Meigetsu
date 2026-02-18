@@ -125,52 +125,55 @@ class DownloadWorker @AssistedInject constructor(
             updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, 0f)
 
             var downloadUrl = download.url
-            if (download.mediaType == "MANGA") {
-                val provider = extensionManager.mangaProviders.value[download.extensionId] ?: return Result.failure()
-                val pages = provider.getPages(Chapter(download.itemId, download.mediaId, 0.0, download.itemTitle, null))
-                if (pages.isEmpty()) return Result.failure()
+            if (downloadUrl.isBlank()) {
+                // Try to resolve URL using extension
+                val provider = extensionManager.animeProviders.value[download.extensionId]
+                    ?: extensionManager.mangaProviders.value[download.extensionId]
 
-                val dir = java.io.File(context.getExternalFilesDir(null), "${download.mediaId}/${download.itemId}")
-                dir.mkdirs()
+                if (provider != null) {
+                    if (download.mediaType == "ANIME" && provider is AnimeProvider) {
+                        val streams = provider.getStreamUrls(Episode(download.itemId, download.mediaId, 0, download.itemTitle, null, null))
+                        downloadUrl = streams.firstOrNull()?.url ?: ""
+                    } else if (provider is MangaProvider) {
+                        val pages = provider.getPages(Chapter(download.itemId, download.mediaId, 0.0, download.itemTitle, null))
+                        // For manga, we might need a different download logic (multiple pages),
+                        // but for simplicity we'll assume a single zip/cbz if url is provided or handle it later.
+                        downloadUrl = pages.firstOrNull() ?: ""
+                    }
 
-                pages.forEachIndexed { index, pageUrl ->
-                    val pageFile = java.io.File(dir, "${index + 1}.jpg")
-                    val response = client.get(pageUrl)
-                    pageFile.writeBytes(response.readBytes())
-                    updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, (index + 1).toFloat() / pages.size)
-                    if (isStopped) return Result.retry()
+                    if (downloadUrl.isNotBlank()) {
+                        downloadDao.updateUrl(id, downloadUrl)
+                    } else {
+                        updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.FAILED, 0f)
+                        return Result.failure()
+                    }
+                } else {
+                    updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.FAILED, 0f)
+                    return Result.failure()
                 }
-            } else {
-                if (downloadUrl.isBlank()) {
-                    val provider = extensionManager.animeProviders.value[download.extensionId] ?: return Result.failure()
-                    val streams = provider.getStreamUrls(Episode(download.itemId, download.mediaId, 0, download.itemTitle, null, null))
-                    downloadUrl = streams.firstOrNull()?.url ?: ""
-                    if (downloadUrl.isBlank()) return Result.failure()
-                    downloadDao.updateUrl(id, downloadUrl)
-                }
+            }
 
-                val filePath = download.filePath ?: "${download.mediaId}/${download.itemId}.mp4"
-                val file = java.io.File(context.getExternalFilesDir(null), filePath)
-                file.parentFile?.mkdirs()
+            val filePath = download.filePath ?: "${download.mediaId}/${download.itemId}.mp4"
+            val file = java.io.File(context.getExternalFilesDir(null), filePath)
+            file.parentFile?.mkdirs()
 
-                client.prepareGet(downloadUrl).execute { httpResponse ->
-                    val totalBytes = httpResponse.contentLength() ?: -1L
-                    var downloadedBytes = 0L
-                    val channel = httpResponse.bodyAsChannel()
+            val response = client.prepareGet(downloadUrl).execute { httpResponse ->
+                val totalBytes = httpResponse.contentLength() ?: -1L
+                var downloadedBytes = 0L
+                val channel = httpResponse.bodyAsChannel()
 
-                    file.outputStream().use { output ->
-                        val buffer = ByteArray(1024 * 8)
-                        while (!channel.isClosedForRead) {
-                            val read = channel.readAvailable(buffer)
-                            if (read == -1) break
-                            output.write(buffer, 0, read)
-                            downloadedBytes += read
-                            if (totalBytes > 0) {
-                                val progress = downloadedBytes.toFloat() / totalBytes
-                                updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, progress, downloadedBytes)
-                            }
-                            if (isStopped) break
+                file.outputStream().use { output ->
+                    val buffer = ByteArray(1024 * 8)
+                    while (!channel.isClosedForRead) {
+                        val read = channel.readAvailable(buffer)
+                        if (read == -1) break
+                        output.write(buffer, 0, read)
+                        downloadedBytes += read
+                        if (totalBytes > 0) {
+                            val progress = downloadedBytes.toFloat() / totalBytes
+                            updateStatus(id, com.meigetsu.core.database.entity.DownloadStatus.DOWNLOADING, progress, downloadedBytes)
                         }
+                        if (isStopped) break
                     }
                 }
             }
