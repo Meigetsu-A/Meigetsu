@@ -9,6 +9,7 @@ import io.ktor.client.statement.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,10 +25,15 @@ class EverythingMoeRepositoryImpl @Inject constructor(
             val doc = Jsoup.parse(response)
             val sources = mutableListOf<ExternalSource>()
 
+            val allowedCategories = listOf("Anime", "Manga", "Novel", "Manhwa", "Donghua")
+
             // EverythingMoe uses <h3> for categories and following elements for sites
             val categories = doc.select("h3")
             for (categoryElement in categories) {
-                val categoryName = categoryElement.text().replace(Regex("\\(\\d+\\)"), "").trim()
+                val categoryText = categoryElement.text()
+                val categoryName = categoryText.replace(Regex("\\(\\d+\\)"), "").trim()
+
+                if (!allowedCategories.any { categoryName.contains(it, ignoreCase = true) }) continue
 
                 // The sites are in a container following the <h3> or inside it?
                 // Looking at the view_text_website output, it seems they are listed.
@@ -38,7 +44,7 @@ class EverythingMoeRepositoryImpl @Inject constructor(
                 // From experience, they are often links with icons.
 
                 val parent = categoryElement.parent()
-                val siteElements = parent?.select("a[href^='/s/']") ?: emptyList()
+                val siteElements = parent?.select("a[href^='/s/']") ?: emptyList<Element>()
 
                 for (site in siteElements) {
                     var name = site.text().trim()
