@@ -1,0 +1,7 @@
+feature/browse/build.gradle.kts:    implementation(libs.coil.compose)
+feature/details/build.gradle.kts:    implementation(libs.coil.compose)
+feature/home/build.gradle.kts:    implementation(libs.coil.compose)
+feature/reader/build.gradle.kts:    implementation(libs.coil.compose)
+feature/schedule/build.gradle.kts:    implementation(libs.coil.compose)
+feature/settings/build.gradle.kts:    implementation(libs.coil.compose)
+feature/updates/build.gradle.kts:    implementation(libs.coil.compose)
