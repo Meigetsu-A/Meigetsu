@@ -1,5 +1,0 @@
-> Run with --scan to get full insights.
-> Get more help at https://help.gradle.org.
-
-BUILD FAILED in 1m 26s
-592 actionable tasks: 99 executed, 493 up-to-date
