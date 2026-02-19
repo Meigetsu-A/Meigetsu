@@ -2,6 +2,7 @@ package com.meigetsu.core.domain.repository
 
 import com.meigetsu.core.model.Anime
 import com.meigetsu.core.model.Manga
+import com.meigetsu.core.model.Category
 import com.meigetsu.core.model.WatchHistory
 import com.meigetsu.core.model.ReadHistory
 import kotlinx.coroutines.flow.Flow
