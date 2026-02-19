@@ -56,6 +56,12 @@ fun ReaderScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        if (pages.isEmpty()) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        }
+
         when (mode) {
             ReaderMode.VERTICAL, ReaderMode.WEBTOON -> {
                 LazyColumn(

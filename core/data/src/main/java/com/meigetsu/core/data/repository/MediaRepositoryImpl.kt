@@ -103,15 +103,16 @@ class MediaRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getRecommendedAnime(): Flow<Resource<List<Anime>>> = flow {
+    override fun getRecommendedAnime(genres: List<String>?): Flow<Resource<List<Anime>>> = flow {
         emit(Resource.Loading())
         try {
-            val response = apolloClient.query(GetMediaListQuery(
+            val response = apolloClient.query(SearchMediaQuery(
                 type = com.apollographql.apollo.api.Optional.present(MediaType.ANIME),
-                sort = com.apollographql.apollo.api.Optional.present(listOf(MediaSort.SCORE_DESC))
+                genre = com.apollographql.apollo.api.Optional.presentIfNotNull(genres?.firstOrNull()), // Simplified: use first genre
+                sort = com.apollographql.apollo.api.Optional.present(listOf(com.meigetsu.core.network.type.MediaSort.SCORE_DESC))
             )).execute()
             val animeList = response.data?.Page?.media?.filterNotNull()?.map {
-                it.toAnime()
+                it.toAnimeSearch()
             } ?: emptyList()
             emit(Resource.Success(animeList))
         } catch (e: Exception) {

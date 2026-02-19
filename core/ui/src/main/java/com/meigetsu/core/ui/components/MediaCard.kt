@@ -46,7 +46,8 @@ fun MediaCard(
                     contentDescription = title,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .aspectRatio(0.7f), // Standard media ratio
+                        .aspectRatio(0.7f)
+                        .clip(RoundedCornerShape(12.dp)), // Standard media ratio
                     contentScale = ContentScale.Crop
                 )
 

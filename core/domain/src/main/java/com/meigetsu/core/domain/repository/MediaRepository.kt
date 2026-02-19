@@ -11,7 +11,7 @@ interface MediaRepository {
     fun getTrendingManga(): Flow<Resource<List<Manga>>>
     fun getPopularAnime(): Flow<Resource<List<Anime>>>
     fun getPopularManga(): Flow<Resource<List<Manga>>>
-    fun getRecommendedAnime(): Flow<Resource<List<Anime>>>
+    fun getRecommendedAnime(genres: List<String>? = null): Flow<Resource<List<Anime>>>
     fun searchAnime(
         query: String?,
         page: Int,

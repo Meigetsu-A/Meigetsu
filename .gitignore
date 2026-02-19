@@ -1,5 +1,5 @@
 .gradle/
-build/
+**/build/
 *.class
 *.bin
 *.lock
@@ -8,3 +8,4 @@ local.properties
 .idea/
 *.iml
 *.log
+node_modules/

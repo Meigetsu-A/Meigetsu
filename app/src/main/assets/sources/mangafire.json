@@ -13,29 +13,11 @@
       "image": { "selector": "img", "attribute": "src" }
     }
   },
-  "popular": {
-    "endpoint": "/trending",
-    "selector": ".original .unit",
-    "fields": {
-      "id": { "selector": "a", "attribute": "href", "replace": { "/manga/": "" } },
-      "title": { "selector": ".inner .info h3 a", "attribute": "title" },
-      "image": { "selector": "img", "attribute": "src" }
-    }
-  },
-  "latest": {
-    "endpoint": "/latest",
-    "selector": ".original .unit",
-    "fields": {
-      "id": { "selector": "a", "attribute": "href", "replace": { "/manga/": "" } },
-      "title": { "selector": ".inner .info h3 a", "attribute": "title" },
-      "image": { "selector": "img", "attribute": "src" }
-    }
-  },
   "chapters": {
     "endpoint": "/manga/{id}",
     "selector": ".chapters li",
     "fields": {
-      "id": { "selector": "a", "attribute": "href" },
+      "id": { "selector": "a", "attribute": "href", "replace": { "/read/": "" } },
       "number": { "selector": "a", "attribute": "data-number" },
       "title": { "selector": "a span", "attribute": "title" },
       "url": { "selector": "a", "attribute": "href" }

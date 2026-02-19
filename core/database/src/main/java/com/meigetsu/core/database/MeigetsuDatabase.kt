@@ -23,9 +23,10 @@ import javax.inject.Singleton
         ExtensionRepoEntity::class,
         ReadingStatsEntity::class,
         TrackerEntity::class,
-        CharacterEntity::class
+        CharacterEntity::class,
+        SearchHistoryEntity::class
     ],
-    version = 7
+    version = 8
 )
 abstract class MeigetsuDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
@@ -34,6 +35,7 @@ abstract class MeigetsuDatabase : RoomDatabase() {
     abstract fun statsDao(): ReadingStatsDao
     abstract fun characterDao(): CharacterDao
     abstract fun historyDao(): HistoryDao
+    abstract fun searchHistoryDao(): SearchHistoryDao
 }
 
 @Module
@@ -68,4 +70,7 @@ object DatabaseModule {
 
     @Provides
     fun provideHistoryDao(db: MeigetsuDatabase): HistoryDao = db.historyDao()
+
+    @Provides
+    fun provideSearchHistoryDao(db: MeigetsuDatabase): SearchHistoryDao = db.searchHistoryDao()
 }

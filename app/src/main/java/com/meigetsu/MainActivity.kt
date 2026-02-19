@@ -33,6 +33,7 @@ import com.meigetsu.feature.home.HomeScreen
 import com.meigetsu.feature.library.LibraryScreen
 import com.meigetsu.feature.settings.SettingsScreen
 import com.meigetsu.feature.settings.StatsScreen
+import com.meigetsu.feature.settings.ExtensionManagementScreen
 import com.meigetsu.feature.updates.UpdatesScreen
 import com.meigetsu.feature.browse.BrowseScreen
 import com.meigetsu.feature.schedule.ScheduleScreen
@@ -205,7 +206,11 @@ fun MainScreen(viewModel: MainViewModel) {
             exitTransition = { fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
         ) {
             composable(Screen.Home.route) {
-                HomeScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") })
+                HomeScreen(
+                    hiltViewModel(),
+                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") },
+                    onSearchClick = { navController.navigate(Screen.Browse.route) }
+                )
             }
             composable(Screen.Library.route) {
                 LibraryScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") })
@@ -226,11 +231,18 @@ fun MainScreen(viewModel: MainViewModel) {
             composable(Screen.Settings.route) {
                 SettingsScreen(
                     hiltViewModel(),
-                    onStatsClick = { navController.navigate("stats") }
+                    onStatsClick = { navController.navigate("stats") },
+                    onExtensionsClick = { navController.navigate("extensions") }
                 )
             }
             composable("stats") {
                 StatsScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
+            }
+            composable("extensions") {
+                ExtensionManagementScreen(
+                    hiltViewModel(),
+                    onBackClick = { navController.popBackStack() }
+                )
             }
             composable(
                 "details/{mediaId}?malId={malId}&mediaType={mediaType}",
@@ -260,7 +272,11 @@ fun MainScreen(viewModel: MainViewModel) {
                         val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
                         navController.navigate("player/$encodedUrl?mediaId=$id")
                     },
-                    onReadClick = { mangaId, chapterId -> navController.navigate("reader/$mangaId/$chapterId") },
+                    onReadClick = { mangaId, chapterId, url ->
+                        val encodedUrl = url?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.toString()) }
+                        val route = if (encodedUrl != null) "reader/$mangaId/$chapterId?url=$encodedUrl" else "reader/$mangaId/$chapterId"
+                        navController.navigate(route)
+                    },
                     onCharacterClick = { charId -> navController.navigate("character/$charId") }
                 )
             }
@@ -284,10 +300,11 @@ fun MainScreen(viewModel: MainViewModel) {
                 PlayerScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
             composable(
-                "reader/{mangaId}/{chapterId}",
+                "reader/{mangaId}/{chapterId}?url={url}",
                 arguments = listOf(
                     navArgument("mangaId") { type = NavType.StringType },
-                    navArgument("chapterId") { type = NavType.StringType }
+                    navArgument("chapterId") { type = NavType.StringType },
+                    navArgument("url") { type = NavType.StringType; nullable = true; defaultValue = null }
                 )
             ) {
                 ReaderScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })

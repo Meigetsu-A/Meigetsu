@@ -23,10 +23,14 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onStatsClick: () -> Unit
+    onStatsClick: () -> Unit,
+    onExtensionsClick: () -> Unit
 ) {
     val themeMode by viewModel.themeMode.collectAsState()
     val primaryColor by viewModel.primaryColor.collectAsState()
+    val secondaryColor by viewModel.secondaryColor.collectAsState()
+    val accentColor by viewModel.accentColor.collectAsState()
+    val cornerRadius by viewModel.cornerRadius.collectAsState()
     val incognito by viewModel.incognitoMode.collectAsState()
     val biometricEnabled by viewModel.biometricEnabled.collectAsState()
     val dataSaver by viewModel.dataSaverEnabled.collectAsState()
@@ -69,22 +73,32 @@ fun SettingsScreen(
                             viewModel.setThemeMode(next)
                         }
                     )
-                    SettingsItem(
-                        icon = Icons.Rounded.ColorLens,
-                        title = "Primary Color",
-                        description = "Tap to cycle colors",
-                        onClick = {
-                            val colors = listOf(Color(0xFFE50914), Color(0xFF00BFFF), Color(0xFF00FF00), Color(0xFFFFA500))
-                            val currentIndex = colors.indexOf(primaryColor)
-                            val nextColor = colors[(currentIndex + 1) % colors.size]
-                            viewModel.updatePrimaryColor(nextColor)
-                        }
+
+                    Text("Theme Builder", modifier = Modifier.padding(16.dp), style = MaterialTheme.typography.labelLarge, color = Color.Gray)
+
+                    ThemeColorPicker(
+                        label = "Primary Color",
+                        selectedColor = primaryColor,
+                        onColorSelected = { viewModel.updatePrimaryColor(it) }
                     )
-                    SettingsItem(
-                        icon = Icons.Rounded.RoundedCorner,
-                        title = "Corner Radius",
-                        description = "Adjust UI roundness",
-                        onClick = { viewModel.updateCornerRadius(if (viewModel.cornerRadius.value > 12) 0 else 24) }
+                    ThemeColorPicker(
+                        label = "Secondary Color",
+                        selectedColor = secondaryColor,
+                        onColorSelected = { viewModel.updateSecondaryColor(it) }
+                    )
+                    ThemeColorPicker(
+                        label = "Accent Color",
+                        selectedColor = accentColor,
+                        onColorSelected = { viewModel.updateAccentColor(it) }
+                    )
+
+                    Spacer(Modifier.height(8.dp))
+                    Text("Corner Radius: ${cornerRadius}dp", modifier = Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+                    Slider(
+                        value = cornerRadius.toFloat(),
+                        onValueChange = { viewModel.updateCornerRadius(it.toInt()) },
+                        valueRange = 0f..24f,
+                        modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
             }
@@ -161,6 +175,12 @@ fun SettingsScreen(
                         onCheckedChange = { viewModel.setDataSaverEnabled(it) }
                     )
                     SettingsItem(
+                        icon = Icons.Rounded.Extension,
+                        title = "Extension Management",
+                        description = "Manage your sources",
+                        onClick = onExtensionsClick
+                    )
+                    SettingsItem(
                         icon = Icons.Rounded.Backup,
                         title = "Backup & Restore",
                         description = "Export/Import your library",
@@ -200,6 +220,45 @@ fun SettingsScreen(
             }
 
             item { Spacer(Modifier.height(100.dp)) }
+        }
+    }
+}
+
+@Composable
+fun ThemeColorPicker(
+    label: String,
+    selectedColor: Color,
+    onColorSelected: (Color) -> Unit
+) {
+    val colors = listOf(
+        Color(0xFFE50914), // Netflix Red
+        Color(0xFF00BFFF), // Sky Blue
+        Color(0xFF00FF00), // Lime
+        Color(0xFFFFA500), // Orange
+        Color(0xFF8A2BE2), // Purple
+        Color(0xFF00CED1), // Dark Turquoise
+        Color(0xFFFF1493), // Deep Pink
+        Color(0xFF141414)  // Dark Grey
+    )
+
+    Column(modifier = Modifier.padding(16.dp)) {
+        Text(label, style = MaterialTheme.typography.labelMedium)
+        Spacer(Modifier.height(8.dp))
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            colors.forEach { color ->
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(color)
+                        .clickable { onColorSelected(color) }
+                        .padding(2.dp)
+                ) {
+                    if (selectedColor == color) {
+                        Icon(Icons.Rounded.Check, null, tint = if (color == Color.White) Color.Black else Color.White)
+                    }
+                }
+            }
         }
     }
 }

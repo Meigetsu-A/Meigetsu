@@ -97,7 +97,13 @@ class DetailsViewModel @Inject constructor(
                 ?: providers.firstOrNull()
 
             if (provider != null) {
-                _episodes.value = provider.getEpisodes(anime.id)
+                // Try searching by title first to get the provider-specific ID
+                val searchResults = provider.search(anime.title, 1)
+                val bestMatch = searchResults.find { it.title.equals(anime.title, ignoreCase = true) }
+                    ?: searchResults.firstOrNull()
+
+                val providerId = bestMatch?.id ?: anime.id
+                _episodes.value = provider.getEpisodes(providerId)
             }
         }
     }
@@ -109,7 +115,12 @@ class DetailsViewModel @Inject constructor(
                 ?: providers.firstOrNull()
 
             if (provider != null) {
-                _chapters.value = provider.getChapters(manga.id)
+                val searchResults = provider.search(manga.title, 1)
+                val bestMatch = searchResults.find { it.title.equals(manga.title, ignoreCase = true) }
+                    ?: searchResults.firstOrNull()
+
+                val providerId = bestMatch?.id ?: manga.id
+                _chapters.value = provider.getChapters(providerId)
             }
         }
     }
@@ -168,16 +179,14 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    fun fetchStreams() {
+    fun fetchStreams(episode: Episode) {
         viewModelScope.launch {
-            val anime = (uiState.value as? Resource.Success)?.data ?: return@launch
-            // Try to find a provider that can handle this anime
             val providers = extensionManager.animeProviders.value.values
             val provider = providers.find { it.metadata.id != "anilist" }
                 ?: providers.firstOrNull()
 
             provider?.let {
-                _streamUrls.value = it.getStreamUrls(Episode("1", anime.id, 1, "Episode 1", null, null))
+                _streamUrls.value = it.getStreamUrls(episode)
             }
         }
     }

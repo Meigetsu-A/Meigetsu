@@ -24,6 +24,15 @@ interface LibraryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(category: CategoryEntity)
 
+    @Query("DELETE FROM categories WHERE id = :id")
+    suspend fun deleteCategory(id: String)
+
+    @Query("UPDATE library_items SET categoryId = :categoryId WHERE id IN (:ids)")
+    suspend fun updateItemsCategory(ids: List<String>, categoryId: String?)
+
+    @Query("UPDATE library_items SET status = :status WHERE id IN (:ids)")
+    suspend fun updateItemsStatus(ids: List<String>, status: String)
+
     @Query("SELECT * FROM watch_history ORDER BY lastWatched DESC")
     fun getWatchHistory(): Flow<List<WatchHistoryEntity>>
 

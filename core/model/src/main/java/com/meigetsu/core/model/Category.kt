@@ -1,0 +1,7 @@
+package com.meigetsu.core.model
+
+data class Category(
+    val id: String,
+    val name: String,
+    val order: Int
+)

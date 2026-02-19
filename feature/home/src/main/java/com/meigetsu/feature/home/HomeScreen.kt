@@ -35,7 +35,8 @@ import com.meigetsu.core.model.Anime
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onMediaClick: (String, String) -> Unit
+    onMediaClick: (String, String) -> Unit,
+    onSearchClick: () -> Unit
 ) {
     val trendingAnime by viewModel.trendingAnime.collectAsState()
     val popularAnime by viewModel.popularAnime.collectAsState()
@@ -77,35 +78,21 @@ fun HomeScreen(
                 )
 
                 SearchBar(
-                    query = searchQuery,
-                    onQueryChange = { viewModel.updateSearchQuery(it) },
-                    onSearch = { viewModel.updateSearchQuery(it) },
+                    query = "",
+                    onQueryChange = { onSearchClick() },
+                    onSearch = { onSearchClick() },
                     active = false,
-                    onActiveChange = {},
+                    onActiveChange = { onSearchClick() },
                     placeholder = { Text("Search Anime & Manga...") },
                     leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .clickable { onSearchClick() },
+                    enabled = false,
                     shape = MaterialTheme.shapes.medium,
                     colors = SearchBarDefaults.colors(containerColor = Color(0xFF141414))
                 ) { }
-
-                LazyRow(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                    contentPadding = PaddingValues(horizontal = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(viewModel.genres) { genre ->
-                        FilterChip(
-                            selected = selectedGenre == genre,
-                            onClick = { viewModel.updateGenre(genre) },
-                            label = { Text(genre) },
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = MaterialTheme.colorScheme.primary,
-                                selectedLabelColor = Color.Black
-                            )
-                        )
-                    }
-                }
             }
         },
         containerColor = Color.Black

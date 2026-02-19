@@ -35,7 +35,7 @@ fun MediaDetailsScreen(
     viewModel: DetailsViewModel,
     onBackClick: () -> Unit,
     onWatchClick: (String, String) -> Unit,
-    onReadClick: (String, String) -> Unit,
+    onReadClick: (String, String, String?) -> Unit,
     onCharacterClick: (String) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -171,7 +171,7 @@ fun MediaActions(
     media: Media,
     viewModel: DetailsViewModel,
     uriHandler: androidx.compose.ui.platform.UriHandler,
-    onReadClick: (String, String) -> Unit,
+    onReadClick: (String, String, String?) -> Unit,
     firstItemId: String?,
     isInLibrary: Boolean
 ) {
@@ -181,8 +181,12 @@ fun MediaActions(
     ) {
         Button(
             onClick = {
-                if (media is Manga) onReadClick(media.id, firstItemId ?: media.id)
-                else viewModel.fetchStreams()
+                if (media is Manga) {
+                    val firstChapter = viewModel.chapters.value.firstOrNull()
+                    onReadClick(media.id, firstItemId ?: media.id, firstChapter?.url)
+                } else {
+                    viewModel.episodes.value.firstOrNull()?.let { viewModel.fetchStreams(it) }
+                }
             },
             modifier = Modifier.weight(1f).height(54.dp),
             shape = RoundedCornerShape(12.dp),
@@ -280,7 +284,7 @@ fun CharacterList(characters: List<com.meigetsu.core.model.Character>, onCharact
 fun EpisodeItem(
     episode: com.meigetsu.core.model.Episode,
     anime: Anime,
-    onReadClick: (String, String) -> Unit,
+    onReadClick: (String, String, String?) -> Unit,
     viewModel: DetailsViewModel
 ) {
     ListItem(
@@ -304,7 +308,7 @@ fun EpisodeItem(
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable {
-            viewModel.fetchStreams()
+            viewModel.fetchStreams(episode)
         }
     )
 }
@@ -313,7 +317,7 @@ fun EpisodeItem(
 fun ChapterItem(
     chapter: com.meigetsu.core.model.Chapter,
     manga: Manga,
-    onReadClick: (String, String) -> Unit
+    onReadClick: (String, String, String?) -> Unit
 ) {
     ListItem(
         headlineContent = { Text(chapter.title ?: "Chapter ${chapter.number}", fontWeight = FontWeight.Bold) },
@@ -336,7 +340,7 @@ fun ChapterItem(
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
         modifier = Modifier.clickable {
-            onReadClick(manga.id, chapter.id)
+            onReadClick(manga.id, chapter.id, chapter.url)
         }
     )
 }

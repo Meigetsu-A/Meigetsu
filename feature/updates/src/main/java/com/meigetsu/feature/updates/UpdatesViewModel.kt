@@ -44,22 +44,66 @@ class UpdatesViewModel @Inject constructor(
 
     fun loadUpdates() {
         viewModelScope.launch {
-            combine(
-                libraryRepository.getLibraryAnime(),
-                libraryRepository.getLibraryManga()
-            ) { anime, manga ->
-                val allItems = (anime.map { it.id to it.title } + manga.map { it.id to it.title })
-                allItems.map { (id, title) ->
-                    UpdateItem(
-                        id = id,
-                        title = title,
-                        updateInfo = "Checked for updates",
-                        timestamp = System.currentTimeMillis()
-                    )
+            val anime = libraryRepository.getLibraryAnime().first()
+            val manga = libraryRepository.getLibraryManga().first()
+
+            val newUpdates = mutableListOf<UpdateItem>()
+
+            anime.forEach { item ->
+                launch {
+                    val provider = extensionManager.animeProviders.value.values.firstOrNull { it.metadata.id != "anilist" }
+                    provider?.let { p ->
+                        try {
+                            val searchResults = p.search(item.title, 1)
+                            val bestMatch = searchResults.find { it.title.equals(item.title, ignoreCase = true) }
+                            bestMatch?.let {
+                                val episodes = p.getEpisodes(it.id)
+                                if (item.episodes != null && episodes.size > item.episodes!!) {
+                                    newUpdates.add(UpdateItem(
+                                        id = item.id,
+                                        title = item.title,
+                                        updateInfo = "New Episode: ${episodes.lastOrNull()?.number ?: ""}",
+                                        timestamp = System.currentTimeMillis(),
+                                        imageUrl = item.coverImage
+                                    ))
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
                 }
-            }.collect {
-                _updates.value = it
             }
+
+            manga.forEach { item ->
+                launch {
+                    val provider = extensionManager.mangaProviders.value.values.firstOrNull { it.metadata.id != "anilist" }
+                    provider?.let { p ->
+                        try {
+                            val searchResults = p.search(item.title, 1)
+                            val bestMatch = searchResults.find { it.title.equals(item.title, ignoreCase = true) }
+                            bestMatch?.let {
+                                val chapters = p.getChapters(it.id)
+                                if (item.chapters != null && chapters.size > item.chapters!!) {
+                                    newUpdates.add(UpdateItem(
+                                        id = item.id,
+                                        title = item.title,
+                                        updateInfo = "New Chapter: ${chapters.lastOrNull()?.number ?: ""}",
+                                        timestamp = System.currentTimeMillis(),
+                                        imageUrl = item.coverImage
+                                    ))
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                }
+            }
+
+            // Wait for all launches to finish (simplified)
+            delay(2000)
+            _updates.value = newUpdates.sortedByDescending { it.timestamp }
         }
     }
 }
@@ -68,5 +112,6 @@ data class UpdateItem(
     val id: String,
     val title: String,
     val updateInfo: String,
-    val timestamp: Long
+    val timestamp: Long,
+    val imageUrl: String? = null
 )

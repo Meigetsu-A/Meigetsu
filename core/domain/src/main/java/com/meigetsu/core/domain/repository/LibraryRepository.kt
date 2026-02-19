@@ -16,6 +16,12 @@ interface LibraryRepository {
     suspend fun removeFromLibrary(id: String)
     suspend fun removeCharacterFromLibrary(id: String)
 
+    fun getCategories(): Flow<List<Category>>
+    suspend fun addCategory(name: String)
+    suspend fun deleteCategory(id: String)
+    suspend fun updateItemsCategory(ids: List<String>, categoryId: String?)
+    suspend fun updateItemsStatus(ids: List<String>, status: String)
+
     fun getWatchHistory(): Flow<List<String>> // Returns IDs
     suspend fun getWatchHistoryById(mediaId: String): WatchHistory?
     fun getReadHistory(): Flow<List<String>>

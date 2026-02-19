@@ -15,6 +15,9 @@ interface CharacterDao {
     @Delete
     suspend fun deleteCharacter(character: CharacterEntity)
 
+    @Query("DELETE FROM favorite_characters WHERE id = :id")
+    suspend fun deleteCharacterById(id: String)
+
     @Query("SELECT EXISTS(SELECT * FROM favorite_characters WHERE id = :id)")
     fun isCharacterFavorite(id: String): Flow<Boolean>
 }

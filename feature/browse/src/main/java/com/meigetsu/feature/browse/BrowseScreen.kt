@@ -38,6 +38,7 @@ fun BrowseScreen(
     val isSearching by viewModel.isSearching.collectAsState()
     val filters by viewModel.filters.collectAsState()
     val externalSources by viewModel.externalSources.collectAsState()
+    val searchHistory by viewModel.searchHistory.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     var showFilterSheet by remember { mutableStateOf(false) }
@@ -84,27 +85,46 @@ fun BrowseScreen(
                 }
 
                 if (selectedBrowseTab == 0) {
+                    var active by remember { mutableStateOf(false) }
                     SearchBar(
                         query = filters.query,
                         onQueryChange = { viewModel.updateQuery(it) },
-                        onSearch = { viewModel.search() },
-                        active = false,
-                        onActiveChange = {},
+                        onSearch = { viewModel.search(); active = false },
+                        active = active,
+                        onActiveChange = { active = it },
                         placeholder = { Text("Anime, Manga, Characters...") },
                         leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+                        trailingIcon = {
+                            if (active) {
+                                IconButton(onClick = { viewModel.updateQuery(""); active = false }) {
+                                    Icon(Icons.Rounded.Close, null)
+                                }
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                         shape = MaterialTheme.shapes.medium,
                         colors = SearchBarDefaults.colors(containerColor = Color(0xFF141414))
-                    ) { }
+                    ) {
+                        SearchHistoryContent(
+                            history = searchHistory,
+                            onQuerySelect = { viewModel.updateQuery(it); active = false },
+                            onRemove = { viewModel.removeSearch(it) },
+                            onClear = { viewModel.clearHistory() }
+                        )
+                    }
 
                     // Quick Genre Row
-                    val genres = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Romance", "Sci-Fi", "Slice of Life")
+                    val animeGenres = listOf("Action", "Adventure", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", "Thriller")
+                    val mangaGenres = listOf("Action", "Adventure", "Comedy", "Drama", "Ecchi", "Fantasy", "Horror", "Mahou Shoujo", "Mecha", "Music", "Mystery", "Psychological", "Romance", "Sci-Fi", "Slice of Life", "Sports", "Supernatural", "Thriller")
+
+                    val currentGenres = if (filters.format?.contains("MANGA") == true || filters.format == "NOVEL") mangaGenres else animeGenres
+
                     LazyRow(
                         modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                         contentPadding = PaddingValues(horizontal = 16.dp),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        items(genres) { genre ->
+                        items(currentGenres) { genre ->
                             FilterChip(
                                 selected = filters.genre == genre,
                                 onClick = { viewModel.updateGenre(if (filters.genre == genre) null else genre) },
@@ -408,6 +428,50 @@ fun UnifiedSearchResults(
         }
 
         item { Spacer(Modifier.height(100.dp)) }
+    }
+}
+
+@Composable
+fun SearchHistoryContent(
+    history: List<com.meigetsu.core.model.SearchHistory>,
+    onQuerySelect: (String) -> Unit,
+    onRemove: (String) -> Unit,
+    onClear: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Search History", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            if (history.isNotEmpty()) {
+                TextButton(onClick = onClear) { Text("Clear All") }
+            }
+        }
+
+        LazyColumn {
+            items(history) { item ->
+                ListItem(
+                    headlineContent = { Text(item.query) },
+                    leadingContent = { Icon(Icons.Rounded.History, null) },
+                    trailingContent = {
+                        IconButton(onClick = { onRemove(item.query) }) {
+                            Icon(Icons.Rounded.DeleteOutline, null)
+                        }
+                    },
+                    modifier = Modifier.clickable { onQuerySelect(item.query) },
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                )
+            }
+            if (history.isEmpty()) {
+                item {
+                    Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
+                        Text("No recent searches", color = Color.Gray)
+                    }
+                }
+            }
+        }
     }
 }
 

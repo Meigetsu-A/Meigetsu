@@ -152,9 +152,28 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadRecommended() {
-        mediaRepository.getRecommendedAnime().onEach {
-            _recommendedAnime.value = it
-        }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            // Get genres from history
+            libraryRepository.getWatchHistory().take(1).collect { ids ->
+                if (ids.isNotEmpty()) {
+                    mediaRepository.getMultipleAnime(ids).collect { resource ->
+                        if (resource is Resource.Success) {
+                            val genres = resource.data?.flatMap { it.genres }?.groupBy { it }
+                                ?.mapValues { it.value.size }?.toList()?.sortedByDescending { it.second }
+                                ?.map { it.first } ?: emptyList()
+
+                            mediaRepository.getRecommendedAnime(genres).collect {
+                                _recommendedAnime.value = it
+                            }
+                        }
+                    }
+                } else {
+                    mediaRepository.getRecommendedAnime(null).collect {
+                        _recommendedAnime.value = it
+                    }
+                }
+            }
+        }
     }
 
     private fun loadContinueWatching() {

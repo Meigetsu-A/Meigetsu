@@ -111,7 +111,33 @@ class LibraryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun removeCharacterFromLibrary(id: String) {
-        // Implementation
+        characterDao.deleteCharacterById(id)
+    }
+
+    override fun getCategories(): Flow<List<Category>> {
+        return libraryDao.getAllCategories().map { entities ->
+            entities.map { Category(it.id, it.name, it.order) }
+        }
+    }
+
+    override suspend fun addCategory(name: String) {
+        libraryDao.insertCategory(CategoryEntity(
+            id = java.util.UUID.randomUUID().toString(),
+            name = name,
+            order = 0
+        ))
+    }
+
+    override suspend fun deleteCategory(id: String) {
+        libraryDao.deleteCategory(id)
+    }
+
+    override suspend fun updateItemsCategory(ids: List<String>, categoryId: String?) {
+        libraryDao.updateItemsCategory(ids, categoryId)
+    }
+
+    override suspend fun updateItemsStatus(ids: List<String>, status: String) {
+        libraryDao.updateItemsStatus(ids, status)
     }
 
     override fun getWatchHistory(): Flow<List<String>> {

@@ -2,13 +2,15 @@ package com.meigetsu.core.extensions
 
 import com.meigetsu.core.model.SourceDefinition
 import com.meigetsu.core.network.ScraperEngine
+import com.meigetsu.core.network.LinkExtractor
 import com.meigetsu.core.model.Episode
 import com.meigetsu.core.model.Chapter
 import com.meigetsu.core.extensions.ExtensionType
 
 class UniversalProvider(
     val definition: SourceDefinition,
-    private val scraperEngine: ScraperEngine
+    private val scraperEngine: ScraperEngine,
+    private val linkExtractor: LinkExtractor? = null
 ) : AnimeProvider, MangaProvider {
 
     override val metadata: ExtensionMetadata = ExtensionMetadata(
@@ -42,8 +44,10 @@ class UniversalProvider(
         val action = definition.streamUrls ?: return emptyList()
         val results = scraperEngine.executeAction(definition.baseUrl, action, mapOf("url" to episode.url), definition.headers)
         return results.map { map ->
+            val rawUrl = map["url"] ?: ""
+            val resolvedUrl = if (linkExtractor != null) linkExtractor.extract(rawUrl) else rawUrl
             StreamUrl(
-                url = map["url"] ?: "",
+                url = resolvedUrl,
                 quality = map["quality"] ?: "Auto"
             )
         }

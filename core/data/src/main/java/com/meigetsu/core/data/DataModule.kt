@@ -46,4 +46,10 @@ abstract class DataModule {
     abstract fun bindEverythingMoeRepository(
         everythingMoeRepositoryImpl: EverythingMoeRepositoryImpl
     ): EverythingMoeRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSearchHistoryRepository(
+        searchHistoryRepositoryImpl: SearchHistoryRepositoryImpl
+    ): SearchHistoryRepository
 }

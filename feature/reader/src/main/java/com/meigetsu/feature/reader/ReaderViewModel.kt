@@ -28,6 +28,9 @@ class ReaderViewModel @Inject constructor(
 
     private val chapterId: String = savedStateHandle["chapterId"] ?: ""
     private val mangaId: String = savedStateHandle["mangaId"] ?: ""
+    private val chapterUrl: String? = savedStateHandle.get<String>("url")?.let {
+        java.net.URLDecoder.decode(it, java.nio.charset.StandardCharsets.UTF_8.toString())
+    }
 
     private val _pages = MutableStateFlow<List<String>>(emptyList())
     val pages: StateFlow<List<String>> = _pages.asStateFlow()
@@ -42,11 +45,10 @@ class ReaderViewModel @Inject constructor(
     private fun fetchPages() {
         viewModelScope.launch {
             val providers = extensionManager.mangaProviders.value.values
-            val provider = providers.find { it.metadata.id == "mangadex" }
-                ?: providers.find { it.metadata.id != "anilist" }
+            val provider = providers.find { it.metadata.id != "anilist" }
                 ?: providers.firstOrNull() ?: return@launch
 
-            val chapter = Chapter(chapterId, mangaId, 0.0, null, null)
+            val chapter = Chapter(chapterId, mangaId, 0.0, null, null, chapterUrl ?: "")
             val urls = provider.getPages(chapter)
             _pages.value = urls
             preloadPages(0, 3)

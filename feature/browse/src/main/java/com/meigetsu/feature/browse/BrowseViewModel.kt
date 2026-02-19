@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.meigetsu.core.common.Resource
 import com.meigetsu.core.domain.repository.MediaRepository
 import com.meigetsu.core.domain.repository.EverythingMoeRepository
+import com.meigetsu.core.domain.repository.SearchHistoryRepository
 import com.meigetsu.core.domain.usecase.GlobalSearchUseCase
 import com.meigetsu.core.network.JikanService
 import com.meigetsu.core.extensions.ExtensionManager
@@ -34,6 +35,7 @@ data class BrowseFilters(
 class BrowseViewModel @Inject constructor(
     private val mediaRepository: MediaRepository,
     private val everythingMoeRepository: EverythingMoeRepository,
+    private val searchHistoryRepository: SearchHistoryRepository,
     private val jikanService: JikanService,
     private val globalSearchUseCase: GlobalSearchUseCase,
     val extensionManager: ExtensionManager
@@ -60,6 +62,9 @@ class BrowseViewModel @Inject constructor(
     private val _isSearching = MutableStateFlow(false)
     val isSearching = _isSearching.asStateFlow()
 
+    val searchHistory: StateFlow<List<SearchHistory>> = searchHistoryRepository.getSearchHistory()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     private val _eventChannel = Channel<BrowseUiEvent>()
     val events = _eventChannel.receiveAsFlow()
 
@@ -85,6 +90,9 @@ class BrowseViewModel @Inject constructor(
         currentPage = 1
 
         viewModelScope.launch {
+            if (currentFilters.query.isNotBlank()) {
+                searchHistoryRepository.addSearch(currentFilters.query)
+            }
             _isSearching.value = true
 
             launch {
@@ -125,6 +133,18 @@ class BrowseViewModel @Inject constructor(
             }
 
             _isSearching.value = false
+        }
+    }
+
+    fun removeSearch(query: String) {
+        viewModelScope.launch {
+            searchHistoryRepository.removeSearch(query)
+        }
+    }
+
+    fun clearHistory() {
+        viewModelScope.launch {
+            searchHistoryRepository.clearHistory()
         }
     }
 

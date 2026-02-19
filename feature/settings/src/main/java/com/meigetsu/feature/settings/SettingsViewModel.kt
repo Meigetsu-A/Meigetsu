@@ -71,6 +71,14 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch { preferenceRepository.setPrimaryColor(color.toArgb()) }
     }
 
+    fun updateSecondaryColor(color: Color) {
+        viewModelScope.launch { preferenceRepository.setSecondaryColor(color.toArgb()) }
+    }
+
+    fun updateAccentColor(color: Color) {
+        viewModelScope.launch { preferenceRepository.setAccentColor(color.toArgb()) }
+    }
+
     fun setThemeMode(mode: String) {
         viewModelScope.launch { preferenceRepository.setThemeMode(mode) }
     }

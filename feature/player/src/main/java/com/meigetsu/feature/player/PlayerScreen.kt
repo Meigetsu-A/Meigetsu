@@ -42,6 +42,15 @@ fun PlayerScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
+        val isPlaying by viewModel.isPlaying.collectAsState()
+        val duration by viewModel.duration.collectAsState()
+
+        if (duration == 0L) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        }
+
         AndroidView(
             factory = {
                 PlayerView(context).apply {
