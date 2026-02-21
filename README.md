@@ -1,62 +1,58 @@
-# Meigetsu
+# Meigetsu - Content Aggregator
 
-Meigetsu is a high-performance, automated media discovery and consumption application for Android. Built with a focus on speed, efficiency, and a premium aesthetic, Meigetsu utilizes advanced automation to provide seamless access to anime and manga from public internet sources.
+Meigetsu is a high-performance, open-source content aggregator for anime, manga, and light novels. Built with **Jetpack Compose**, **Clean Architecture**, and **QuickJS**, it provides a unified interface for accessing media from various third-party extensions.
 
-## ⚖️ LEGAL DISCLAIMER
+## ⚠️ LEGAL / DMCA SAFETY (READ CAREFULLY)
 
-**IMPORTANT: FOR EDUCATIONAL PURPOSES ONLY**
+*   **Meigetsu does NOT host or store any copyrighted content.**
+*   **Meigetsu does NOT provide copyrighted media.**
+*   The application works solely as a content aggregator using publicly available APIs and third-party extensions.
+*   The extension system loads external source definitions dynamically.
+*   **Users are solely responsible for the extensions they install.**
+*   The developer is not liable for any content provided by third-party sources.
+*   Meigetsu contains no hardcoded piracy sources.
 
-*   **Meigetsu is a content aggregator tool.** It does NOT host, store, or provide any copyrighted media content.
-*   The application functions as a specialized browser that automates the process of finding and viewing publicly available content on the third-party websites.
-*   Users are solely responsible for the extensions they install and the content they choose to access.
-*   The developer of Meigetsu is NOT liable for any third-party content or any misuse of the application.
-*   Meigetsu does not provide copyrighted media. All content is provided by third-party sources.
-
-### 🛡️ DMCA Takedown & Copyright
-If you believe that your copyrighted work is being linked to or accessed through Meigetsu in a way that constitutes copyright infringement, please contact the third-party source directly. Since Meigetsu does not host content, we cannot remove it from the internet. However, for any concerns regarding the application itself, you may contact:
+### DMCA Takedown
+If you believe that your copyrighted work is being aggregated via a third-party extension and you wish to have the metadata removed from the search index (powered by AniList), please contact:
 **Email:** meigetsu.app@gmail.com
 
-### 📜 Terms of Use
-By using Meigetsu, you agree that:
-1.  You will not use the app for any illegal purposes.
-2.  You understand that all media content is provided by external sources.
-3.  You use the extension system and scraping features at your own risk.
+## Features
+*   **Unified Search:** Search across multiple sources for Anime, Manga, and Novels.
+*   **Modern Video Player:** Netflix-style ExoPlayer with gesture controls, subtitle support, and picture-in-picture.
+*   **Advanced Manga Reader:** Supports Vertical, Horizontal, and Webtoon modes with smooth animations.
+*   **Theme Builder:** Fully customizable primary colors, theme modes, and typography.
+*   **Offline Tracking:** Local library persistence using Room database.
+*   **Extension System:** Dynamically load scrapers written in JavaScript.
 
-### 📄 License
-This project is licensed under the **MIT License**.
+## Architecture
+Meigetsu follows **Clean Architecture** principles and is highly modularized:
+- `:app`: Main application entry point and navigation.
+- `:core:data`: Repository implementations, Room database, and DataStore.
+- `:core:domain`: UseCases and repository interfaces.
+- `:core:network`: GraphQL (Apollo) and REST (Retrofit/Ktor) clients.
+- `:core:ui`: Design system, themes, and shared components.
+- `:feature:*`: Feature-specific modules (Home, Search, Player, Reader, etc.).
+
+## Tech Stack
+- **Language:** Kotlin
+- **UI:** Jetpack Compose (Material 3)
+- **Dependency Injection:** Hilt
+- **Database:** Room
+- **Networking:** Apollo GraphQL, Ktor, Retrofit
+- **Async:** Coroutines + Flow
+- **Media:** ExoPlayer (Media3), Coil
+- **Scraping Engine:** QuickJS Android
+
+## Building
+1. Clone the repository.
+2. Open in Android Studio Jellyfish or newer.
+3. Sync Gradle.
+4. Run `./gradlew assembleDebug`.
+
+## License
+Licensed under the **MIT License**. See `LICENSE` for more details.
 
 ---
-
-## 📱 Features
-
-*   **Home Discovery:** Smart discovery engine with horizontal carousels for Trending, Popular, and Recommended media.
-*   **Integrated Search:** Unified search across metadata providers and installed extensions.
-*   **Library Management:** Persist your collection with custom sections and status tracking (Watching, Completed, On Hold, etc.).
-*   **Schedule Tab:** Keep track of upcoming anime episodes by day of the week.
-*   **Advanced Video Player:** Netflix-style player using ExoPlayer with gesture controls, PIP, and custom UI.
-*   **Manga Reader:** Multi-mode reader (Webtoon, Vertical, Paged) with smooth transitions.
-*   **Theme Builder:** Advanced customization for primary/secondary colors, corner radius, and more.
-*   **Security:** Biometric lock and Incognito mode for privacy.
-
-## 🏗️ Architecture
-
-Meigetsu follows **Clean Architecture** principles and is highly modularized:
-- `:app`: The main Android entry point.
-- `:core`: Shared logic, models, and networking.
-- `:feature`: Feature-specific modules (Home, Library, Player, etc.).
-- `:extensions`: The dynamic scraping engine and provider interfaces.
-
-## 🚀 Getting Started
-
-### How to Build
-1.  Clone the repository.
-2.  Open in Android Studio.
-3.  Sync Gradle and run the `:app` module.
-
-### How to Add Extensions
-Meigetsu loads external source definitions dynamically. Place your JSON source definitions in the `extensions` directory of the app's external storage or bundle them in `assets/sources`.
-
-## 🤝 Contact
-*   **Email:** meigetsu.app@gmail.com
-*   **Discord:** [https://discord.gg/JskMdb4cS](https://discord.gg/JskMdb4cS)
-*   **GitHub:** [https://github.com/Azu-na/Meigetsu-](https://github.com/Azu-na/Meigetsu-)
+**Official Links:**
+- Discord: https://discord.gg/JskMdb4cS
+- GitHub: https://github.com/Azu-na/Meigetsu-

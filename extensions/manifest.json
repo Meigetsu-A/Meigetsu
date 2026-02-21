@@ -1,0 +1,7 @@
+{
+    "name": "Example Extension",
+    "version": "1.0.0",
+    "sources": [
+        { "name": "Test Source", "type": "ANIME", "baseUrl": "https://example.com" }
+    ]
+}
