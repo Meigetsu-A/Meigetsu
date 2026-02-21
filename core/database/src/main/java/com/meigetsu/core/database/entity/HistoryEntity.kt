@@ -3,19 +3,10 @@ package com.meigetsu.core.database.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "watch_history")
-data class WatchHistoryEntity(
+@Entity(tableName = "history")
+data class HistoryEntity(
     @PrimaryKey val mediaId: String,
-    val episodeNumber: Int,
+    val lastItemNumber: Double,
     val position: Long,
-    val duration: Long,
-    val lastWatched: Long
-)
-
-@Entity(tableName = "read_history")
-data class ReadHistoryEntity(
-    @PrimaryKey val mediaId: String,
-    val chapterNumber: Double,
-    val pageNumber: Int,
-    val lastRead: Long
+    val timestamp: Long
 )

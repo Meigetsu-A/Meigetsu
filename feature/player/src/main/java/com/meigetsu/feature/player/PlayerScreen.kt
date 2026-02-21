@@ -2,59 +2,65 @@ package com.meigetsu.feature.player
 
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.annotation.OptIn
-import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Pause
 import androidx.compose.material.icons.rounded.*
+import androidx.compose.material.icons.filled.SkipNext
+import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.media3.common.util.UnstableApi
+import androidx.media3.common.MediaItem
+import androidx.media3.common.Player
+import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.ui.PlayerView
+import com.meigetsu.core.model.*
+import com.meigetsu.core.ui.theme.*
+import kotlinx.coroutines.delay
 
-@OptIn(UnstableApi::class)
 @Composable
 fun PlayerScreen(
     viewModel: PlayerViewModel,
     onBackClick: () -> Unit
 ) {
     val context = LocalContext.current
-    val player = viewModel.player
+    val exoPlayer = remember {
+        ExoPlayer.Builder(context).build()
+    }
+
     var showControls by remember { mutableStateOf(true) }
 
-    // Hide controls automatically after 3 seconds
     LaunchedEffect(showControls) {
         if (showControls) {
-            kotlinx.coroutines.delay(3000)
+            delay(3000)
             showControls = false
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black)) {
-        val isPlaying by viewModel.isPlaying.collectAsState()
-        val duration by viewModel.duration.collectAsState()
-
-        if (duration == 0L) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
+    DisposableEffect(Unit) {
+        onDispose {
+            exoPlayer.release()
         }
+    }
 
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black)
+            .clickable { showControls = !showControls }
+    ) {
         AndroidView(
             factory = {
-                PlayerView(context).apply {
-                    this.player = player
+                PlayerView(it).apply {
+                    player = exoPlayer
                     useController = false
                     layoutParams = FrameLayout.LayoutParams(
                         ViewGroup.LayoutParams.MATCH_PARENT,
@@ -62,127 +68,78 @@ fun PlayerScreen(
                     )
                 }
             },
-            modifier = Modifier.fillMaxSize().pointerInput(Unit) {
-                detectTapGestures(onTap = { showControls = !showControls })
-            },
-            update = { it.player = player }
+            modifier = Modifier.fillMaxSize()
         )
 
-        // Modern Controls Overlay
-        AnimatedVisibility(
-            visible = showControls,
-            enter = fadeIn(),
-            exit = fadeOut()
-        ) {
-            PlayerOverlay(
-                viewModel = viewModel,
+        if (showControls) {
+            PlayerControls(
                 onBackClick = onBackClick,
-                onToggleControls = { showControls = !showControls }
+                onTogglePlay = {
+                    if (exoPlayer.isPlaying) exoPlayer.pause() else exoPlayer.play()
+                },
+                isPlaying = exoPlayer.isPlaying
             )
         }
     }
 }
 
 @Composable
-fun PlayerOverlay(
-    viewModel: PlayerViewModel,
+fun PlayerControls(
     onBackClick: () -> Unit,
-    onToggleControls: () -> Unit
+    onTogglePlay: () -> Unit,
+    isPlaying: Boolean
 ) {
-    Box(modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f))) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp)
+    ) {
         // Top Bar
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .statusBarsPadding(),
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
-                Icon(Icons.Rounded.ArrowBack, null, tint = Color.White)
+                Icon(Icons.Rounded.ArrowBack, null, tint = PrimaryText)
             }
-            Spacer(Modifier.width(8.dp))
-            Text("Playing Media", style = MaterialTheme.typography.titleMedium, color = Color.White)
-            Spacer(Modifier.weight(1f))
-            IconButton(onClick = { /* Settings */ }) {
-                Icon(Icons.Rounded.Settings, null, tint = Color.White)
-            }
+            Text("Episode 12", style = Typography.labelLarge, color = PrimaryText)
+            Text("GogoAnime", style = Typography.labelLarge, color = SecondaryText)
         }
 
-        // Center Controls
-        Row(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalArrangement = Arrangement.spacedBy(48.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = { viewModel.seekRelative(-10000) }, modifier = Modifier.size(64.dp)) {
-                Icon(Icons.Rounded.Replay10, null, tint = Color.White, modifier = Modifier.size(48.dp))
-            }
+        Spacer(Modifier.weight(1f))
 
-            val isPlaying by viewModel.isPlaying.collectAsState()
-            FloatingActionButton(
-                onClick = { if (isPlaying) viewModel.pause() else viewModel.play() },
-                containerColor = Color.White,
-                contentColor = Color.Black,
-                shape = androidx.compose.foundation.shape.CircleShape,
-                modifier = Modifier.size(72.dp)
-            ) {
-                Icon(
-                    if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-                    null,
-                    modifier = Modifier.size(40.dp)
-                )
-            }
-
-            IconButton(onClick = { viewModel.seekRelative(10000) }, modifier = Modifier.size(64.dp)) {
-                Icon(Icons.Rounded.Forward10, null, tint = Color.White, modifier = Modifier.size(48.dp))
-            }
-        }
-
-        // Bottom Controls
-        Column(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(24.dp)
-                .navigationBarsPadding()
-        ) {
-            val progress by viewModel.progress.collectAsState()
-            val duration by viewModel.duration.collectAsState()
-
+        // Bottom Bar
+        Column(modifier = Modifier.fillMaxWidth()) {
             Slider(
-                value = if (duration > 0) progress.toFloat() / duration.toFloat() else 0f,
-                onValueChange = { viewModel.seekTo((it * duration).toLong()) },
-                colors = SliderDefaults.colors(
-                    thumbColor = MaterialTheme.colorScheme.primary,
-                    activeTrackColor = MaterialTheme.colorScheme.primary,
-                    inactiveTrackColor = Color.Gray
-                )
+                value = 0.5f,
+                onValueChange = {},
+                colors = SliderDefaults.colors(thumbColor = SecondaryText, activeTrackColor = SecondaryText)
             )
-
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                Text(formatTime(progress), color = Color.White, style = MaterialTheme.typography.labelMedium)
-                Text(formatTime(duration), color = Color.White, style = MaterialTheme.typography.labelMedium)
+                Text("12:00", style = Typography.labelSmall)
+                Text("24:00", style = Typography.labelSmall)
             }
 
-            Spacer(Modifier.height(16.dp))
-
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
-                TextButton(onClick = { /* Next Episode */ }) {
-                    Icon(Icons.Rounded.SkipNext, null)
-                    Spacer(Modifier.width(4.dp))
-                    Text("NEXT EPISODE")
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = {}) { Icon(Icons.Rounded.SkipPrevious, null, tint = PrimaryText) }
+                IconButton(onClick = onTogglePlay, modifier = Modifier.size(64.dp)) {
+                    Icon(
+                        if (isPlaying) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                        null,
+                        tint = PrimaryText,
+                        modifier = Modifier.size(48.dp)
+                    )
                 }
+                IconButton(onClick = {}) { Icon(Icons.Rounded.SkipNext, null, tint = PrimaryText) }
             }
         }
     }
-}
-
-private fun formatTime(ms: Long): String {
-    val totalSeconds = ms / 1000
-    val minutes = totalSeconds / 60
-    val seconds = totalSeconds % 60
-    return "%d:%02d".format(minutes, seconds)
 }

@@ -37,7 +37,6 @@ dependencies {
     implementation(project(":core:domain"))
     implementation(project(":core:network"))
     implementation(project(":core:database"))
-    implementation(project(":core:extensions"))
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.apollo.runtime)
@@ -45,8 +44,8 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.hilt.work)
     ksp(libs.hilt.work.compiler)
-    implementation(libs.ktor.client.core)
-    implementation(libs.ktor.client.okhttp)
+    implementation(libs.okhttp)
+    implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.jsoup)
 }

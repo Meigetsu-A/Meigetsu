@@ -3,334 +3,217 @@ package com.meigetsu
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
-import androidx.compose.animation.*
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavDestination.Companion.hierarchy
-import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavType
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import androidx.navigation.navArgument
-import com.meigetsu.core.ui.theme.MeigetsuTheme
-import com.meigetsu.feature.details.MediaDetailsScreen
-import com.meigetsu.feature.details.CharacterDetailsScreen
+import com.meigetsu.core.ui.theme.*
 import com.meigetsu.feature.home.HomeScreen
-import com.meigetsu.feature.library.LibraryScreen
-import com.meigetsu.feature.settings.SettingsScreen
-import com.meigetsu.feature.settings.StatsScreen
-import com.meigetsu.feature.settings.ExtensionManagementScreen
-import com.meigetsu.feature.updates.UpdatesScreen
+import com.meigetsu.feature.search.SearchScreen
 import com.meigetsu.feature.browse.BrowseScreen
-import com.meigetsu.feature.schedule.ScheduleScreen
+import com.meigetsu.feature.library.LibraryScreen
+import com.meigetsu.feature.profile.ProfileScreen
+import com.meigetsu.feature.details.MediaDetailScreen
 import com.meigetsu.feature.player.PlayerScreen
 import com.meigetsu.feature.reader.ReaderScreen
 import dagger.hilt.android.AndroidEntryPoint
-import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
 
 @AndroidEntryPoint
-class MainActivity : androidx.fragment.app.FragmentActivity() {
-    private val viewModel: MainViewModel by viewModels()
-
+class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            val viewModel: MainViewModel = hiltViewModel()
             val primaryColor by viewModel.primaryColor.collectAsState()
             val themeMode by viewModel.themeMode.collectAsState()
-            val cornerRadius by viewModel.cornerRadius.collectAsState()
-            val biometricEnabled by viewModel.biometricEnabled.collectAsState()
-            val isOnboardingCompleted by viewModel.isOnboardingCompleted.collectAsState()
-            var isAuthenticated by remember { mutableStateOf(!biometricEnabled) }
 
-            if (biometricEnabled && !isAuthenticated) {
-                LaunchedEffect(Unit) {
-                    showBiometricPrompt { authenticated ->
-                        isAuthenticated = authenticated
-                    }
-                }
-            }
-
-            MeigetsuTheme(themeMode = themeMode, primaryColor = primaryColor, cornerRadius = cornerRadius) {
-                if (!isOnboardingCompleted) {
-                    OnboardingScreen(onComplete = { viewModel.completeOnboarding() })
-                } else if (isAuthenticated) {
-                    MainScreen(viewModel)
-                } else {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
-                        Button(onClick = {
-                            showBiometricPrompt { authenticated -> isAuthenticated = authenticated }
-                        }) {
-                            Text("Unlock Meigetsu")
-                        }
-                    }
-                }
+            MeigetsuTheme(
+                primaryColor = primaryColor,
+                isDarkTheme = themeMode == "DARK" || themeMode == "SYSTEM"
+            ) {
+                MainScreen()
             }
         }
-    }
-
-    override fun onUserLeaveHint() {
-        super.onUserLeaveHint()
-        if (viewModel.isPlayerActive.value) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                try {
-                    enterPictureInPictureMode(android.app.PictureInPictureParams.Builder().build())
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-    }
-
-    private fun showBiometricPrompt(onResult: (Boolean) -> Unit) {
-        val executor = androidx.core.content.ContextCompat.getMainExecutor(this)
-        val biometricPrompt = androidx.biometric.BiometricPrompt(this, executor,
-            object : androidx.biometric.BiometricPrompt.AuthenticationCallback() {
-                override fun onAuthenticationSucceeded(result: androidx.biometric.BiometricPrompt.AuthenticationResult) {
-                    super.onAuthenticationSucceeded(result)
-                    onResult(true)
-                }
-                override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                    super.onAuthenticationError(errorCode, errString)
-                    onResult(false)
-                }
-            })
-
-        val promptInfo = androidx.biometric.BiometricPrompt.PromptInfo.Builder()
-            .setTitle("Biometric login for Meigetsu")
-            .setSubtitle("Log in using your biometric credential")
-            .setNegativeButtonText("Cancel")
-            .build()
-
-        biometricPrompt.authenticate(promptInfo)
     }
 }
 
 @Composable
-fun MainScreen(viewModel: MainViewModel) {
+fun MainScreen() {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-
-    LaunchedEffect(navBackStackEntry) {
-        val route = navBackStackEntry?.destination?.route
-        viewModel.setPlayerActive(route?.startsWith("player") == true)
-    }
+    val currentDestination = navBackStackEntry?.destination
 
     Scaffold(
         bottomBar = {
-            val currentDestination = navBackStackEntry?.destination
-            val showBottomBar = items.any { it.route == currentDestination?.route }
-
-            if (showBottomBar) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .navigationBarsPadding()
-                ) {
-                    Surface(
-                        color = Color(0xFF141414),
-                        shape = RoundedCornerShape(24.dp),
-                        tonalElevation = 8.dp,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(vertical = 8.dp, horizontal = 12.dp)
-                                .fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceAround,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            items.forEach { screen ->
-                                val selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-                                val contentColor = if (selected) MaterialTheme.colorScheme.primary else Color.Gray
-                                val scale by animateFloatAsState(if (selected) 1.2f else 1.0f)
-
-                                Column(
-                                    horizontalAlignment = Alignment.CenterHorizontally,
-                                    modifier = Modifier
-                                        .clickable {
-                                            navController.navigate(screen.route) {
-                                                popUpTo(navController.graph.findStartDestination().id) {
-                                                    saveState = true
-                                                }
-                                                launchSingleTop = true
-                                                restoreState = true
-                                            }
-                                        }
-                                        .padding(8.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = if (selected) screen.selectedIcon else screen.unselectedIcon,
-                                        contentDescription = null,
-                                        tint = contentColor,
-                                        modifier = Modifier.size(24.dp).graphicsLayer(scaleX = scale, scaleY = scale)
-                                    )
-                                    AnimatedVisibility(visible = selected) {
-                                        Text(
-                                            text = screen.label,
-                                            style = MaterialTheme.typography.labelSmall,
-                                            color = contentColor,
-                                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                                            fontSize = 10.sp
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            if (shouldShowBottomBar(currentDestination?.route)) {
+                CustomBottomNavigation(navController)
             }
         },
-        containerColor = Color.Black
-    ) { _ ->
+        containerColor = Background
+    ) { innerPadding ->
         NavHost(
-            navController,
-            startDestination = Screen.Home.route,
-            Modifier.padding(bottom = 0.dp),
-            enterTransition = { fadeIn(animationSpec = androidx.compose.animation.core.tween(300)) },
-            exitTransition = { fadeOut(animationSpec = androidx.compose.animation.core.tween(300)) }
+            navController = navController,
+            startDestination = "home",
+            modifier = Modifier.padding(innerPadding)
         ) {
-            composable(Screen.Home.route) {
-                HomeScreen(
-                    hiltViewModel(),
-                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") },
-                    onSearchClick = { navController.navigate(Screen.Browse.route) }
-                )
+            composable("home") {
+                HomeScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("detail/$id/$type") })
             }
-            composable(Screen.Library.route) {
-                LibraryScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") })
+            composable("search") {
+                SearchScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("detail/$id/$type") })
             }
-            composable(Screen.Updates.route) {
-                UpdatesScreen(hiltViewModel())
+            composable("browse") {
+                BrowseScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("detail/$id/$type") })
             }
-            composable(Screen.Schedule.route) {
-                ScheduleScreen(hiltViewModel(), onMediaClick = { malId -> navController.navigate("details/null?malId=$malId&mediaType=ANIME") })
+            composable("library") {
+                LibraryScreen(hiltViewModel(), onMediaClick = { id, type -> navController.navigate("detail/$id/$type") })
             }
-            composable(Screen.Browse.route) {
-                BrowseScreen(
-                    hiltViewModel(),
-                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") },
-                    onCharacterClick = { charId -> navController.navigate("character/$charId") }
-                )
+            composable("profile") {
+                ProfileScreen(hiltViewModel())
             }
-            composable(Screen.Settings.route) {
-                SettingsScreen(
-                    hiltViewModel(),
-                    onStatsClick = { navController.navigate("stats") },
-                    onExtensionsClick = { navController.navigate("extensions") }
-                )
-            }
-            composable("stats") {
-                StatsScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
-            }
-            composable("extensions") {
-                ExtensionManagementScreen(
-                    hiltViewModel(),
-                    onBackClick = { navController.popBackStack() }
-                )
-            }
-            composable(
-                "details/{mediaId}?malId={malId}&mediaType={mediaType}",
-                arguments = listOf(
-                    navArgument("mediaId") {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = null
-                    },
-                    navArgument("malId") {
-                        type = NavType.IntType
-                        defaultValue = -1
-                    },
-                    navArgument("mediaType") {
-                        type = NavType.StringType
-                        nullable = true
-                        defaultValue = "ANIME"
-                    }
-                )
-            ) { backStackEntry ->
-                val malId = backStackEntry.arguments?.getInt("malId")?.let { if (it == -1) null else it }
 
-                MediaDetailsScreen(
+            composable("detail/{id}/{type}") {
+                MediaDetailScreen(
                     hiltViewModel(),
                     onBackClick = { navController.popBackStack() },
-                    onWatchClick = { url, id ->
-                        val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-                        navController.navigate("player/$encodedUrl?mediaId=$id")
-                    },
-                    onReadClick = { mangaId, chapterId, url ->
-                        val encodedUrl = url?.let { URLEncoder.encode(it, StandardCharsets.UTF_8.toString()) }
-                        val route = if (encodedUrl != null) "reader/$mangaId/$chapterId?url=$encodedUrl" else "reader/$mangaId/$chapterId"
-                        navController.navigate(route)
-                    },
-                    onCharacterClick = { charId -> navController.navigate("character/$charId") }
+                    onWatchClick = { id, source -> navController.navigate("player/$id/$source") },
+                    onReadClick = { id, source -> navController.navigate("reader/$id/$source") }
                 )
             }
-            composable(
-                "character/{charId}",
-                arguments = listOf(navArgument("charId") { type = NavType.StringType })
-            ) {
-                CharacterDetailsScreen(
-                    hiltViewModel(),
-                    onBackClick = { navController.popBackStack() },
-                    onMediaClick = { id, type -> navController.navigate("details/$id?mediaType=$type") }
-                )
-            }
-            composable(
-                "player/{url}?mediaId={mediaId}",
-                arguments = listOf(
-                    navArgument("url") { type = NavType.StringType },
-                    navArgument("mediaId") { type = NavType.StringType; nullable = true }
-                )
-            ) {
+            composable("player/{id}/{source}") {
                 PlayerScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
-            composable(
-                "reader/{mangaId}/{chapterId}?url={url}",
-                arguments = listOf(
-                    navArgument("mangaId") { type = NavType.StringType },
-                    navArgument("chapterId") { type = NavType.StringType },
-                    navArgument("url") { type = NavType.StringType; nullable = true; defaultValue = null }
-                )
-            ) {
+            composable("reader/{id}/{source}") {
                 ReaderScreen(hiltViewModel(), onBackClick = { navController.popBackStack() })
             }
         }
     }
 }
 
-sealed class Screen(
-    val route: String,
-    val label: String,
-    val selectedIcon: androidx.compose.ui.graphics.vector.ImageVector,
-    val unselectedIcon: androidx.compose.ui.graphics.vector.ImageVector
-) {
-    object Home : Screen("home", "Home", Icons.Rounded.Home, Icons.Rounded.Home)
-    object Library : Screen("library", "Library", Icons.Rounded.AutoStories, Icons.Rounded.AutoStories)
-    object Updates : Screen("updates", "Updates", Icons.Rounded.Update, Icons.Rounded.Update)
-    object Schedule : Screen("schedule", "Schedule", Icons.Rounded.CalendarMonth, Icons.Rounded.CalendarMonth)
-    object Browse : Screen("browse", "Browse", Icons.Rounded.Search, Icons.Rounded.Search)
-    object Settings : Screen("settings", "Settings", Icons.Rounded.Settings, Icons.Rounded.Settings)
+fun shouldShowBottomBar(route: String?): Boolean {
+    return route in listOf("home", "search", "browse", "library", "profile")
 }
 
-val items = listOf(
-    Screen.Home,
-    Screen.Library,
-    Screen.Updates,
-    Screen.Browse,
-    Screen.Settings
-)
+@Composable
+fun CustomBottomNavigation(navController: NavHostController) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    val items = listOf(
+        NavigationItem("home", "HOME") { HomeIcon(it) },
+        NavigationItem("search", "SEARCH") { SearchIcon(it) },
+        NavigationItem("browse", "BROWSE") { BrowseIcon(it) },
+        NavigationItem("library", "LIBRARY") { LibraryIcon(it) },
+        NavigationItem("profile", "PROFILE") { ProfileIcon(it) }
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .background(Background)
+            .padding(bottom = 12.dp),
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        items.forEach { item ->
+            val selected = currentDestination?.hierarchy?.any { it.route == item.route } == true
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .weight(1f)
+                    .clickable {
+                        navController.navigate(item.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    }
+            ) {
+                if (selected) {
+                    Box(
+                        modifier = Modifier
+                            .width(20.dp)
+                            .height(2.dp)
+                            .background(PrimaryText)
+                    )
+                    Spacer(Modifier.height(8.dp))
+                } else {
+                    Spacer(Modifier.height(10.dp))
+                }
+
+                item.icon(selected)
+
+                Text(
+                    text = item.label,
+                    style = Typography.labelSmall,
+                    color = if (selected) PrimaryText else MutedText,
+                    fontSize = 10.sp
+                )
+            }
+        }
+    }
+}
+
+data class NavigationItem(val route: String, val label: String, val icon: @Composable (Boolean) -> Unit)
+
+@Composable fun HomeIcon(selected: Boolean) {
+    Icon(
+        imageVector = if (selected) Icons.Rounded.Home else Icons.Rounded.Home,
+        contentDescription = null,
+        tint = if (selected) PrimaryText else MutedText,
+        modifier = Modifier.size(24.dp)
+    )
+}
+
+@Composable fun SearchIcon(selected: Boolean) {
+    Icon(
+        imageVector = Icons.Rounded.Search,
+        contentDescription = null,
+        tint = if (selected) PrimaryText else MutedText,
+        modifier = Modifier.size(24.dp)
+    )
+}
+
+@Composable fun BrowseIcon(selected: Boolean) {
+    Icon(
+        imageVector = Icons.Rounded.GridView,
+        contentDescription = null,
+        tint = if (selected) PrimaryText else MutedText,
+        modifier = Modifier.size(24.dp)
+    )
+}
+
+@Composable fun LibraryIcon(selected: Boolean) {
+    Icon(
+        imageVector = Icons.Rounded.CollectionsBookmark,
+        contentDescription = null,
+        tint = if (selected) PrimaryText else MutedText,
+        modifier = Modifier.size(24.dp)
+    )
+}
+
+@Composable fun ProfileIcon(selected: Boolean) {
+    Icon(
+        imageVector = Icons.Rounded.Person,
+        contentDescription = null,
+        tint = if (selected) PrimaryText else MutedText,
+        modifier = Modifier.size(24.dp)
+    )
+}

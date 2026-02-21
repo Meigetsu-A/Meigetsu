@@ -1,45 +1,54 @@
 package com.meigetsu.core.ui.theme
 
+import android.app.Activity
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
+
+private val DarkColorScheme = darkColorScheme(
+    primary = PrimaryText,
+    secondary = SecondaryText,
+    tertiary = MutedText,
+    background = Background,
+    surface = Background,
+    onPrimary = Background,
+    onSecondary = Background,
+    onTertiary = Background,
+    onBackground = PrimaryText,
+    onSurface = PrimaryText,
+)
 
 @Composable
 fun MeigetsuTheme(
-    themeMode: String = "SYSTEM",
-    primaryColor: Color = Color(0xFF00BFFF), // Vibrant Deep Sky Blue
-    cornerRadius: Int = 16,
+    primaryColor: Color = PrimaryText,
+    isDarkTheme: Boolean = true,
     content: @Composable () -> Unit
 ) {
-    // Force Dark Mode for the premium "AniLab" feel
-    val darkTheme = true
+    val colorScheme = if (isDarkTheme) {
+        DarkColorScheme.copy(primary = primaryColor)
+    } else {
+        DarkColorScheme.copy(primary = primaryColor) // Meigetsu is dark-focused
+    }
 
-    val colorScheme = darkColorScheme(
-        primary = primaryColor,
-        onPrimary = Color.Black,
-        surface = Color(0xFF0A0A0A),
-        onSurface = Color(0xFFE1E1E1),
-        background = Color(0xFF000000),
-        onBackground = Color.White,
-        surfaceVariant = Color(0xFF1E1E1E),
-        onSurfaceVariant = Color(0xFFB0B0B0),
-        secondary = Color(0xFF1DB954), // Subtle green secondary
-        tertiary = Color(0xFFFFD700) // Gold for ratings
-    )
-
-    val shapes = Shapes(
-        small = RoundedCornerShape(4.dp),
-        medium = RoundedCornerShape(cornerRadius.dp),
-        large = RoundedCornerShape(24.dp)
-    )
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = Background.toArgb()
+            window.navigationBarColor = Background.toArgb()
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
+        }
+    }
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        shapes = shapes,
         content = content
     )
 }

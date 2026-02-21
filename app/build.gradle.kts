@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.services)
 }
 
 android {
@@ -57,16 +56,14 @@ dependencies {
     implementation(project(":core:network"))
     implementation(project(":core:database"))
     implementation(project(":core:ui"))
-    implementation(project(":core:extensions"))
     implementation(project(":feature:home"))
-    implementation(project(":feature:library"))
-    implementation(project(":feature:updates"))
+    implementation(project(":feature:search"))
     implementation(project(":feature:browse"))
+    implementation(project(":feature:library"))
     implementation(project(":feature:details"))
     implementation(project(":feature:player"))
     implementation(project(":feature:reader"))
-    implementation(project(":feature:settings"))
-    implementation(project(":feature:schedule"))
+    implementation(project(":feature:profile"))
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -85,9 +82,6 @@ dependencies {
     implementation(libs.androidx.work.runtime.ktx)
     implementation(libs.androidx.biometric)
     implementation(libs.material)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,16 +1,8 @@
 package com.meigetsu.core.model
 
-data class WatchHistory(
+data class History(
     val mediaId: String,
-    val episodeNumber: Int,
+    val lastItemNumber: Double,
     val position: Long,
-    val duration: Long,
-    val lastWatched: Long
-)
-
-data class ReadHistory(
-    val mediaId: String,
-    val chapterNumber: Double,
-    val pageNumber: Int,
-    val lastRead: Long
+    val timestamp: Long
 )

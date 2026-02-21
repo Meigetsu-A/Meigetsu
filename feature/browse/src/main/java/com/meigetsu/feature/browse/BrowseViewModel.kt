@@ -2,186 +2,41 @@ package com.meigetsu.feature.browse
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.meigetsu.core.common.Resource
-import com.meigetsu.core.domain.repository.MediaRepository
-import com.meigetsu.core.domain.repository.EverythingMoeRepository
-import com.meigetsu.core.domain.repository.SearchHistoryRepository
-import com.meigetsu.core.domain.usecase.GlobalSearchUseCase
-import com.meigetsu.core.network.JikanService
-import com.meigetsu.core.extensions.ExtensionManager
-import com.meigetsu.core.extensions.MediaSearchResult
 import com.meigetsu.core.model.*
+import com.meigetsu.core.network.AniListService
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class BrowseUiEvent {
-    data class ShowSnackbar(val message: String) : BrowseUiEvent()
-}
-
-data class BrowseFilters(
-    val query: String = "",
-    val genre: String? = null,
-    val season: String? = null,
-    val year: Int? = null,
-    val format: String? = null,
-    val status: String? = null,
-    val sort: String? = "POPULARITY_DESC"
-)
-
 @HiltViewModel
 class BrowseViewModel @Inject constructor(
-    private val mediaRepository: MediaRepository,
-    private val everythingMoeRepository: EverythingMoeRepository,
-    private val searchHistoryRepository: SearchHistoryRepository,
-    private val jikanService: JikanService,
-    private val globalSearchUseCase: GlobalSearchUseCase,
-    val extensionManager: ExtensionManager
+    private val aniListService: AniListService
 ) : ViewModel() {
 
-    private val _filters = MutableStateFlow(BrowseFilters())
-    val filters = _filters.asStateFlow()
+    private val _selectedGenre = MutableStateFlow("Action")
+    val selectedGenre = _selectedGenre.asStateFlow()
 
-    private val _animeResults = MutableStateFlow<Resource<List<Anime>>>(Resource.Success(emptyList()))
-    val animeResults = _animeResults.asStateFlow()
+    private val _spotlight = MutableStateFlow<Media?>(null)
+    val spotlight = _spotlight.asStateFlow()
 
-    private val _mangaResults = MutableStateFlow<Resource<List<Manga>>>(Resource.Success(emptyList()))
-    val mangaResults = _mangaResults.asStateFlow()
+    private val _results = MutableStateFlow<List<Media>>(emptyList())
+    val results = _results.asStateFlow()
 
-    private val _characterResults = MutableStateFlow<Resource<List<Character>>>(Resource.Success(emptyList()))
-    val characterResults = _characterResults.asStateFlow()
-
-    private val _extensionResults = MutableStateFlow<List<MediaSearchResult>>(emptyList())
-    val extensionResults = _extensionResults.asStateFlow()
-
-    private val _externalSources = MutableStateFlow<Resource<List<ExternalSource>>>(Resource.Loading())
-    val externalSources = _externalSources.asStateFlow()
-
-    private val _isSearching = MutableStateFlow(false)
-    val isSearching = _isSearching.asStateFlow()
-
-    val searchHistory: StateFlow<List<SearchHistory>> = searchHistoryRepository.getSearchHistory()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-    private val _eventChannel = Channel<BrowseUiEvent>()
-    val events = _eventChannel.receiveAsFlow()
-
-    private var currentPage = 1
-
-    fun updateQuery(query: String) {
-        _filters.value = _filters.value.copy(query = query)
-        search()
+    init {
+        loadGenreData("Action")
     }
 
-    fun updateGenre(genre: String?) {
-        _filters.value = _filters.value.copy(genre = genre)
-        search()
+    fun onGenreSelected(genre: String) {
+        _selectedGenre.value = genre
+        loadGenreData(genre)
     }
 
-    fun updateFilters(newFilters: BrowseFilters) {
-        _filters.value = newFilters
-        search()
-    }
-
-    fun search() {
-        val currentFilters = _filters.value
-        currentPage = 1
-
+    private fun loadGenreData(genre: String) {
         viewModelScope.launch {
-            if (currentFilters.query.isNotBlank()) {
-                searchHistoryRepository.addSearch(currentFilters.query)
-            }
-            _isSearching.value = true
-
-            launch {
-                mediaRepository.searchAnime(
-                    currentFilters.query,
-                    currentPage,
-                    currentFilters.genre,
-                    currentFilters.season,
-                    currentFilters.year,
-                    currentFilters.format,
-                    currentFilters.status,
-                    currentFilters.sort
-                ).collect { _animeResults.value = it }
-            }
-            launch {
-                mediaRepository.searchManga(
-                    currentFilters.query,
-                    currentPage,
-                    currentFilters.genre,
-                    currentFilters.format,
-                    currentFilters.status,
-                    currentFilters.sort
-                ).collect { _mangaResults.value = it }
-            }
-            launch {
-                if (currentFilters.query.isNotBlank()) {
-                    mediaRepository.searchCharacters(currentFilters.query).collect { _characterResults.value = it }
-                } else {
-                    _characterResults.value = Resource.Success(emptyList())
-                }
-            }
-            launch {
-                if (currentFilters.query.isNotBlank()) {
-                    _extensionResults.value = globalSearchUseCase.execute(currentFilters.query)
-                } else {
-                    _extensionResults.value = emptyList()
-                }
-            }
-
-            _isSearching.value = false
-        }
-    }
-
-    fun removeSearch(query: String) {
-        viewModelScope.launch {
-            searchHistoryRepository.removeSearch(query)
-        }
-    }
-
-    fun clearHistory() {
-        viewModelScope.launch {
-            searchHistoryRepository.clearHistory()
-        }
-    }
-
-    fun loadNextPage() {
-        val currentFilters = _filters.value
-        currentPage++
-
-        viewModelScope.launch {
-            mediaRepository.searchAnime(
-                currentFilters.query,
-                currentPage,
-                currentFilters.genre,
-                currentFilters.season,
-                currentFilters.year,
-                currentFilters.format,
-                currentFilters.status,
-                currentFilters.sort
-            ).collect { resource ->
-                if (resource is Resource.Success) {
-                    val currentList = (_animeResults.value as? Resource.Success)?.data ?: emptyList()
-                    _animeResults.value = Resource.Success(currentList + (resource.data ?: emptyList()))
-                }
-            }
-
-            mediaRepository.searchManga(
-                currentFilters.query,
-                currentPage,
-                currentFilters.genre,
-                currentFilters.format,
-                currentFilters.status,
-                currentFilters.sort
-            ).collect { resource ->
-                if (resource is Resource.Success) {
-                    val currentList = (_mangaResults.value as? Resource.Success)?.data ?: emptyList()
-                    _mangaResults.value = Resource.Success(currentList + (resource.data ?: emptyList()))
-                }
-            }
+            val list = aniListService.getTrending(MediaType.ANIME)
+            _results.value = list
+            _spotlight.value = list.firstOrNull()
         }
     }
 }

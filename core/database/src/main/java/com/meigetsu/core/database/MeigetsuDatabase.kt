@@ -16,26 +16,15 @@ import javax.inject.Singleton
 @Database(
     entities = [
         LibraryEntity::class,
-        CategoryEntity::class,
-        WatchHistoryEntity::class,
-        ReadHistoryEntity::class,
-        DownloadEntity::class,
-        ExtensionRepoEntity::class,
-        ReadingStatsEntity::class,
-        TrackerEntity::class,
-        CharacterEntity::class,
-        SearchHistoryEntity::class
+        HistoryEntity::class,
+        DownloadEntity::class
     ],
-    version = 8
+    version = 9
 )
 abstract class MeigetsuDatabase : RoomDatabase() {
     abstract fun libraryDao(): LibraryDao
-    abstract fun downloadDao(): DownloadDao
-    abstract fun repoDao(): RepoDao
-    abstract fun statsDao(): ReadingStatsDao
-    abstract fun characterDao(): CharacterDao
     abstract fun historyDao(): HistoryDao
-    abstract fun searchHistoryDao(): SearchHistoryDao
+    abstract fun downloadDao(): DownloadDao
 }
 
 @Module
@@ -57,20 +46,8 @@ object DatabaseModule {
     fun provideLibraryDao(db: MeigetsuDatabase): LibraryDao = db.libraryDao()
 
     @Provides
-    fun provideDownloadDao(db: MeigetsuDatabase): DownloadDao = db.downloadDao()
-
-    @Provides
-    fun provideRepoDao(db: MeigetsuDatabase): RepoDao = db.repoDao()
-
-    @Provides
-    fun provideStatsDao(db: MeigetsuDatabase): ReadingStatsDao = db.statsDao()
-
-    @Provides
-    fun provideCharacterDao(db: MeigetsuDatabase): CharacterDao = db.characterDao()
-
-    @Provides
     fun provideHistoryDao(db: MeigetsuDatabase): HistoryDao = db.historyDao()
 
     @Provides
-    fun provideSearchHistoryDao(db: MeigetsuDatabase): SearchHistoryDao = db.searchHistoryDao()
+    fun provideDownloadDao(db: MeigetsuDatabase): DownloadDao = db.downloadDao()
 }
