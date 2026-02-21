@@ -1,0 +1,33 @@
+{
+  "id": "mangafire",
+  "name": "MangaFire",
+  "type": "MANGA",
+  "baseUrl": "https://mangafire.to",
+  "version": 1,
+  "search": {
+    "endpoint": "/filter?keyword={query}",
+    "selector": ".original .unit",
+    "fields": {
+      "id": { "selector": "a", "attribute": "href", "replace": { "/manga/": "" } },
+      "title": { "selector": ".inner .info h3 a", "attribute": "title" },
+      "image": { "selector": "img", "attribute": "src" }
+    }
+  },
+  "chapters": {
+    "endpoint": "/manga/{id}",
+    "selector": ".chapters li",
+    "fields": {
+      "id": { "selector": "a", "attribute": "href", "replace": { "/read/": "" } },
+      "number": { "selector": "a", "attribute": "data-number" },
+      "title": { "selector": "a span", "attribute": "title" },
+      "url": { "selector": "a", "attribute": "href" }
+    }
+  },
+  "pages": {
+    "endpoint": "{url}",
+    "selector": ".reader-area img",
+    "fields": {
+      "url": { "selector": "", "attribute": "src" }
+    }
+  }
+}

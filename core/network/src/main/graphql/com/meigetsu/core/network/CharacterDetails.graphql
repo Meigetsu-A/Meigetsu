@@ -1,0 +1,25 @@
+query GetCharacterDetails($id: Int) {
+  Character(id: $id) {
+    id
+    name {
+      full
+      native
+    }
+    image {
+      large
+    }
+    description
+    media(type: ANIME) {
+      nodes {
+        id
+        title {
+          romaji
+          english
+        }
+        coverImage {
+          large
+        }
+      }
+    }
+  }
+}

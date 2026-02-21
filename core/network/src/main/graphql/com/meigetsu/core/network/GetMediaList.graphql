@@ -1,0 +1,29 @@
+query GetMediaList($type: MediaType, $sort: [MediaSort], $page: Int) {
+  Page(page: $page, perPage: 20) {
+    media(type: $type, sort: $sort) {
+      id
+      title {
+        romaji
+        english
+      }
+      description
+      coverImage {
+        extraLarge
+      }
+      bannerImage
+      averageScore
+      popularity
+      status
+      format
+      episodes
+      chapters
+      trailer {
+        id
+        site
+      }
+      genres
+      season
+      seasonYear
+    }
+  }
+}

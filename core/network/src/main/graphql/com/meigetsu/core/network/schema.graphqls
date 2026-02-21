@@ -1,0 +1,197 @@
+type Query {
+  Page(page: Int, perPage: Int): Page
+  Media(id: Int, idMal: Int, type: MediaType): Media
+  Character(id: Int): Character
+}
+
+type Page {
+  pageInfo: PageInfo
+  media(
+    type: MediaType,
+    sort: [MediaSort],
+    search: String,
+    id: Int,
+    idMal: Int,
+    id_in: [Int],
+    genre: String,
+    season: MediaSeason,
+    seasonYear: Int,
+    format: MediaFormat,
+    status: MediaStatus
+  ): [Media]
+  characters(search: String): [Character]
+}
+
+type PageInfo {
+  total: Int
+  perPage: Int
+  currentPage: Int
+  lastPage: Int
+  hasNextPage: Boolean
+}
+
+type Media {
+  id: Int!
+  idMal: Int
+  title: MediaTitle
+  description(asHtml: Boolean): String
+  coverImage: MediaCoverImage
+  bannerImage: String
+  averageScore: Int
+  popularity: Int
+  status: MediaStatus
+  format: MediaFormat
+  episodes: Int
+  chapters: Int
+  genres: [String]
+  season: MediaSeason
+  seasonYear: Int
+  trailer: MediaTrailer
+  characters(role: CharacterRole, sort: [CharacterSort]): CharacterConnection
+  recommendations(sort: [RecommendationSort], page: Int, perPage: Int): RecommendationConnection
+}
+
+type MediaTrailer {
+  id: String
+  site: String
+  thumbnail: String
+}
+
+type MediaTitle {
+  romaji: String
+  english: String
+  native: String
+}
+
+type MediaCoverImage {
+  extraLarge: String
+  large: String
+  medium: String
+  color: String
+}
+
+type Character {
+  id: Int!
+  name: CharacterName
+  image: CharacterImage
+  description(asHtml: Boolean): String
+  media(sort: [MediaSort], type: MediaType): MediaConnection
+}
+
+type CharacterName {
+  full: String
+  native: String
+  alternative: [String]
+}
+
+type CharacterImage {
+  large: String
+  medium: String
+}
+
+type CharacterConnection {
+  nodes: [Character]
+}
+
+type MediaConnection {
+  nodes: [Media]
+}
+
+type RecommendationConnection {
+  nodes: [Recommendation]
+}
+
+type Recommendation {
+  id: Int
+  media: Media
+  mediaRecommendation: Media
+}
+
+enum MediaType {
+  ANIME
+  MANGA
+}
+
+enum MediaStatus {
+  FINISHED
+  RELEASING
+  NOT_YET_RELEASED
+  CANCELLED
+  HIATUS
+}
+
+enum MediaFormat {
+  TV
+  TV_SHORT
+  MOVIE
+  SPECIAL
+  OVA
+  ONA
+  MUSIC
+  MANGA
+  NOVEL
+  ONE_SHOT
+}
+
+enum MediaSort {
+  ID
+  ID_DESC
+  TITLE_ROMAJI
+  TITLE_ROMAJI_DESC
+  TITLE_ENGLISH
+  TITLE_ENGLISH_DESC
+  TITLE_NATIVE
+  TITLE_NATIVE_DESC
+  TYPE
+  TYPE_DESC
+  FORMAT
+  FORMAT_DESC
+  START_DATE
+  START_DATE_DESC
+  END_DATE
+  END_DATE_DESC
+  SCORE
+  SCORE_DESC
+  POPULARITY
+  POPULARITY_DESC
+  TRENDING
+  TRENDING_DESC
+  EPISODES
+  EPISODES_DESC
+  CHAPTERS
+  CHAPTERS_DESC
+  VOLUMES
+  VOLUMES_DESC
+  UPDATED_AT
+  UPDATED_AT_DESC
+  SEARCH_MATCH
+  FAVOURITES
+  FAVOURITES_DESC
+}
+
+enum MediaSeason {
+  WINTER
+  SPRING
+  SUMMER
+  FALL
+}
+
+enum CharacterRole {
+  MAIN
+  SUPPORTING
+  BACKGROUND
+}
+
+enum CharacterSort {
+  ID
+  ID_DESC
+  ROLE
+  ROLE_DESC
+}
+
+enum RecommendationSort {
+  ID
+  ID_DESC
+  RATING
+  RATING_DESC
+}

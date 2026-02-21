@@ -1,0 +1,29 @@
+query GetMultipleMedia($ids: [Int], $type: MediaType) {
+  Page(page: 1, perPage: 20) {
+    media(id_in: $ids, type: $type) {
+      id
+      title {
+        romaji
+        english
+      }
+      description
+      coverImage {
+        extraLarge
+      }
+      bannerImage
+      averageScore
+      popularity
+      status
+      format
+      episodes
+      chapters
+      trailer {
+        id
+        site
+      }
+      genres
+      season
+      seasonYear
+    }
+  }
+}

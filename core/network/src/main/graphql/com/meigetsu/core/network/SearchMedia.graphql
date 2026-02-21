@@ -1,0 +1,48 @@
+query SearchMedia(
+  $search: String,
+  $type: MediaType,
+  $page: Int,
+  $genre: String,
+  $season: MediaSeason,
+  $seasonYear: Int,
+  $format: MediaFormat,
+  $status: MediaStatus,
+  $sort: [MediaSort]
+) {
+  Page(page: $page, perPage: 20) {
+    media(
+      search: $search,
+      type: $type,
+      genre: $genre,
+      season: $season,
+      seasonYear: $seasonYear,
+      format: $format,
+      status: $status,
+      sort: $sort
+    ) {
+      id
+      title {
+        romaji
+        english
+      }
+      description
+      coverImage {
+        extraLarge
+      }
+      bannerImage
+      averageScore
+      popularity
+      status
+      format
+      episodes
+      chapters
+      trailer {
+        id
+        site
+      }
+      genres
+      season
+      seasonYear
+    }
+  }
+}

@@ -1,0 +1,53 @@
+query GetMediaDetails($id: Int, $idMal: Int) {
+  Media(id: $id, idMal: $idMal) {
+    id
+    idMal
+    title {
+      romaji
+      english
+    }
+    description
+    coverImage {
+      extraLarge
+    }
+    bannerImage
+    averageScore
+    popularity
+    status
+    format
+    episodes
+    chapters
+    trailer {
+      id
+      site
+    }
+    genres
+    season
+    seasonYear
+    characters(role: MAIN, sort: [ROLE]) {
+      nodes {
+        id
+        name {
+          full
+        }
+        image {
+          large
+        }
+      }
+    }
+    recommendations(perPage: 10, sort: [RATING_DESC]) {
+      nodes {
+        mediaRecommendation {
+          id
+          title {
+            romaji
+            english
+          }
+          coverImage {
+            large
+          }
+        }
+      }
+    }
+  }
+}

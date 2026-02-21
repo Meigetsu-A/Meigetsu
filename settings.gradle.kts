@@ -1,0 +1,34 @@
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "Meigetsu"
+
+include(":app")
+include(":core:common")
+include(":core:model")
+include(":core:domain")
+include(":core:data")
+include(":core:network")
+include(":core:database")
+include(":core:ui")
+
+include(":feature:home")
+include(":feature:search")
+include(":feature:browse")
+include(":feature:library")
+include(":feature:details")
+include(":feature:player")
+include(":feature:reader")
+include(":feature:profile")
